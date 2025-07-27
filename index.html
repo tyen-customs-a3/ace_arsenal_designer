@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACE3 Arsenal Simulation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="arsenal-container">
+        <!-- Compact Category Sidebar -->
+        <div class="category-sidebar">
+            <button class="category-tab active" data-category="weapons" data-tooltip="Primary Weapons">🔫</button>
+            <button class="category-tab" data-category="handguns" data-tooltip="Handguns">🔫</button>
+            <button class="category-tab" data-category="launchers" data-tooltip="Launchers">🚀</button>
+            <button class="category-tab" data-category="backpacks" data-tooltip="Backpacks">🎒</button>
+            <button class="category-tab" data-category="vests" data-tooltip="Vests">🎽</button>
+        </div>
+
+        <!-- Left Panel - Equipment List -->
+        <div class="left-panel">
+            <div class="left-panel-header">Equipment List</div>
+            <div class="grouping-controls">
+                <!-- Sorting Controls - Always Available -->
+                <div class="control-group">
+                    <label class="control-label">Sort by:</label>
+                    <select id="sortingSelect">
+                        <option value="sortByName">Name</option>
+                        <option value="sortByMod">Mod</option>
+                        <option value="sortByRange">Range</option>
+                        <option value="sortByMass">Mass</option>
+                        <option value="sortByCategory">Category</option>
+                    </select>
+                    <select id="sortOrderSelect">
+                        <option value="asc">↑ Ascending</option>
+                        <option value="desc">↓ Descending</option>
+                    </select>
+                </div>
+                
+                <!-- Grouping Controls - Property-Based Organization -->
+                <div class="control-group">
+                    <label class="control-label">Group by:</label>
+                    <select id="primaryGrouping">
+                        <option value="none">None</option>
+                        <option value="groupByMod">Mod</option>
+                        <option value="groupByCaliber">Caliber</option>
+                        <option value="groupByWeaponType">Weapon Type</option>
+                        <option value="groupByVariants">🎨 Variants</option>
+                    </select>
+                    <select id="secondaryGrouping">
+                        <option value="none">Then by: None</option>
+                        <option value="groupByMod">Then by Mod</option>
+                        <option value="groupByCaliber">Then by Caliber</option>
+                    </select>
+                </div>
+                
+                <!-- View Mode Controls - Removed, grouping is controlled by grouping settings -->
+                <div class="control-group">
+                    <label class="control-label">View:</label>
+                    <div class="view-mode-container">
+                        <label class="view-mode-option">
+                            <input type="radio" name="viewMode" value="list" checked>
+                            <span>Flat List</span>
+                        </label>
+                        <label class="view-mode-option">
+                            <input type="radio" name="viewMode" value="hierarchy">
+                            <span>Inheritance Tree</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="tree-controls">
+                <button class="tree-control-btn" onclick="expandAllGroups()" title="Expand all groups and inheritance trees">📂 Expand All</button>
+                <button class="tree-control-btn" onclick="collapseAllGroups()" title="Collapse all groups and inheritance trees">📁 Collapse All</button>
+                <button class="tree-control-btn" onclick="toggleInheritanceView()" title="Toggle inheritance hierarchy view">🌳 Inheritance</button>
+                <button class="tree-control-btn" onclick="regenerateData()" title="Regenerate mock data">🔄 Regen</button>
+                <button class="tree-control-btn" onclick="clearSelection()" title="Clear current selection">✖️ Clear</button>
+            </div>
+            <div class="item-count">Items: <span id="itemCount">0</span></div>
+            <div class="search-container">
+                <input type="text" class="search-input" id="leftSearch" placeholder="Search items...">
+            </div>
+            <div class="left-content">
+                <ul class="tree-view" id="leftTreeView">
+                    <!-- Category items will be populated here -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Panel - Selected Item Options -->
+        <div class="right-panel">
+            <div class="right-panel-header">Compatible Items</div>
+            <div class="search-container">
+                <input type="text" class="search-input" id="rightSearch" placeholder="Search items...">
+            </div>
+            <div class="right-content">
+                <ul class="tree-view" id="rightTreeView">
+                    <!-- Attachments and magazines will be populated here -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Attachment Category Sidebar -->
+        <div class="attachment-sidebar">
+            <button class="attachment-tab active" data-attachment="attachments" data-tooltip="Attachments">🔧</button>
+            <button class="attachment-tab" data-attachment="magazines" data-tooltip="Magazines">📦</button>
+        </div>
+
+        <!-- Central Area - 3D Preview Space -->
+        <div class="central-area">
+            <div>
+                <div style="font-size: 24px; margin-bottom: 10px;">⚔️</div>
+                <div>3D Equipment Preview</div>
+                <div style="font-size: 12px; color: #777; margin-top: 8px;">Select items to preview</div>
+            </div>
+        </div>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <div class="stats-title">Item Statistics</div>
+            <div class="stat-item">
+                <span class="stat-label">Damage:</span>
+                <span class="stat-value" id="statDamage">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Range:</span>
+                <span class="stat-value" id="statRange">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Mass:</span>
+                <span class="stat-value" id="statMass">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Capacity:</span>
+                <span class="stat-value" id="statCapacity">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Mod Source:</span>
+                <span class="stat-value" id="statMod">-</span>
+            </div>
+        </div>
+
+        <!-- Equipment Preview Panel -->
+        <div class="preview-area">
+            <div class="preview-title">Current Loadout</div>
+            <div class="preview-item" id="previewWeapon">Primary: None</div>
+            <div class="preview-item" id="previewHandgun">Handgun: None</div>
+            <div class="preview-item" id="previewBackpack">Backpack: None</div>
+            <div class="preview-item" id="previewVest">Vest: None</div>
+            <div class="preview-item" id="previewAttachments">Attachments: None</div>
+        </div>
+
+        <div class="timing" id="timing">Ready</div>
+    </div>
+
+    <script type="module">
+        // Import data and algorithms
+        import { generateMockItems, MOCK_ITEMS } from './data.js';
+        import * as algorithms from './algorithms.js';
+        import * as multiGrouping from './algorithms/multiGrouping.js';
+        import * as hierarchyAlgorithms from './algorithms/hierarchy.js';
+        
+        // Import simple tree components  
+        import { 
+            createTreeData,
+            renderSimpleTree,
+            toggleTreeGroup,
+            selectTreeItem
+        } from './ui/simpleTree.js';
+        
+        // Global state - simplified
+        let currentItems = [...MOCK_ITEMS];
+        let filteredItems = [...MOCK_ITEMS];
+        let selectedCategory = 'weapons';
+        let selectedRightCategory = 'attachments';
+        let selectedItem = null;
+        let currentLoadout = {
+            weapon: null,
+            handgun: null,
+            backpack: null,
+            vest: null,
+            attachments: []
+        };
+
+        // Category filtering
+        function filterItemsByCategory(category) {
+            return currentItems.filter(item => item.category === category);
+        }
+
+        // Filter compatible accessories for selected weapon using weaponSlots
+        function getCompatibleAccessories(weapon) {
+            if (!weapon) return [];
+            
+            const attachments = currentItems.filter(item => item.category === 'attachments');
+            
+            // Filter attachments by weapon slot compatibility
+            if (weapon.weaponSlots && weapon.weaponSlots.length > 0) {
+                return attachments.filter(attachment => {
+                    if (!attachment.weaponSlots || attachment.weaponSlots.length === 0) {
+                        return false; // Attachment has no slot info, assume incompatible
+                    }
+                    
+                    // Check if any weapon slot matches any attachment slot
+                    return weapon.weaponSlots.some(weaponSlot => 
+                        attachment.weaponSlots.some(attachmentSlot => 
+                            weaponSlot === attachmentSlot
+                        )
+                    );
+                });
+            }
+            
+            // If weapon has no slot info, show no attachments (strict compatibility)
+            console.log('⚠️ Weapon has no weaponSlots defined, showing no attachments');
+            return [];
+        }
+
+        // Filter compatible magazines for selected weapon using magazineWells
+        function getCompatibleMagazines(weapon) {
+            if (!weapon) return [];
+            
+            const magazines = currentItems.filter(item => item.category === 'magazines');
+            
+            // Filter magazines by magazineWells compatibility
+            if (weapon.magazineWells && weapon.magazineWells.length > 0) {
+                return magazines.filter(magazine => {
+                    if (!magazine.magazineWells || magazine.magazineWells.length === 0) {
+                        return false; // Magazine has no well info, assume incompatible
+                    }
+                    
+                    // Check if any weapon magazine well matches any magazine well
+                    return weapon.magazineWells.some(weaponWell => 
+                        magazine.magazineWells.some(magWell => 
+                            weaponWell === magWell
+                        )
+                    );
+                });
+            }
+            
+            // If weapon has no magazine well info, show no magazines (strict compatibility)
+            console.log('⚠️ Weapon has no magazineWells defined, showing no magazines');
+            return [];
+        }
+
+        // Update right panel with compatible accessories
+        function updateCompatibleAccessories(weapon) {
+            console.log('🔫 Weapon selected:', weapon.displayName);
+            console.log('📦 Magazine wells:', weapon.magazineWells);
+            console.log('🔧 Weapon slots:', weapon.weaponSlots);
+            console.log('🎯 Right panel category:', selectedRightCategory);
+            
+            if (selectedRightCategory === 'attachments') {
+                const compatibleAttachments = getCompatibleAccessories(weapon);
+                console.log('✅ Compatible attachments found:', compatibleAttachments.length);
+                console.log('📋 Sample attachments:', compatibleAttachments.slice(0, 3).map(a => ({
+                    name: a.displayName,
+                    weaponSlots: a.weaponSlots,
+                    subcategory: a.subcategory
+                })));
+                renderTreeView(compatibleAttachments, 'rightTreeView', false);
+            } else if (selectedRightCategory === 'magazines') {
+                const compatibleMagazines = getCompatibleMagazines(weapon);
+                console.log('✅ Compatible magazines found:', compatibleMagazines.length);
+                console.log('📋 Sample magazines:', compatibleMagazines.slice(0, 3).map(m => ({
+                    name: m.displayName,
+                    magazineWells: m.magazineWells,
+                    caliber: m.caliber
+                })));
+                renderTreeView(compatibleMagazines, 'rightTreeView', false);
+            }
+        }
+
+
+        // Simple tree view rendering
+        function renderTreeView(items, containerId, useGrouping = true) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const startTime = performance.now();
+
+            // Get current UI state
+            const viewMode = document.querySelector('input[name="viewMode"]:checked')?.value || 'list';
+            const sortMethod = document.getElementById('sortingSelect').value;
+            const sortOrder = document.getElementById('sortOrderSelect').value;
+            const primaryGrouping = document.getElementById('primaryGrouping').value;
+            const secondaryGrouping = document.getElementById('secondaryGrouping').value;
+
+            let groupingFunction = null;
+            let sortingFunction = null;
+            let showHierarchy = false;
+
+            // Get sorting function
+            if (sortMethod && algorithms[sortMethod]) {
+                sortingFunction = (items) => algorithms[sortMethod](items, sortOrder);
+            }
+
+            // Determine what kind of tree to show
+            if (viewMode === 'hierarchy') {
+                // Show inheritance hierarchy regardless of grouping settings
+                showHierarchy = true;
+                useGrouping = true;
+            } else if (primaryGrouping !== 'none') {
+                // Show property-based grouping
+                useGrouping = true;
+                if (secondaryGrouping !== 'none') {
+                    // Multi-level grouping
+                    groupingFunction = (items) => applyMultiGrouping(items, primaryGrouping, secondaryGrouping);
+                } else {
+                    // Single level grouping
+                    groupingFunction = algorithms[primaryGrouping];
+                }
+            } else {
+                // Flat list - no grouping
+                useGrouping = false;
+            }
+
+            // Create tree data structure
+            const treeData = createTreeData(items, useGrouping, groupingFunction, sortingFunction);
+            
+            // Render simple tree
+            const html = `<ul class="tree-view">${renderSimpleTree(treeData)}</ul>`;
+            
+            const endTime = performance.now();
+            document.getElementById('timing').textContent = `${(endTime - startTime).toFixed(2)}ms`;
+
+            container.innerHTML = html;
+            updateItemCount();
+        }
+
+        // Simple tree toggle - delegates to simpleTree.js
+        function toggleTreeNodeExpansion(nodeId) {
+            toggleTreeGroup(nodeId);
+        }
+
+        // Item selection and stats display
+        function selectItem(element) {
+            console.log('🖱️ Item clicked!', element);
+            
+            // Remove previous selection
+            document.querySelectorAll('.tree-item').forEach(item => item.classList.remove('selected'));
+            document.querySelectorAll('.tree-parent').forEach(item => item.classList.remove('selected'));
+            element.classList.add('selected');
+
+            try {
+                selectedItem = JSON.parse(element.dataset.item);
+                console.log('✅ Item parsed:', selectedItem.displayName, 'Category:', selectedItem.category);
+                
+                updateStats(selectedItem);
+                updateLoadout(selectedItem);
+                
+                // Update right panel with compatible accessories when weapon is selected
+                if (selectedItem.category === 'weapons') {
+                    console.log('🔫 Weapon detected, updating right panel...');
+                    updateCompatibleAccessories(selectedItem);
+                } else {
+                    console.log('🚫 Not a weapon, category:', selectedItem.category);
+                }
+            } catch (e) {
+                console.warn('Could not parse item data:', e);
+            }
+        }
+
+        function updateStats(item) {
+            document.getElementById('statDamage').textContent = item.damage || '-';
+            document.getElementById('statRange').textContent = item.range ? `${item.range}m` : '-';
+            document.getElementById('statMass').textContent = item.mass ? `${(item.mass/1000).toFixed(2)}kg` : '-';
+            document.getElementById('statCapacity').textContent = item.capacity || '-';
+            
+            // Enhanced mod display with inheritance info
+            let modText = item.mod || '-';
+            if (item.baseClass) {
+                modText += ` (${item.baseClass})`;
+            }
+            if (item.variant) {
+                modText += ` [${item.variant}]`;
+            }
+            document.getElementById('statMod').textContent = modText;
+        }
+
+        function updateLoadout(item) {
+            // Update current loadout based on item type
+            if (item.category === 'weapons') {
+                currentLoadout.weapon = item;
+                document.getElementById('previewWeapon').textContent = `Primary: ${item.displayName}`;
+            } else if (item.category === 'handguns') {
+                currentLoadout.handgun = item;
+                document.getElementById('previewHandgun').textContent = `Handgun: ${item.displayName}`;
+            } else if (item.category === 'backpacks') {
+                currentLoadout.backpack = item;
+                document.getElementById('previewBackpack').textContent = `Backpack: ${item.displayName}`;
+            } else if (item.category === 'vests') {
+                currentLoadout.vest = item;
+                document.getElementById('previewVest').textContent = `Vest: ${item.displayName}`;
+            } else if (item.category === 'attachments') {
+                currentLoadout.attachments.push(item);
+                document.getElementById('previewAttachments').textContent = `Attachments: ${currentLoadout.attachments.length} items`;
+            }
+        }
+
+        // Category tab handling
+        function switchCategory(category) {
+            selectedCategory = category;
+            
+            // Update tab appearance
+            document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            
+            // Filter and display items
+            filteredItems = filterItemsByCategory(category);
+            renderTreeView(filteredItems, 'leftTreeView');
+        }
+
+        function switchRightCategory(category) {
+            console.log('🔄 Switching right category to:', category);
+            selectedRightCategory = category;
+            
+            // Update tab appearance
+            document.querySelectorAll('.attachment-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`[data-attachment="${category}"]`).classList.add('active');
+            
+            // Filter and display items based on selected weapon compatibility
+            if (selectedItem && selectedItem.category === 'weapons') {
+                console.log('🔫 Weapon is selected, filtering for compatibility...');
+                updateCompatibleAccessories(selectedItem);
+            } else {
+                console.log('🔍 No weapon selected, showing all', category);
+                // If no weapon selected, show all items of this category
+                const rightItems = filterItemsByCategory(category);
+                console.log('📦 Right items found:', rightItems.length);
+                renderTreeView(rightItems, 'rightTreeView', false); // No grouping for right panel
+            }
+        }
+
+        function updateItemCount() {
+            const leftCount = filteredItems.length;
+            const rightCount = filterItemsByCategory(selectedRightCategory).length;
+            document.getElementById('itemCount').textContent = leftCount + rightCount;
+        }
+
+        // Data generation
+        function regenerateData() {
+            currentItems = generateMockItems(200);
+            switchCategory(selectedCategory);
+            switchRightCategory(selectedRightCategory);
+            clearSelection();
+        }
+
+        // New UI control functions
+        function applySorting(items, method, order) {
+            const sortFunction = algorithms[method];
+            if (sortFunction) {
+                return sortFunction(items, order);
+            }
+            return items;
+        }
+        
+        function applyMultiGrouping(items, primary, secondary) {
+            // Convert string names to actual grouping functions
+            const primaryFunction = algorithms[primary];
+            const secondaryFunction = getSecondaryGroupingFunction(secondary);
+            
+            if (primaryFunction && secondaryFunction) {
+                return multiGrouping.groupByMultiple(items, primaryFunction, secondaryFunction);
+            } else if (primaryFunction) {
+                return primaryFunction(items);
+            }
+            
+            return { 'All Items': items };
+        }
+        
+        function getSecondaryGroupingFunction(secondaryName) {
+            const mapping = {
+                'groupByMod': algorithms.groupByMod,
+                'groupByCaliber': algorithms.groupByCaliber
+            };
+            return mapping[secondaryName] || null;
+        }
+        
+        function toggleInheritanceView() {
+            // Toggle between flat list and inheritance hierarchy
+            const currentView = document.querySelector('input[name="viewMode"]:checked').value;
+            if (currentView === 'list') {
+                document.querySelector('input[name="viewMode"][value="hierarchy"]').checked = true;
+            } else {
+                document.querySelector('input[name="viewMode"][value="list"]').checked = true;
+            }
+            
+            renderTreeView(filteredItems, 'leftTreeView');
+        }
+
+        function runGrouping() {
+            renderTreeView(filteredItems, 'leftTreeView');
+        }
+
+        function clearSelection() {
+            // Clear visual selection
+            document.querySelectorAll('.tree-item').forEach(item => item.classList.remove('selected'));
+            document.querySelectorAll('.tree-parent').forEach(item => item.classList.remove('selected'));
+            
+            // Clear selected item
+            selectedItem = null;
+            
+            // Clear stats
+            ['statDamage', 'statRange', 'statMass', 'statCapacity', 'statMod'].forEach(id => {
+                document.getElementById(id).textContent = '-';
+            });
+
+            // Clear loadout
+            currentLoadout = { weapon: null, handgun: null, backpack: null, vest: null, attachments: [] };
+            document.getElementById('previewWeapon').textContent = 'Primary: None';
+            document.getElementById('previewHandgun').textContent = 'Handgun: None';
+            document.getElementById('previewBackpack').textContent = 'Backpack: None';
+            document.getElementById('previewVest').textContent = 'Vest: None';
+            document.getElementById('previewAttachments').textContent = 'Attachments: None';
+            
+            // Reset right panel to show all items of current category
+            const rightItems = filterItemsByCategory(selectedRightCategory);
+            renderTreeView(rightItems, 'rightTreeView', false);
+        }
+
+        // Simple expand/collapse all
+        function expandAllGroups() {
+            document.querySelectorAll('.tree-children').forEach(el => {
+                el.style.display = 'block';
+            });
+            document.querySelectorAll('.tree-toggle').forEach(el => {
+                el.textContent = '▼';
+            });
+        }
+
+        function collapseAllGroups() {
+            document.querySelectorAll('.tree-children').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.tree-toggle').forEach(el => {
+                el.textContent = '▶';
+            });
+        }
+
+        // Global functions for buttons and tree interaction
+        window.regenerateData = regenerateData;
+        window.runGrouping = runGrouping;
+        window.clearSelection = clearSelection;
+        window.selectItem = selectItem;
+        window.toggleTreeGroup = toggleTreeGroup;
+        window.selectTreeItem = selectTreeItem;
+        window.toggleInheritanceView = toggleInheritanceView;
+        window.expandAllGroups = expandAllGroups;
+        window.collapseAllGroups = collapseAllGroups;
+
+        // Event listeners for new UI controls
+        document.getElementById('sortingSelect').addEventListener('change', (e) => {
+            renderTreeView(filteredItems, 'leftTreeView');
+        });
+        
+        document.getElementById('sortOrderSelect').addEventListener('change', (e) => {
+            renderTreeView(filteredItems, 'leftTreeView');
+        });
+        
+        document.getElementById('primaryGrouping').addEventListener('change', (e) => {
+            renderTreeView(filteredItems, 'leftTreeView');
+        });
+        
+        document.getElementById('secondaryGrouping').addEventListener('change', (e) => {
+            renderTreeView(filteredItems, 'leftTreeView');
+        });
+        
+        // View mode radio button listeners
+        document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                renderTreeView(filteredItems, 'leftTreeView');
+            });
+        });
+        
+        // Category tab listeners
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', () => switchCategory(tab.dataset.category));
+        });
+
+        // Right panel tab listeners
+        document.querySelectorAll('.attachment-tab').forEach(tab => {
+            tab.addEventListener('click', () => switchRightCategory(tab.dataset.attachment));
+        });
+
+        // Search functionality
+        document.getElementById('leftSearch').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const items = filterItemsByCategory(selectedCategory)
+                .filter(item => item.displayName.toLowerCase().includes(searchTerm));
+            renderTreeView(items, 'leftTreeView');
+        });
+
+        document.getElementById('rightSearch').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const items = filterItemsByCategory(selectedRightCategory)
+                .filter(item => item.displayName.toLowerCase().includes(searchTerm));
+            renderTreeView(items, 'rightTreeView', false);
+        });
+
+        // Initialize UI state
+        switchCategory('weapons');
+        switchRightCategory('attachments');
+
+        console.log('🎯 ACE3 Arsenal Simulation Ready!');
+        console.log('💡 Select a weapon to see compatible attachments and magazines.');
+        console.log('📊 Items loaded:', {
+            weapons: currentItems.filter(i => i.category === 'weapons').length,
+            handguns: currentItems.filter(i => i.category === 'handguns').length,
+            launchers: currentItems.filter(i => i.category === 'launchers').length,
+            attachments: currentItems.filter(i => i.category === 'attachments').length,
+            magazines: currentItems.filter(i => i.category === 'magazines').length,
+            backpacks: currentItems.filter(i => i.category === 'backpacks').length,
+            vests: currentItems.filter(i => i.category === 'vests').length
+        });
+        
+        // Debug: Check some sample items have the right data
+        const sampleWeapon = currentItems.find(i => i.category === 'weapons');
+        const sampleMagazine = currentItems.find(i => i.category === 'magazines');
+        const sampleAttachment = currentItems.find(i => i.category === 'attachments');
+        
+        console.log('🔫 Sample weapon:', sampleWeapon?.displayName, 'magazineWells:', sampleWeapon?.magazineWells, 'weaponSlots:', sampleWeapon?.weaponSlots);
+        console.log('📦 Sample magazine:', sampleMagazine?.displayName, 'magazineWells:', sampleMagazine?.magazineWells);
+        console.log('🔧 Sample attachment:', sampleAttachment?.displayName, 'weaponSlots:', sampleAttachment?.weaponSlots);
+        
+        // Debug: Check all magazines for magazineWells data
+        const allMagazines = currentItems.filter(i => i.category === 'magazines');
+        console.log('📦 Total magazines:', allMagazines.length);
+        console.log('📦 Magazines with magazineWells:', allMagazines.filter(m => m.magazineWells && m.magazineWells.length > 0).length);
+        console.log('📦 Sample magazine data:', allMagazines.slice(0, 3).map(m => ({
+            name: m.displayName,
+            magazineWells: m.magazineWells,
+            caliber: m.caliber
+        })));
+    </script>
+</body>
+</html>
