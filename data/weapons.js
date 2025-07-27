@@ -56,9 +56,9 @@ export function generateWeapons() {
     
     // MX texture variants (real Arma 3 variants)
     const mxVariants = [
-        { className: 'arifle_MX_Black_F', name: 'MX 6.5 mm (Black)', texture: 'black', hiddenSelections: ['camo'], hiddenSelectionsTextures: ['\\a3\\weapons_f\\rifles\\mx\\data\\mx_black_co.paa'] },
-        { className: 'arifle_MX_khk_F', name: 'MX 6.5 mm (Khaki)', texture: 'khaki', hiddenSelections: ['camo'], hiddenSelectionsTextures: ['\\a3\\weapons_f\\rifles\\mx\\data\\mx_khaki_co.paa'] },
-        { className: 'arifle_MX_SW_F', name: 'MX SW 6.5 mm', texture: 'sand', mass: 4200, range: 600, rateOfFire: 550 }
+        { className: 'arifle_MX_Black_F', name: 'Black', texture: 'black', hiddenSelections: ['camo'], hiddenSelectionsTextures: ['\\a3\\weapons_f\\rifles\\mx\\data\\mx_black_co.paa'] },
+        { className: 'arifle_MX_khk_F', name: 'Khaki', texture: 'khaki', hiddenSelections: ['camo'], hiddenSelectionsTextures: ['\\a3\\weapons_f\\rifles\\mx\\data\\mx_khaki_co.paa'] },
+        { className: 'arifle_MX_SW_F', name: 'SW', texture: 'sand', mass: 4200, range: 600, rateOfFire: 550 }
     ];
     
     mxVariants.forEach(variant => {
@@ -92,7 +92,7 @@ export function generateWeapons() {
     // MXC variants
     ['arifle_MXC_Black_F', 'arifle_MXC_khk_F'].forEach((className, i) => {
         const textures = ['black', 'khaki'];
-        const item = createVariant(mxc, `MXC 6.5 mm (${textures[i] === 'black' ? 'Black' : 'Khaki'})`, textures[i], {
+        const item = createVariant(mxc, textures[i] === 'black' ? 'Black' : 'Khaki', textures[i], {
             className: className
         });
         items.push(item);
@@ -295,10 +295,10 @@ export function generateWeapons() {
     
     // AK-74M variants
     const ak74mVariants = [
-        { className: 'rhs_weap_ak74m_desert', name: 'AK-74M (Desert)', texture: 'desert' },
-        { className: 'rhs_weap_ak74m_fullplum', name: 'AK-74M (Plum)', texture: 'plum' },
-        { className: 'rhs_weap_ak74m_zenitco01', name: 'AK-74M (Zenitco)', texture: 'zenitco' },
-        { className: 'rhs_weap_ak74m_zenitco01_b33', name: 'AK-74M (Zenitco B33)', texture: 'zenitco_b33' }
+        { className: 'rhs_weap_ak74m_desert', name: 'Desert', texture: 'desert' },
+        { className: 'rhs_weap_ak74m_fullplum', name: 'Plum', texture: 'plum' },
+        { className: 'rhs_weap_ak74m_zenitco01', name: 'Zenitco', texture: 'zenitco' },
+        { className: 'rhs_weap_ak74m_zenitco01_b33', name: 'Zenitco B33', texture: 'zenitco_b33' }
     ];
     
     ak74mVariants.forEach(variant => {
@@ -374,11 +374,11 @@ export function generateWeapons() {
     
     // M4A1 variants
     const m4a1Variants = [
-        { className: 'rhs_weap_m4a1_blockII', name: 'M4A1 Block II', texture: 'block2', features: ['SOPMOD Block II'] },
-        { className: 'rhs_weap_m4a1_carryhandle', name: 'M4A1 (Carry Handle)', texture: 'carryhandle', features: ['Carry handle'] },
-        { className: 'rhs_weap_m4a1_carryhandle_mstock', name: 'M4A1 (M-Stock)', texture: 'm_stock', features: ['M-Stock'] },
-        { className: 'rhs_weap_m4a1_d', name: 'M4A1 (Desert)', texture: 'desert' },
-        { className: 'rhs_weap_m4a1_wd', name: 'M4A1 (Woodland)', texture: 'woodland' }
+        { className: 'rhs_weap_m4a1_blockII', name: 'Block II', texture: 'block2', features: ['SOPMOD Block II'] },
+        { className: 'rhs_weap_m4a1_carryhandle', name: 'Carry Handle', texture: 'carryhandle', features: ['Carry handle'] },
+        { className: 'rhs_weap_m4a1_carryhandle_mstock', name: 'M-Stock', texture: 'm_stock', features: ['M-Stock'] },
+        { className: 'rhs_weap_m4a1_d', name: 'Desert', texture: 'desert' },
+        { className: 'rhs_weap_m4a1_wd', name: 'Woodland', texture: 'woodland' }
     ];
     
     m4a1Variants.forEach(variant => {

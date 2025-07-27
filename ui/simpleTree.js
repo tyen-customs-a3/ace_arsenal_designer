@@ -51,17 +51,29 @@ export function createTreeData(items, useGrouping, groupingFunction, sortingFunc
                 
                 primaryNode.children.push(secondaryNode);
             } else {
-                const groupNode = {
-                    name: groupName,
-                    item: null,
-                    children: groupItems.map(item => ({
+                // Check if this is a single-item group that should be rendered flat
+                if (groupItems.length === 1) {
+                    // Single item - render as flat item, not as expandable group
+                    const item = groupItems[0];
+                    treeData.push({
                         name: item.displayName,
                         item: item,
                         children: null
-                    }))
-                };
-                
-                treeData.push(groupNode);
+                    });
+                } else {
+                    // Multiple items - render as expandable group
+                    const groupNode = {
+                        name: groupName,
+                        item: null,
+                        children: groupItems.map(item => ({
+                            name: item.displayName,
+                            item: item,
+                            children: null
+                        }))
+                    };
+                    
+                    treeData.push(groupNode);
+                }
             }
         });
         

@@ -45,7 +45,6 @@
                         <option value="groupByMod">Mod</option>
                         <option value="groupByCaliber">Caliber</option>
                         <option value="groupByWeaponType">Weapon Type</option>
-                        <option value="groupByVariants">🎨 Variants</option>
                     </select>
                     <select id="secondaryGrouping">
                         <option value="none">Then by: None</option>
@@ -65,6 +64,10 @@
                         <label class="view-mode-option">
                             <input type="radio" name="viewMode" value="hierarchy">
                             <span>Inheritance Tree</span>
+                        </label>
+                        <label class="view-mode-option">
+                            <input type="radio" name="viewMode" value="variants">
+                            <span>🎨 Variants</span>
                         </label>
                     </div>
                 </div>
@@ -108,11 +111,7 @@
 
         <!-- Central Area - 3D Preview Space -->
         <div class="central-area">
-            <div>
-                <div style="font-size: 24px; margin-bottom: 10px;">⚔️</div>
-                <div>3D Equipment Preview</div>
-                <div style="font-size: 12px; color: #777; margin-top: 8px;">Select items to preview</div>
-            </div>
+            <canvas id="wireframeCanvas" style="width: 100%; height: 100%; border: 1px solid #444; background: #1a1a1a; display: block;"></canvas>
         </div>
 
         <!-- Stats Panel -->
@@ -157,8 +156,10 @@
         // Import data and algorithms
         import { generateMockItems, MOCK_ITEMS } from './data.js';
         import * as algorithms from './algorithms.js';
+        import * as groupingAlgorithms from './algorithms/grouping.js';
         import * as multiGrouping from './algorithms/multiGrouping.js';
         import * as hierarchyAlgorithms from './algorithms/hierarchy.js';
+        import { WireframeRenderer } from './wireframe.js';
         
         // Import simple tree components  
         import { 
@@ -298,6 +299,10 @@
                 // Show inheritance hierarchy regardless of grouping settings
                 showHierarchy = true;
                 useGrouping = true;
+            } else if (viewMode === 'variants') {
+                // Show variants view - group by weapon variants
+                useGrouping = true;
+                groupingFunction = groupingAlgorithms.groupByVariants;
             } else if (primaryGrouping !== 'none') {
                 // Show property-based grouping
                 useGrouping = true;
@@ -346,6 +351,7 @@
                 
                 updateStats(selectedItem);
                 updateLoadout(selectedItem);
+                wireframeRenderer.setSelectedItem(selectedItem);
                 
                 // Update right panel with compatible accessories when weapon is selected
                 if (selectedItem.category === 'weapons') {
@@ -630,6 +636,11 @@
             magazineWells: m.magazineWells,
             caliber: m.caliber
         })));
+
+        // Initialize 3D Wireframe Renderer
+        const canvas = document.getElementById('wireframeCanvas');
+        const wireframeRenderer = new WireframeRenderer(canvas);
+        wireframeRenderer.startAnimation();
     </script>
 </body>
 </html>
