@@ -21,6 +21,14 @@
     "backpack": [
       "subcategory", "maximumLoad", "mass", "faction", "variant", "texture", 
       "hiddenSelections", "hiddenSelectionsTextures"
+    ],
+    "magazine": [
+      "subcategory", "caliber", "capacity", "mass", "magazineWells", "faction", 
+      "variant", "texture", "tracer", "picture", "icon"
+    ],
+    "attachment": [
+      "subcategory", "mass", "weaponSlots", "faction", "features", "variant", 
+      "texture", "zoom", "recoilModifier", "swayModifier", "picture", "icon"
     ]
   },
   "items": [
@@ -1881,6 +1889,196 @@
       "properties": {
         "variant": "Coyote",
         "texture": "coyote"
+      }
+    },
+    {
+      "className": "30Rnd_65x39_caseless_mag",
+      "parentClass": "CA_Magazine",
+      "name": "6.5 mm 30Rnd STANAG Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "subcategory": "rifles",
+        "caliber": "6.5×39 mm",
+        "capacity": 30,
+        "mass": 100,
+        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "30Rnd_65x39_caseless_mag_Tracer",
+      "parentClass": "30Rnd_65x39_caseless_mag",
+      "name": "6.5 mm 30Rnd Tracer Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "subcategory": "rifles",
+        "caliber": "6.5×39 mm",
+        "capacity": 30,
+        "mass": 100,
+        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "Tracer"
+      }
+    },
+    {
+      "className": "optic_Arco",
+      "parentClass": "ItemCore",
+      "name": "ARCO",
+      "type": "attachment",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "subcategory": "optics",
+        "mass": 300,
+        "weaponSlots": ["asdg_OpticRail"],
+        "faction": "NATO",
+        "features": ["thermal", "nightvision"],
+        "zoom": [4, 2]
+      }
+    },
+    {
+      "className": "optic_Hamr",
+      "parentClass": "ItemCore", 
+      "name": "RCO",
+      "type": "attachment",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "subcategory": "optics",
+        "mass": 250,
+        "weaponSlots": ["asdg_OpticRail"],
+        "faction": "NATO",
+        "zoom": [4]
+      }
+    },
+    {
+      "className": "muzzle_snds_H",
+      "parentClass": "ItemCore",
+      "name": "Sound Suppressor (6.5 mm)",
+      "type": "attachment", 
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "subcategory": "muzzle",
+        "mass": 200,
+        "weaponSlots": ["asdg_MuzzleSlot"],
+        "faction": "NATO",
+        "features": ["suppressor"],
+        "recoilModifier": -0.15
+      }
+    },
+    {
+      "className": "bipod_01_F_snd",
+      "parentClass": "ItemCore",
+      "name": "Bipod (Sand)",
+      "type": "attachment",
+      "mod": "A3", 
+      "scope": 2,
+      "properties": {
+        "subcategory": "underbarrel",
+        "mass": 150,
+        "weaponSlots": ["asdg_UnderBarrelSlot"],
+        "faction": "NATO",
+        "features": ["bipod"],
+        "swayModifier": -0.3
+      }
+    },
+    {
+      "className": "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+      "parentClass": "CA_Magazine",
+      "name": "30Rnd 5.56x45mm M855A1",
+      "type": "magazine",
+      "mod": "RHS_USAF",
+      "scope": 2,
+      "properties": {
+        "subcategory": "rifles",
+        "caliber": "5.56×45 mm",
+        "capacity": 30,
+        "mass": 120,
+        "magazineWells": ["STANAG_556x45", "CBA_556x45_STANAG"],
+        "faction": "USA"
+      }
+    },
+    {
+      "className": "rhsusf_acc_ACOG3",
+      "parentClass": "ItemCore",
+      "name": "M150 RCO (ACOG)",
+      "type": "attachment",
+      "mod": "RHS_USAF",
+      "scope": 2,
+      "properties": {
+        "subcategory": "optics",
+        "mass": 320,
+        "weaponSlots": ["asdg_OpticRail"],
+        "faction": "USA",
+        "zoom": [4]
+      }
+    },
+    {
+      "className": "100Rnd_65x39_caseless_mag",
+      "parentClass": "CA_Magazine",
+      "name": "6.5 mm 100Rnd Belt",
+      "type": "magazine", 
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "subcategory": "lmg",
+        "caliber": "6.5×39 mm",
+        "capacity": 100,
+        "mass": 350,
+        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "optic_Holosight",
+      "parentClass": "ItemCore",
+      "name": "Mk17 Holosight",
+      "type": "attachment",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "subcategory": "optics",
+        "mass": 150,
+        "weaponSlots": ["asdg_OpticRail"],
+        "faction": "NATO",
+        "zoom": [1]
+      }
+    },
+    {
+      "className": "muzzle_snds_B",
+      "parentClass": "ItemCore",
+      "name": "Sound Suppressor (7.62 mm)",
+      "type": "attachment",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "subcategory": "muzzle",
+        "mass": 250,
+        "weaponSlots": ["asdg_MuzzleSlot_762"],
+        "faction": "NATO",
+        "features": ["suppressor"],
+        "recoilModifier": -0.20
+      }
+    },
+    {
+      "className": "optic_AMS", 
+      "parentClass": "ItemCore",
+      "name": "AMS",
+      "type": "attachment",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "subcategory": "optics",
+        "mass": 400,
+        "weaponSlots": ["asdg_OpticRail_AK"],
+        "faction": "CSAT",
+        "zoom": [8, 4, 2]
       }
     }
   ]

@@ -361,10 +361,11 @@
             if (!weapon) return [];
             
             const attachments = currentItems.filter(item => item.category === 'attachments');
+            console.log(`🔧 Found ${attachments.length} total attachments in currentItems`);
             
             // Filter attachments by weapon slot compatibility
             if (weapon.weaponSlots && weapon.weaponSlots.length > 0) {
-                return attachments.filter(attachment => {
+                const compatible = attachments.filter(attachment => {
                     if (!attachment.weaponSlots || attachment.weaponSlots.length === 0) {
                         return false; // Attachment has no slot info, assume incompatible
                     }
@@ -376,6 +377,8 @@
                         )
                     );
                 });
+                console.log(`🔧 Found ${compatible.length} compatible attachments:`, compatible.map(a => a.displayName));
+                return compatible;
             }
             
             // If weapon has no slot info, show no attachments (strict compatibility)
@@ -388,10 +391,11 @@
             if (!weapon) return [];
             
             const magazines = currentItems.filter(item => item.category === 'magazines');
+            console.log(`📦 Found ${magazines.length} total magazines in currentItems`);
             
             // Filter magazines by magazineWells compatibility
             if (weapon.magazineWells && weapon.magazineWells.length > 0) {
-                return magazines.filter(magazine => {
+                const compatible = magazines.filter(magazine => {
                     if (!magazine.magazineWells || magazine.magazineWells.length === 0) {
                         return false; // Magazine has no well info, assume incompatible
                     }
@@ -403,6 +407,8 @@
                         )
                     );
                 });
+                console.log(`📦 Found ${compatible.length} compatible magazines:`, compatible.map(m => m.displayName));
+                return compatible;
             }
             
             // If weapon has no magazine well info, show no magazines (strict compatibility)
@@ -524,6 +530,11 @@
                 // Update right panel with compatible accessories when weapon is selected
                 if (selectedItem.category === 'weapons') {
                     console.log('🔫 Weapon detected, updating right panel...');
+                    console.log('🔍 Current items total:', currentItems.length);
+                    console.log('🔍 Items by category:', currentItems.reduce((acc, item) => {
+                        acc[item.category] = (acc[item.category] || 0) + 1;
+                        return acc;
+                    }, {}));
                     updateCompatibleAccessories(selectedItem);
                 } else {
                     console.log('🚫 Not a weapon, category:', selectedItem.category);

@@ -88,7 +88,9 @@ class DataLoader {
             'handgun': 'handguns', 
             'launcher': 'launchers',
             'vest': 'vests',
-            'backpack': 'backpacks'
+            'backpack': 'backpacks',
+            'magazine': 'magazines',
+            'attachment': 'attachments'
         };
         return mapping[type] || type;
     }
