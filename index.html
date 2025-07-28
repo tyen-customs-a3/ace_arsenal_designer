@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    
     <div class="arsenal-container">
         <!-- Compact Category Sidebar -->
         <div class="category-sidebar">
@@ -19,23 +20,18 @@
 
         <!-- Left Panel - Equipment List -->
         <div class="left-panel">
-            <div class="left-panel-header">Equipment List</div>
-            <div class="grouping-controls">
-                <!-- Sorting Controls - Always Available -->
-                <div class="control-group">
-                    <label class="control-label">Sort by:</label>
-                    <select id="sortingSelect">
-                        <option value="sortByName">Name</option>
-                        <option value="sortByMod">Mod</option>
-                        <option value="sortByRange">Range</option>
-                        <option value="sortByMass">Mass</option>
-                        <option value="sortByCategory">Category</option>
-                    </select>
-                    <select id="sortOrderSelect">
-                        <option value="asc">↑ Ascending</option>
-                        <option value="desc">↓ Descending</option>
-                    </select>
+            <div class="left-panel-header">
+                <span class="header-title">Equipment List</span>
+                <div class="header-controls">
+                    <input type="text" class="header-search" id="leftSearch" placeholder="Search...">
                 </div>
+            </div>
+            
+            <!-- Filter Tab docked to top right -->
+            <div class="filter-tab" id="filterTab" onclick="toggleFilterPanel()" title="Toggle filters">
+                <span class="filter-tab-text">Filters</span>
+            </div>
+            <div class="grouping-controls">
                 
                 <!-- Grouping Controls - Property-Based Organization -->
                 <div class="control-group">
@@ -44,7 +40,6 @@
                         <option value="none">None</option>
                         <option value="groupByMod">Mod</option>
                         <option value="groupByCaliber">Caliber</option>
-                        <option value="groupByWeaponType">Weapon Type</option>
                     </select>
                     <select id="secondaryGrouping">
                         <option value="none">Then by: None</option>
@@ -53,12 +48,45 @@
                     </select>
                 </div>
                 
-                <!-- View Mode Controls - Removed, grouping is controlled by grouping settings -->
-                <div class="control-group">
-                    <label class="control-label">View:</label>
+            </div>
+            
+            <!-- Compact Sort Controls -->
+            <div class="compact-sort-controls">
+                <div class="sort-control-group">
+                    <label class="sort-label">Sort by:</label>
+                    <select id="sortingSelect">
+                        <option value="sortByName">Name</option>
+                        <option value="sortByMod">Mod</option>
+                        <option value="sortByRange">Range</option>
+                        <option value="sortByMass">Mass</option>
+                        <option value="sortByCategory">Category</option>
+                    </select>
+                    <button class="sort-order-toggle" id="sortOrderToggle" onclick="toggleSortOrder()" title="Toggle sort order">↑</button>
+                </div>
+            </div>
+            
+            <!-- Tree Controls outside and above list -->
+            <div class="tree-controls-external">
+                <button class="tree-toggle-btn" id="treeToggleBtn" onclick="toggleExpandCollapse()">▶</button>
+                <span class="tree-toggle-text" id="treeToggleText">Expand All</span>
+            </div>
+            
+            <div class="left-content">
+                <ul class="tree-view" id="leftTreeView">
+                    <!-- Category items will be populated here -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Expandable Filter Panel -->
+        <div class="expandable-filter-panel" id="expandableFilterPanel">
+            <div class="filter-panel-content">
+                <!-- View Mode Section -->
+                <div class="filter-section">
+                    <div class="filter-section-header">View Options</div>
                     <div class="view-mode-container">
                         <label class="view-mode-option">
-                            <input type="radio" name="viewMode" value="list" checked>
+                            <input type="radio" name="viewMode" value="list">
                             <span>Flat List</span>
                         </label>
                         <label class="view-mode-option">
@@ -66,27 +94,58 @@
                             <span>Inheritance Tree</span>
                         </label>
                         <label class="view-mode-option">
-                            <input type="radio" name="viewMode" value="variants">
+                            <input type="radio" name="viewMode" value="variants" checked>
                             <span>🎨 Variants</span>
                         </label>
                     </div>
                 </div>
-            </div>
-            <div class="tree-controls">
-                <button class="tree-control-btn" onclick="expandAllGroups()" title="Expand all groups and inheritance trees">📂 Expand All</button>
-                <button class="tree-control-btn" onclick="collapseAllGroups()" title="Collapse all groups and inheritance trees">📁 Collapse All</button>
-                <button class="tree-control-btn" onclick="toggleInheritanceView()" title="Toggle inheritance hierarchy view">🌳 Inheritance</button>
-                <button class="tree-control-btn" onclick="regenerateData()" title="Regenerate mock data">🔄 Regen</button>
-                <button class="tree-control-btn" onclick="clearSelection()" title="Clear current selection">✖️ Clear</button>
-            </div>
-            <div class="item-count">Items: <span id="itemCount">0</span></div>
-            <div class="search-container">
-                <input type="text" class="search-input" id="leftSearch" placeholder="Search items...">
-            </div>
-            <div class="left-content">
-                <ul class="tree-view" id="leftTreeView">
-                    <!-- Category items will be populated here -->
-                </ul>
+
+                <!-- Filters Section -->
+                <div class="filter-section">
+                    <div class="filter-section-header">Filters</div>
+                    
+                    <!-- Compact Filter Groups -->
+                    <div class="compact-filter-group">
+                        <label class="compact-filter-label">Mod:</label>
+                        <div class="compact-filter-checkboxes" id="modFilters">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="compact-filter-group">
+                        <label class="compact-filter-label">Caliber:</label>
+                        <div class="compact-filter-checkboxes" id="caliberFilters">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="compact-filter-group">
+                        <label class="compact-filter-label">Variants:</label>
+                        <div class="compact-filter-radios">
+                            <label class="compact-filter-option">
+                                <input type="radio" name="variantFilter" value="all" checked>
+                                <span>All</span>
+                            </label>
+                            <label class="compact-filter-option">
+                                <input type="radio" name="variantFilter" value="base-only">
+                                <span>Base</span>
+                            </label>
+                            <label class="compact-filter-option">
+                                <input type="radio" name="variantFilter" value="variants-only">
+                                <span>Variants</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="compact-filter-group">
+                        <label class="compact-filter-label">Type:</label>
+                        <div class="compact-filter-checkboxes" id="subcategoryFilters">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <button class="clear-filters-btn" onclick="clearAllFilters()" title="Clear all filters">Clear All Filters</button>
+                </div>
             </div>
         </div>
 
@@ -103,15 +162,15 @@
             </div>
         </div>
 
+
         <!-- Attachment Category Sidebar -->
         <div class="attachment-sidebar">
             <button class="attachment-tab active" data-attachment="attachments" data-tooltip="Attachments">🔧</button>
             <button class="attachment-tab" data-attachment="magazines" data-tooltip="Magazines">📦</button>
         </div>
 
-        <!-- Central Area - 3D Preview Space -->
+        <!-- Central Area - Empty space for UI layout -->
         <div class="central-area">
-            <canvas id="wireframeCanvas" style="width: 100%; height: 100%; border: 1px solid #444; background: #1a1a1a; display: block;"></canvas>
         </div>
 
         <!-- Stats Panel -->
@@ -159,7 +218,6 @@
         import * as groupingAlgorithms from './algorithms/grouping.js';
         import * as multiGrouping from './algorithms/multiGrouping.js';
         import * as hierarchyAlgorithms from './algorithms/hierarchy.js';
-        import { WireframeRenderer } from './wireframe.js';
         
         // Import simple tree components  
         import { 
@@ -175,6 +233,8 @@
         let selectedCategory = 'weapons';
         let selectedRightCategory = 'attachments';
         let selectedItem = null;
+        let currentSortOrder = 'asc';
+        let currentExpandState = false;
         let currentLoadout = {
             weapon: null,
             handgun: null,
@@ -183,9 +243,117 @@
             attachments: []
         };
 
+        // Filter state
+        let activeFilters = {
+            mods: new Set(),
+            calibers: new Set(),
+            variants: 'all',
+            subcategories: new Set()
+        };
+
         // Category filtering
         function filterItemsByCategory(category) {
-            return currentItems.filter(item => item.category === category);
+            const categoryItems = currentItems.filter(item => item.category === category);
+            return applyActiveFilters(categoryItems);
+        }
+
+        // Apply all active filters to items
+        function applyActiveFilters(items) {
+            return items.filter(item => {
+                // Mod filter
+                if (activeFilters.mods.size > 0 && !activeFilters.mods.has(item.mod || 'Unknown')) {
+                    return false;
+                }
+
+                // Caliber filter
+                if (activeFilters.calibers.size > 0 && !activeFilters.calibers.has(item.caliber || 'Unknown')) {
+                    return false;
+                }
+
+                // Variant filter
+                if (activeFilters.variants === 'base-only' && item.variant) {
+                    return false;
+                }
+                if (activeFilters.variants === 'variants-only' && !item.variant) {
+                    return false;
+                }
+
+                // Subcategory filter
+                if (activeFilters.subcategories.size > 0 && !activeFilters.subcategories.has(item.subcategory || 'Unknown')) {
+                    return false;
+                }
+
+                return true;
+            });
+        }
+
+        // Generate filter options dynamically based on current category
+        function populateFilterOptions(category) {
+            const categoryItems = currentItems.filter(item => item.category === category);
+            
+            // Get unique values for each filter type
+            const mods = [...new Set(categoryItems.map(item => item.mod || 'Unknown'))].sort();
+            const calibers = [...new Set(categoryItems.map(item => item.caliber).filter(c => c))].sort();
+            const subcategories = [...new Set(categoryItems.map(item => item.subcategory).filter(c => c))].sort();
+
+            // Populate mod filters
+            const modContainer = document.getElementById('modFilters');
+            modContainer.innerHTML = mods.map(mod => `
+                <label class="filter-checkbox">
+                    <input type="checkbox" value="${mod}" onchange="toggleFilter('mods', '${mod}', this.checked)">
+                    <span>${mod}</span>
+                </label>
+            `).join('');
+
+            // Populate caliber filters
+            const caliberContainer = document.getElementById('caliberFilters');
+            caliberContainer.innerHTML = calibers.map(caliber => `
+                <label class="filter-checkbox">
+                    <input type="checkbox" value="${caliber}" onchange="toggleFilter('calibers', '${caliber}', this.checked)">
+                    <span>${caliber}</span>
+                </label>
+            `).join('');
+
+            // Populate subcategory filters
+            const subcategoryContainer = document.getElementById('subcategoryFilters');
+            subcategoryContainer.innerHTML = subcategories.map(subcategory => `
+                <label class="filter-checkbox">
+                    <input type="checkbox" value="${subcategory}" onchange="toggleFilter('subcategories', '${subcategory}', this.checked)">
+                    <span>${subcategory}</span>
+                </label>
+            `).join('');
+        }
+
+        // Toggle individual filter
+        function toggleFilter(filterType, value, isChecked) {
+            if (isChecked) {
+                activeFilters[filterType].add(value);
+            } else {
+                activeFilters[filterType].delete(value);
+            }
+            updateFilteredItems();
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            activeFilters.mods.clear();
+            activeFilters.calibers.clear();
+            activeFilters.subcategories.clear();
+            activeFilters.variants = 'all';
+
+            // Reset UI
+            document.querySelectorAll('.compact-filter-checkboxes input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.querySelector('input[name="variantFilter"][value="all"]').checked = true;
+
+            updateFilteredItems();
+        }
+
+        // Update filtered items and refresh display
+        function updateFilteredItems() {
+            filteredItems = filterItemsByCategory(selectedCategory);
+            renderTreeView(filteredItems, 'leftTreeView');
         }
 
         // Filter compatible accessories for selected weapon using weaponSlots
@@ -281,7 +449,7 @@
             // Get current UI state
             const viewMode = document.querySelector('input[name="viewMode"]:checked')?.value || 'list';
             const sortMethod = document.getElementById('sortingSelect').value;
-            const sortOrder = document.getElementById('sortOrderSelect').value;
+            const sortOrder = currentSortOrder;
             const primaryGrouping = document.getElementById('primaryGrouping').value;
             const secondaryGrouping = document.getElementById('secondaryGrouping').value;
 
@@ -328,7 +496,6 @@
             document.getElementById('timing').textContent = `${(endTime - startTime).toFixed(2)}ms`;
 
             container.innerHTML = html;
-            updateItemCount();
         }
 
         // Simple tree toggle - delegates to simpleTree.js
@@ -351,7 +518,7 @@
                 
                 updateStats(selectedItem);
                 updateLoadout(selectedItem);
-                wireframeRenderer.setSelectedItem(selectedItem);
+                
                 
                 // Update right panel with compatible accessories when weapon is selected
                 if (selectedItem.category === 'weapons') {
@@ -410,6 +577,9 @@
             document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
             document.querySelector(`[data-category="${category}"]`).classList.add('active');
             
+            // Populate filter options for new category
+            populateFilterOptions(category);
+            
             // Filter and display items
             filteredItems = filterItemsByCategory(category);
             renderTreeView(filteredItems, 'leftTreeView');
@@ -436,11 +606,6 @@
             }
         }
 
-        function updateItemCount() {
-            const leftCount = filteredItems.length;
-            const rightCount = filterItemsByCategory(selectedRightCategory).length;
-            document.getElementById('itemCount').textContent = leftCount + rightCount;
-        }
 
         // Data generation
         function regenerateData() {
@@ -542,6 +707,38 @@
             });
         }
 
+        // New compact toggle functions
+        function toggleSortOrder() {
+            currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+            const button = document.getElementById('sortOrderToggle');
+            button.textContent = currentSortOrder === 'asc' ? '↑' : '↓';
+            button.title = currentSortOrder === 'asc' ? 'Ascending order - click for descending' : 'Descending order - click for ascending';
+            renderTreeView(filteredItems, 'leftTreeView');
+        }
+
+        function toggleExpandCollapse() {
+            const button = document.getElementById('treeToggleBtn');
+            const text = document.getElementById('treeToggleText');
+            if (currentExpandState) {
+                collapseAllGroups();
+                button.textContent = '▶';
+                text.textContent = 'Expand All';
+                currentExpandState = false;
+            } else {
+                expandAllGroups();
+                button.textContent = '▼';
+                text.textContent = 'Collapse All';
+                currentExpandState = true;
+            }
+        }
+
+        function toggleFilterPanel() {
+            const panel = document.getElementById('expandableFilterPanel');
+            const tab = document.getElementById('filterTab');
+            panel.classList.toggle('active');
+            tab.classList.toggle('active');
+        }
+
         // Global functions for buttons and tree interaction
         window.regenerateData = regenerateData;
         window.runGrouping = runGrouping;
@@ -552,15 +749,17 @@
         window.toggleInheritanceView = toggleInheritanceView;
         window.expandAllGroups = expandAllGroups;
         window.collapseAllGroups = collapseAllGroups;
+        window.toggleFilter = toggleFilter;
+        window.clearAllFilters = clearAllFilters;
+        window.toggleSortOrder = toggleSortOrder;
+        window.toggleExpandCollapse = toggleExpandCollapse;
+        window.toggleFilterPanel = toggleFilterPanel;
 
         // Event listeners for new UI controls
         document.getElementById('sortingSelect').addEventListener('change', (e) => {
             renderTreeView(filteredItems, 'leftTreeView');
         });
         
-        document.getElementById('sortOrderSelect').addEventListener('change', (e) => {
-            renderTreeView(filteredItems, 'leftTreeView');
-        });
         
         document.getElementById('primaryGrouping').addEventListener('change', (e) => {
             renderTreeView(filteredItems, 'leftTreeView');
@@ -574,6 +773,14 @@
         document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 renderTreeView(filteredItems, 'leftTreeView');
+            });
+        });
+
+        // Variant filter radio button listeners
+        document.querySelectorAll('input[name="variantFilter"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                activeFilters.variants = e.target.value;
+                updateFilteredItems();
             });
         });
         
@@ -590,8 +797,8 @@
         // Search functionality
         document.getElementById('leftSearch').addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const items = filterItemsByCategory(selectedCategory)
-                .filter(item => item.displayName.toLowerCase().includes(searchTerm));
+            const baseItems = filterItemsByCategory(selectedCategory);
+            const items = baseItems.filter(item => item.displayName.toLowerCase().includes(searchTerm));
             renderTreeView(items, 'leftTreeView');
         });
 
@@ -605,6 +812,16 @@
         // Initialize UI state
         switchCategory('weapons');
         switchRightCategory('attachments');
+        
+        // Set initial expand state based on variant view default
+        // Since variant view creates groups, they should start expanded
+        currentExpandState = true;
+        const button = document.getElementById('treeToggleBtn');
+        const text = document.getElementById('treeToggleText');
+        if (button && text) {
+            button.textContent = '▼';
+            text.textContent = 'Collapse All';
+        }
 
         console.log('🎯 ACE3 Arsenal Simulation Ready!');
         console.log('💡 Select a weapon to see compatible attachments and magazines.');
@@ -637,10 +854,6 @@
             caliber: m.caliber
         })));
 
-        // Initialize 3D Wireframe Renderer
-        const canvas = document.getElementById('wireframeCanvas');
-        const wireframeRenderer = new WireframeRenderer(canvas);
-        wireframeRenderer.startAnimation();
     </script>
 </body>
 </html>
