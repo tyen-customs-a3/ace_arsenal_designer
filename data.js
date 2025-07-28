@@ -1,10 +1,6 @@
-// Mock ACE3 Arsenal Data
-// Main export file - imports from modular data files
+// Arsenal Data - JSON-based data loading
+// Main export file - uses structured JSON data
 
-// Import all data generation functions
+// Import the new JSON data loader
+export * from './data/loader.js';
 export * from './data/mockData.js';
-
-// Import utilities for creating custom data
-export * from './data/inheritance.js';
-export * from './data/weapons.js';
-export * from './data/equipment.js';

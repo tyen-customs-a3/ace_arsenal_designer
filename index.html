@@ -213,7 +213,7 @@
 
     <script type="module">
         // Import data and algorithms
-        import { generateMockItems, MOCK_ITEMS } from './data.js';
+        import { getMockItems } from './data.js';
         import * as algorithms from './algorithms.js';
         import * as groupingAlgorithms from './algorithms/grouping.js';
         import * as multiGrouping from './algorithms/multiGrouping.js';
@@ -228,8 +228,8 @@
         } from './ui/simpleTree.js';
         
         // Global state - simplified
-        let currentItems = [...MOCK_ITEMS];
-        let filteredItems = [...MOCK_ITEMS];
+        let currentItems = [];
+        let filteredItems = [];
         let selectedCategory = 'weapons';
         let selectedRightCategory = 'attachments';
         let selectedItem = null;
@@ -809,50 +809,72 @@
             renderTreeView(items, 'rightTreeView', false);
         });
 
-        // Initialize UI state
-        switchCategory('weapons');
-        switchRightCategory('attachments');
-        
-        // Set initial expand state based on variant view default
-        // Since variant view creates groups, they should start expanded
-        currentExpandState = true;
-        const button = document.getElementById('treeToggleBtn');
-        const text = document.getElementById('treeToggleText');
-        if (button && text) {
-            button.textContent = '▼';
-            text.textContent = 'Collapse All';
-        }
+        // Async initialization function
+        async function initializeArsenal() {
+            // Show loading message
+            document.getElementById('timing').textContent = 'Loading data...';
+            
+            try {
+                // Load data asynchronously
+                const items = await getMockItems();
+                currentItems = [...items];
+                filteredItems = [...items];
+                
+                // Initialize UI state
+                switchCategory('weapons');
+                switchRightCategory('attachments');
+                
+                // Set initial expand state based on variant view default
+                // Since variant view creates groups, they should start expanded
+                currentExpandState = true;
+                const button = document.getElementById('treeToggleBtn');
+                const text = document.getElementById('treeToggleText');
+                if (button && text) {
+                    button.textContent = '▼';
+                    text.textContent = 'Collapse All';
+                }
 
-        console.log('🎯 ACE3 Arsenal Simulation Ready!');
-        console.log('💡 Select a weapon to see compatible attachments and magazines.');
-        console.log('📊 Items loaded:', {
-            weapons: currentItems.filter(i => i.category === 'weapons').length,
-            handguns: currentItems.filter(i => i.category === 'handguns').length,
-            launchers: currentItems.filter(i => i.category === 'launchers').length,
-            attachments: currentItems.filter(i => i.category === 'attachments').length,
-            magazines: currentItems.filter(i => i.category === 'magazines').length,
-            backpacks: currentItems.filter(i => i.category === 'backpacks').length,
-            vests: currentItems.filter(i => i.category === 'vests').length
-        });
+                console.log('🎯 ACE3 Arsenal Simulation Ready!');
+                console.log('💡 Select a weapon to see compatible attachments and magazines.');
+                console.log('📊 Items loaded:', {
+                    weapons: currentItems.filter(i => i.category === 'weapons').length,
+                    handguns: currentItems.filter(i => i.category === 'handguns').length,
+                    launchers: currentItems.filter(i => i.category === 'launchers').length,
+                    attachments: currentItems.filter(i => i.category === 'attachments').length,
+                    magazines: currentItems.filter(i => i.category === 'magazines').length,
+                    backpacks: currentItems.filter(i => i.category === 'backpacks').length,
+                    vests: currentItems.filter(i => i.category === 'vests').length
+                });
+                
+                // Debug: Check some sample items have the right data
+                const sampleWeapon = currentItems.find(i => i.category === 'weapons');
+                const sampleMagazine = currentItems.find(i => i.category === 'magazines');
+                const sampleAttachment = currentItems.find(i => i.category === 'attachments');
+                
+                console.log('🔫 Sample weapon:', sampleWeapon?.displayName, 'magazineWells:', sampleWeapon?.magazineWells, 'weaponSlots:', sampleWeapon?.weaponSlots);
+                console.log('📦 Sample magazine:', sampleMagazine?.displayName, 'magazineWells:', sampleMagazine?.magazineWells);
+                console.log('🔧 Sample attachment:', sampleAttachment?.displayName, 'weaponSlots:', sampleAttachment?.weaponSlots);
+                
+                // Debug: Check all magazines for magazineWells data
+                const allMagazines = currentItems.filter(i => i.category === 'magazines');
+                console.log('📦 Total magazines:', allMagazines.length);
+                console.log('📦 Magazines with magazineWells:', allMagazines.filter(m => m.magazineWells && m.magazineWells.length > 0).length);
+                console.log('📦 Sample magazine data:', allMagazines.slice(0, 3).map(m => ({
+                    name: m.displayName,
+                    magazineWells: m.magazineWells,
+                    caliber: m.caliber
+                })));
+                
+                document.getElementById('timing').textContent = 'Ready';
+                
+            } catch (error) {
+                console.error('Failed to load arsenal data:', error);
+                document.getElementById('timing').textContent = 'Error loading data';
+            }
+        }
         
-        // Debug: Check some sample items have the right data
-        const sampleWeapon = currentItems.find(i => i.category === 'weapons');
-        const sampleMagazine = currentItems.find(i => i.category === 'magazines');
-        const sampleAttachment = currentItems.find(i => i.category === 'attachments');
-        
-        console.log('🔫 Sample weapon:', sampleWeapon?.displayName, 'magazineWells:', sampleWeapon?.magazineWells, 'weaponSlots:', sampleWeapon?.weaponSlots);
-        console.log('📦 Sample magazine:', sampleMagazine?.displayName, 'magazineWells:', sampleMagazine?.magazineWells);
-        console.log('🔧 Sample attachment:', sampleAttachment?.displayName, 'weaponSlots:', sampleAttachment?.weaponSlots);
-        
-        // Debug: Check all magazines for magazineWells data
-        const allMagazines = currentItems.filter(i => i.category === 'magazines');
-        console.log('📦 Total magazines:', allMagazines.length);
-        console.log('📦 Magazines with magazineWells:', allMagazines.filter(m => m.magazineWells && m.magazineWells.length > 0).length);
-        console.log('📦 Sample magazine data:', allMagazines.slice(0, 3).map(m => ({
-            name: m.displayName,
-            magazineWells: m.magazineWells,
-            caliber: m.caliber
-        })));
+        // Initialize the application
+        initializeArsenal();
 
     </script>
 </body>

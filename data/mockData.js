@@ -1,22 +1,19 @@
-// Main mock data service
+// Main mock data service - JSON-based loading
 
-import { generateWeapons, generateHandguns } from './weapons.js';
-import { generateBackpacks, generateVests, generateAttachments, generateMagazines } from './equipment.js';
+import { generateAllItems } from './loader.js';
 
-// Generate variety of items for testing
-export function generateMockItems(count = 400) {
-    const items = [];
+// Generate variety of items for testing - now async
+export async function generateMockItems(count = 400) {
+    // Load all items from JSON
+    const items = await generateAllItems();
     
-    // Generate different categories - magazines first to ensure they're included
-    items.push(...generateMagazines());
-    items.push(...generateAttachments());
-    items.push(...generateWeapons());
-    items.push(...generateHandguns());
-    items.push(...generateBackpacks());
-    items.push(...generateVests());
+    // TODO: Add equipment items (attachments, magazines, etc.) back from equipment.js
+    // For now, just return the JSON items
     
     return items.slice(0, count);
 }
 
-// Default dataset for immediate use
-export const MOCK_ITEMS = generateMockItems(400);
+// Async function to get items - replaces MOCK_ITEMS constant
+export async function getMockItems() {
+    return generateMockItems(400);
+}
