@@ -1,22 +1,18 @@
 // Simple Tree View Implementation
 // Replaces the overcomplicated TreeNode system
 
-// Build inheritance hierarchy tree from class relationships
-export function createTreeData(items, useGrouping, groupingFunction, sortingFunction) {
+// Build tree with proper separation of grouping and view mode concerns
+export function createTreeData(items, useGrouping, groupingFunction, sortingFunction, viewMode = 'list') {
     // Apply sorting first if specified
     const sortedItems = sortingFunction ? sortingFunction(items) : items;
     
     if (!useGrouping) {
-        // Flat list - no grouping or inheritance hierarchy
-        return sortedItems.map(item => ({
-            name: item.displayName,
-            item: item,
-            children: null
-        }));
+        // No top-level grouping, apply view mode directly to all items
+        return applyViewMode(sortedItems, viewMode);
     }
     
     if (groupingFunction && groupingFunction !== 'none') {
-        // Property-based grouping (Mod, Caliber, etc.)
+        // Apply top-level grouping first
         const groups = groupingFunction(sortedItems);
         const treeData = [];
         
@@ -39,21 +35,25 @@ export function createTreeData(items, useGrouping, groupingFunction, sortingFunc
                     treeData.push(primaryNode);
                 }
                 
+                // Apply view mode within this secondary group
+                const childrenData = applyViewMode(groupItems, viewMode);
+                
                 const secondaryNode = {
                     name: secondaryGroup,
                     item: null,
-                    children: groupItems.map(item => ({
-                        name: item.displayName,
-                        item: item,
-                        children: null
-                    }))
+                    children: childrenData
                 };
                 
                 primaryNode.children.push(secondaryNode);
             } else {
-                // Check if this is a single-item group that should be rendered flat
-                if (groupItems.length === 1) {
-                    // Single item - render as flat item, not as expandable group
+                // Single-level grouping
+                
+                // Apply view mode within this group
+                const childrenData = applyViewMode(groupItems, viewMode);
+                
+                // Check if we should flatten single-item groups (only for flat list view)
+                if (groupItems.length === 1 && viewMode === 'list') {
+                    // Single item in flat view - render as flat item, not as expandable group
                     const item = groupItems[0];
                     treeData.push({
                         name: item.displayName,
@@ -61,15 +61,11 @@ export function createTreeData(items, useGrouping, groupingFunction, sortingFunc
                         children: null
                     });
                 } else {
-                    // Multiple items - render as expandable group
+                    // Multiple items or non-flat view - render as expandable group
                     const groupNode = {
                         name: groupName,
                         item: null,
-                        children: groupItems.map(item => ({
-                            name: item.displayName,
-                            item: item,
-                            children: null
-                        }))
+                        children: childrenData
                     };
                     
                     treeData.push(groupNode);
@@ -79,9 +75,96 @@ export function createTreeData(items, useGrouping, groupingFunction, sortingFunc
         
         return treeData;
     } else {
-        // Build inheritance hierarchy from baseClass relationships
-        return buildInheritanceHierarchy(sortedItems);
+        // No grouping function provided, apply view mode directly
+        return applyViewMode(sortedItems, viewMode);
     }
+}
+
+// Apply view mode logic to a set of items
+function applyViewMode(items, viewMode) {
+    switch(viewMode) {
+        case 'list':
+            return items.map(item => ({
+                name: item.displayName,
+                item: item,
+                children: null
+            }));
+        case 'hierarchy':
+            return buildInheritanceHierarchy(items);
+        case 'variants':
+            return buildVariantHierarchy(items);
+        default:
+            return items.map(item => ({
+                name: item.displayName,
+                item: item,
+                children: null
+            }));
+    }
+}
+
+// Build variant hierarchy tree from variant relationships
+function buildVariantHierarchy(items) {
+    const groups = new Map();
+    
+    // First pass: collect all base items (items without variants)
+    items.forEach(item => {
+        if (!item.variant) {
+            if (!groups.has(item.className)) {
+                groups.set(item.className, []);
+            }
+            groups.get(item.className).push(item);
+        }
+    });
+    
+    // Second pass: group variants with their base items using baseClass
+    items.forEach(item => {
+        if (item.variant && item.baseClass) {
+            if (!groups.has(item.baseClass)) {
+                groups.set(item.baseClass, []);
+            }
+            groups.get(item.baseClass).push(item);
+        }
+    });
+    
+    // Build tree structure
+    const treeData = [];
+    
+    for (const [baseClassName, groupItems] of groups) {
+        if (groupItems.length === 0) continue;
+        
+        // Sort items within group - base item first, then variants by name
+        groupItems.sort((a, b) => {
+            if (!a.variant && b.variant) return -1;
+            if (a.variant && !b.variant) return 1;
+            return a.displayName.localeCompare(b.displayName);
+        });
+        
+        if (groupItems.length === 1) {
+            // Single item - no variant grouping needed
+            const item = groupItems[0];
+            treeData.push({
+                name: item.displayName,
+                item: item,
+                children: null
+            });
+        } else {
+            // Multiple items - create variant group
+            const baseItem = groupItems.find(item => !item.variant) || groupItems[0];
+            const groupNode = {
+                name: baseItem.displayName, // Group name is base item's name
+                item: null, // Group is not selectable - it's just a container
+                children: groupItems.map(item => ({
+                    name: item.displayName,
+                    item: item,
+                    children: null
+                }))
+            };
+            
+            treeData.push(groupNode);
+        }
+    }
+    
+    return treeData;
 }
 
 // Build class inheritance hierarchy tree
@@ -201,8 +284,10 @@ function renderTreeNode(node, level) {
         // Leaf item - no toggle needed, no count needed, simple left-aligned text
         const clickHandler = node.item ? `onclick="selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'` : '';
         const className = node.item ? 'tree-item' : 'tree-item tree-base-class';
-        html += `<li style="margin-left: ${indent}px;" class="${className}" ${clickHandler}>`;
+        html += `<li style="margin-left: ${indent}px;">`;
+        html += `<div class="${className}" ${clickHandler}>`;
         html += `<span class="tree-bullet">•</span> ${node.name}`;
+        html += `</div>`;
         html += '</li>';
     }
     

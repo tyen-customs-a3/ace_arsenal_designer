@@ -455,24 +455,18 @@
 
             let groupingFunction = null;
             let sortingFunction = null;
-            let showHierarchy = false;
 
             // Get sorting function
             if (sortMethod && algorithms[sortMethod]) {
                 sortingFunction = (items) => algorithms[sortMethod](items, sortOrder);
             }
 
-            // Determine what kind of tree to show
-            if (viewMode === 'hierarchy') {
-                // Show inheritance hierarchy regardless of grouping settings
-                showHierarchy = true;
-                useGrouping = true;
-            } else if (viewMode === 'variants') {
-                // Show variants view - group by weapon variants
-                useGrouping = true;
-                groupingFunction = groupingAlgorithms.groupByVariants;
-            } else if (primaryGrouping !== 'none') {
-                // Show property-based grouping
+            // Determine grouping and view mode
+            // Priority: User grouping selection > View mode default behavior
+            
+            if (primaryGrouping !== 'none') {
+                // User has selected a grouping - apply it as top-level grouping
+                // View mode will be applied within each group
                 useGrouping = true;
                 if (secondaryGrouping !== 'none') {
                     // Multi-level grouping
@@ -482,12 +476,19 @@
                     groupingFunction = algorithms[primaryGrouping];
                 }
             } else {
-                // Flat list - no grouping
-                useGrouping = false;
+                // No user grouping selected - let view mode handle all organization
+                if (viewMode === 'variants' || viewMode === 'hierarchy') {
+                    // Special view modes that handle their own organization
+                    useGrouping = true;
+                    groupingFunction = null; // No top-level grouping, let view mode handle everything
+                } else {
+                    // Flat list with no grouping
+                    useGrouping = false;
+                }
             }
 
-            // Create tree data structure
-            const treeData = createTreeData(items, useGrouping, groupingFunction, sortingFunction);
+            // Create tree data structure - view mode determines how items are displayed within groups
+            const treeData = createTreeData(items, useGrouping, groupingFunction, sortingFunction, viewMode);
             
             // Render simple tree
             const html = `<ul class="tree-view">${renderSimpleTree(treeData)}</ul>`;

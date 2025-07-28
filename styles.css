@@ -543,6 +543,8 @@ body {
     align-items: center;
     gap: 4px;
     border-bottom: 1px solid #1a1a1a;
+    height: 24px; /* Match tree-item height */
+    min-height: 24px;
 }
 
 .tree-group {
@@ -567,6 +569,12 @@ body {
     color: #ccc;
     font-size: 12px;
     flex: 1;
+    height: 24px; /* Match tree-item height */
+    min-height: 24px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    line-height: 1;
 }
 
 .tree-parent:hover {
@@ -588,6 +596,11 @@ body {
     min-width: 16px;
     text-align: center;
     flex-shrink: 0;
+    height: 16px; /* Constrain toggle height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .tree-toggle:hover {
@@ -600,7 +613,9 @@ body {
 .item-count-inline {
     color: #666;
     font-size: 10px;
-    float: right;
+    margin-left: auto;
+    flex-shrink: 0;
+    line-height: 1;
 }
 
 .tree-children {
@@ -613,6 +628,12 @@ body {
     color: #ccc;
     font-size: 12px;
     border-bottom: 1px solid #1a1a1a;
+    height: 24px; /* Explicit height for consistency */
+    min-height: 24px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    line-height: 1;
 }
 
 .tree-item:hover {
@@ -628,6 +649,8 @@ body {
 .tree-bullet {
     color: #666;
     margin-right: 6px;
+    line-height: 1;
+    flex-shrink: 0;
 }
 
 .tree-base-class {
