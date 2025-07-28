@@ -1,4 +1,5 @@
 // Enhanced sorting algorithms with direction support
+import { sortWithVariantAwareness } from './variantCore.js';
 
 export function sortByName(items, direction = 'asc') {
     const sorted = [...items].sort((a, b) => 
@@ -99,3 +100,44 @@ export function sortByCategoryDesc(items) {
 }
 
 // sortByEffectivenessScore removed - not realistic for Arma 3 configs
+
+// Variant-aware sorting functions
+export function sortByNameVariantAware(items, direction = 'asc') {
+    const sortFn = (a, b) => {
+        const result = a.displayName.localeCompare(b.displayName);
+        return direction === 'desc' ? -result : result;
+    };
+    return sortWithVariantAwareness(items, sortFn);
+}
+
+export function sortByModVariantAware(items, direction = 'asc') {
+    const modPriority = { 'A3': 1, 'ACE3': 2, 'RHS': 3, 'CUP': 4 };
+    
+    const sortFn = (a, b) => {
+        const priorityA = modPriority[a.mod] || 999;
+        const priorityB = modPriority[b.mod] || 999;
+        
+        if (priorityA !== priorityB) {
+            const result = priorityA - priorityB;
+            return direction === 'desc' ? -result : result;
+        }
+        return a.displayName.localeCompare(b.displayName);
+    };
+    
+    return sortWithVariantAwareness(items, sortFn);
+}
+
+export function sortByRangeVariantAware(items, direction = 'desc') {
+    const sortFn = (a, b) => {
+        const rangeA = a.range || 0;
+        const rangeB = b.range || 0;
+        
+        if (rangeB !== rangeA) {
+            const result = rangeB - rangeA; // Default descending
+            return direction === 'asc' ? -result : result;
+        }
+        return a.displayName.localeCompare(b.displayName);
+    };
+    
+    return sortWithVariantAwareness(items, sortFn);
+}

@@ -1,5 +1,5 @@
 // Basic grouping algorithms
-
+import { VariantManager, groupWithVariantAwareness, createArsenalHierarchy } from './variantCore.js';
 
 export function groupByMod(items) {
     const groups = {};
@@ -110,58 +110,68 @@ export function groupByModDetailed(items) {
 }
 
 export function groupByVariants(items) {
-    // Group items by their baseClass to create proper inheritance-based variant groups
-    const groups = new Map();
-    
-    // First pass: collect all base weapons (items without variants)
-    items.forEach(item => {
-        if (!item.variant) {
-            // This is a base weapon
-            if (!groups.has(item.className)) {
-                groups.set(item.className, []);
-            }
-            groups.get(item.className).push(item);
-        }
+    return createArsenalHierarchy(items);
+}
+
+// Arsenal-style mixed flat/hierarchical display
+export function groupByArsenalStyle(items) {
+    return createArsenalHierarchy(items);
+}
+
+// Enhanced variant grouping with mod awareness
+export function groupByVariantsWithMod(items) {
+    return groupWithVariantAwareness(items, (item) => {
+        const mod = item.mod || 'Unknown';
+        return `${mod} Weapons`;
     });
-    
-    // Second pass: group variants with their base weapons using baseClass
-    items.forEach(item => {
-        if (item.variant && item.baseClass) {
-            // This is a variant - group it with its base weapon
-            if (!groups.has(item.baseClass)) {
-                groups.set(item.baseClass, []);
-            }
-            groups.get(item.baseClass).push(item);
-        }
-    });
-    
-    // Build final result structure
-    const result = {};
-    
-    for (const [baseClassName, groupItems] of groups) {
-        if (groupItems.length === 0) continue;
-        
-        // Sort items within group - base weapon first, then variants by name
-        groupItems.sort((a, b) => {
-            // Base weapon (without variant) comes first
-            if (!a.variant && b.variant) return -1;
-            if (a.variant && !b.variant) return 1;
-            
-            // Both are variants or both are base, sort by display name
-            return a.displayName.localeCompare(b.displayName);
-        });
-        
-        if (groupItems.length === 1) {
-            // Single item - use its display name as key
-            const item = groupItems[0];
-            result[item.displayName] = groupItems;
+}
+
+// Variant-aware caliber grouping
+export function groupByVariantsWithCaliber(items) {
+    return groupWithVariantAwareness(items, (item) => {
+        if (item.category === 'weapons' || item.category === 'magazines') {
+            const caliber = item.caliber || 'Unknown Caliber';
+            return caliber;
         } else {
-            // Multiple items - use base weapon's display name as group key
-            const baseWeapon = groupItems.find(item => !item.variant) || groupItems[0];
-            result[baseWeapon.displayName] = groupItems;
+            return 'Other';
         }
-    }
-    
-    return result;
+    });
+}
+
+// Variant-aware role-based grouping
+export function groupByVariantsWithRole(items) {
+    return groupWithVariantAwareness(items, (item) => {
+        if (item.category !== 'weapons') return 'Non-Weapons';
+        
+        const name = item.displayName.toLowerCase();
+        const subcategory = item.subcategory || '';
+        
+        // Determine tactical role
+        if (subcategory === 'machine_guns') return 'Machine Guns';
+        if (subcategory === 'sniper_rifles') return 'Designated Marksman / Sniper';
+        if (name.includes('sw') || name.includes('lmg')) return 'Support Weapons';
+        if (name.includes('c') || name.includes('cqc') || name.includes('compact')) return 'Close Quarters Combat';
+        if (name.includes('gl') || item.underbarrel) return 'Grenadier';
+        if (subcategory === 'rifles') return 'Assault Rifles';
+        
+        return 'Other Weapons';
+    });
+}
+
+// Simple flat list with variant ordering (for testing)
+export function sortVariantsFlat(items) {
+    return VariantManager.createVariantOrderedList(items);
+}
+
+// Demonstration of the exact structure shown in user example
+export function groupByArsenalDemo(items) {
+    // This creates the exact structure:
+    // • AK-105 (single weapon)
+    // AK-74M (4) <- collapsible group
+    //   • AK-74M
+    //   • AK-74M (Desert) 
+    //   • AK-74M (Plum)
+    //   • AK-74M (Zenitco)
+    return createArsenalHierarchy(items);
 }
 

@@ -1,4 +1,5 @@
 // Inheritance and hierarchy-based algorithms
+import { VariantManager, createVariantHierarchy, createArsenalHierarchy, sortWithVariantAwareness } from './variantCore.js';
 
 export function groupByInheritance(items) {
     const groups = {};
@@ -87,35 +88,54 @@ export function groupByClassHierarchy(items) {
 }
 
 export function groupByVariants(items) {
-    const groups = {};
+    return createArsenalHierarchy(items);
+}
+
+// Enhanced variant hierarchy with weapon family grouping
+export function groupByWeaponFamilyVariants(items) {
+    const variantGroups = VariantManager.buildVariantGroups(items);
+    const familyGroups = {};
     
-    items.forEach(item => {
-        if (item.variant) {
-            // Group variants together
-            const baseName = item.displayName.split(' (')[0]; // Remove variant part
-            const groupName = `${baseName} Variants`;
-            
-            if (!groups[groupName]) groups[groupName] = [];
-            groups[groupName].push(item);
-        } else {
-            // Base items get their own groups
-            const groupName = 'Base Items';
-            if (!groups[groupName]) groups[groupName] = [];
-            groups[groupName].push(item);
+    for (const [baseClassName, group] of variantGroups) {
+        const baseWeapon = group.baseWeapon || group.variants[0];
+        if (!baseWeapon) continue;
+        
+        // Determine weapon family (MX, AK, M4, etc.)
+        const familyName = determineWeaponFamily(baseWeapon);
+        
+        if (!familyGroups[familyName]) {
+            familyGroups[familyName] = {};
         }
-    });
+        
+        // Group name based on base weapon display name
+        const groupName = group.baseWeapon ? group.baseWeapon.displayName : baseClassName;
+        const allItems = [group.baseWeapon, ...group.variants].filter(Boolean);
+        
+        familyGroups[familyName][groupName] = allItems;
+    }
     
-    // Sort variants by name within each group
-    Object.keys(groups).forEach(key => {
-        groups[key].sort((a, b) => {
-            if (a.variant && b.variant) {
-                return a.variant.localeCompare(b.variant);
-            }
-            return a.displayName.localeCompare(b.displayName);
-        });
-    });
+    return familyGroups;
+}
+
+function determineWeaponFamily(weapon) {
+    const name = weapon.displayName.toLowerCase();
+    const className = weapon.className.toLowerCase();
     
-    return groups;
+    // Pattern matching for weapon families
+    if (name.includes('mx') || className.includes('mx')) return 'MX Family';
+    if (name.includes('ak-') || className.includes('ak')) return 'AK Family';
+    if (name.includes('m4') || name.includes('m16') || className.includes('m4') || className.includes('m16')) return 'AR-15 Family';
+    if (name.includes('katiba') || className.includes('katiba')) return 'Katiba Family';
+    if (name.includes('trg') || className.includes('trg')) return 'TRG Family';
+    if (name.includes('mk') && name.includes('17') || className.includes('mk17')) return 'SCAR Family';
+    if (name.includes('hk416') || className.includes('hk416')) return 'HK416 Family';
+    if (name.includes('g36') || className.includes('g36')) return 'G36 Family';
+    if (name.includes('aug') || className.includes('aug')) return 'AUG Family';
+    if (name.includes('fal') || className.includes('fal')) return 'FAL Family';
+    if (name.includes('l85') || className.includes('l85')) return 'L85 Family';
+    
+    // Default fallback
+    return 'Other Weapons';
 }
 
 export function groupByInheritanceTree(items) {
