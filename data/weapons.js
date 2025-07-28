@@ -619,17 +619,31 @@ export function generateWeapons() {
     });
     items.push(scarH);
     
+    // Create proper base STD variant first
+    const scarHSTD = createInheritedItem('CUP_arifle_Mk17_STD', 'Mk 17 Mod 0 STD', 'weapons', 'Rifle_Base_F', ['Rifle_Base_F'], {
+        subcategory: 'rifles',
+        caliber: '7.62×51 mm',
+        range: 600,
+        rateOfFire: 600,
+        mass: 4000,
+        modes: ['Single', 'FullAuto'],
+        magazines: ['CUP_20Rnd_762x51_B_SCAR'],
+        mod: 'CUP_Weapons',
+        scope: 2
+    });
+    items.push(scarHSTD);
+    
+    // Create variants with proper short names
     const scarHVariants = [
-        { className: 'CUP_arifle_Mk17_STD', name: 'Mk 17 Mod 0 STD', texture: 'std', range: 600, mass: 4000 },
-        { className: 'CUP_arifle_Mk17_CQC_FG', name: 'Mk 17 Mod 0 CQC (FG)', texture: 'cqc_fg' },
-        { className: 'CUP_arifle_Mk17_STD_FG', name: 'Mk 17 Mod 0 STD (FG)', texture: 'std_fg', range: 600, mass: 4000 }
+        { className: 'CUP_arifle_Mk17_CQC_FG', name: 'FG', texture: 'cqc_fg', baseItem: scarH },
+        { className: 'CUP_arifle_Mk17_STD_FG', name: 'FG', texture: 'std_fg', baseItem: scarHSTD, range: 600, mass: 4000 }
     ];
     
     scarHVariants.forEach(variant => {
-        const item = createVariant(scarH, variant.name, variant.texture, {
+        const item = createVariant(variant.baseItem, variant.name, variant.texture, {
             className: variant.className,
-            range: variant.range || scarH.range,
-            mass: variant.mass || scarH.mass
+            range: variant.range || variant.baseItem.range,
+            mass: variant.mass || variant.baseItem.mass
         });
         items.push(item);
     });
@@ -1142,9 +1156,9 @@ export function generateHandguns() {
     
     // EMR variants
     const emrVariants = [
-        { className: 'srifle_DMR_03_khaki_F', name: 'Mk-I EMR (Khaki)', texture: 'khaki' },
-        { className: 'srifle_DMR_03_multicam_F', name: 'Mk-I EMR (Multicam)', texture: 'multicam' },
-        { className: 'srifle_DMR_03_woodland_F', name: 'Mk-I EMR (Woodland)', texture: 'woodland' }
+        { className: 'srifle_DMR_03_khaki_F', name: 'Khaki', texture: 'khaki' },
+        { className: 'srifle_DMR_03_multicam_F', name: 'Multicam', texture: 'multicam' },
+        { className: 'srifle_DMR_03_woodland_F', name: 'Woodland', texture: 'woodland' }
     ];
     
     emrVariants.forEach(variant => {
@@ -1182,8 +1196,8 @@ export function generateHandguns() {
         items.push(item);
     });
     
-    // MXM 6.5 mm (Enhanced marksman variant)
-    const mxmEnhanced = createInheritedItem('srifle_DMR_06_camo_F', 'Mk14 7.62 mm (Camo)', 'weapons', 'Rifle_Long_Base_F', ['Rifle_Long_Base_F'], {
+    // Mk14 7.62 mm (Base weapon)
+    const mk14 = createInheritedItem('srifle_DMR_06_camo_F', 'Mk14 7.62 mm (Camo)', 'weapons', 'Rifle_Long_Base_F', ['Rifle_Long_Base_F'], {
         subcategory: 'sniper_rifles',
         caliber: '7.62×51 mm',
         range: 750,
@@ -1195,22 +1209,43 @@ export function generateHandguns() {
         scope: 2,
         dlc: 'Marksmen'
     });
-    items.push(mxmEnhanced);
+    items.push(mk14);
     
-    // Mk14 variants
+    // Mk14 variants (only texture variants of the same weapon)
     const mk14Variants = [
-        { className: 'srifle_DMR_06_olive_F', name: 'Mk14 7.62 mm (Olive)', texture: 'olive' },
-        { className: 'srifle_DMR_04_F', name: 'ASP-1 Kir 12.7 mm', texture: 'asp1', caliber: '12.7×54 mm', magazines: ['10Rnd_127x54_Mag'], range: 1200, mass: 8500 },
-        { className: 'srifle_DMR_04_Tan_F', name: 'ASP-1 Kir 12.7 mm (Tan)', texture: 'asp1_tan', caliber: '12.7×54 mm', magazines: ['10Rnd_127x54_Mag'], range: 1200, mass: 8500 }
+        { className: 'srifle_DMR_06_olive_F', name: 'Olive', texture: 'olive' }
     ];
     
     mk14Variants.forEach(variant => {
-        const item = createVariant(mxmEnhanced, variant.name, variant.texture, {
-            className: variant.className,
-            caliber: variant.caliber || mxmEnhanced.caliber,
-            magazines: variant.magazines || mxmEnhanced.magazines,
-            range: variant.range || mxmEnhanced.range,
-            mass: variant.mass || mxmEnhanced.mass
+        const item = createVariant(mk14, variant.name, variant.texture, {
+            className: variant.className
+        });
+        items.push(item);
+    });
+    
+    // ASP-1 Kir 12.7 mm (Separate weapon family)
+    const asp1Kir = createInheritedItem('srifle_DMR_04_F', 'ASP-1 Kir 12.7 mm', 'weapons', 'Rifle_Long_Base_F', ['Rifle_Long_Base_F'], {
+        subcategory: 'sniper_rifles',
+        caliber: '12.7×54 mm',
+        range: 1200,
+        rateOfFire: 400,
+        mass: 8500,
+        modes: ['Single'],
+        magazines: ['10Rnd_127x54_Mag'],
+        mod: 'A3',
+        scope: 2,
+        dlc: 'Marksmen'
+    });
+    items.push(asp1Kir);
+    
+    // ASP-1 Kir variants
+    const asp1KirVariants = [
+        { className: 'srifle_DMR_04_Tan_F', name: 'Tan', texture: 'tan' }
+    ];
+    
+    asp1KirVariants.forEach(variant => {
+        const item = createVariant(asp1Kir, variant.name, variant.texture, {
+            className: variant.className
         });
         items.push(item);
     });
@@ -1245,7 +1280,7 @@ export function generateHandguns() {
         items.push(item);
     });
     
-    // Navid 9.3 mm
+    // Navid 9.3 mm (Base weapon)
     const navid = createInheritedItem('MMG_01_hex_F', 'Navid 9.3 mm (Hex)', 'weapons', 'MGun_base_F', ['MGun_base_F'], {
         subcategory: 'machine_guns',
         caliber: '9.3×64 mm',
@@ -1262,7 +1297,7 @@ export function generateHandguns() {
     
     // Navid variants
     const navidVariants = [
-        { className: 'MMG_01_tan_F', name: 'Navid 9.3 mm (Tan)', texture: 'tan' }
+        { className: 'MMG_01_tan_F', name: 'Tan', texture: 'tan' }
     ];
     
     navidVariants.forEach(variant => {

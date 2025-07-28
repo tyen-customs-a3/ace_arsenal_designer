@@ -110,65 +110,57 @@ export function groupByModDetailed(items) {
 }
 
 export function groupByVariants(items) {
-    // For variants view, return items directly without grouping
-    // The tree renderer will handle the flat display
-    const sortedItems = [...items].sort((a, b) => a.displayName.localeCompare(b.displayName));
+    // Group items by their baseClass to create proper inheritance-based variant groups
+    const groups = new Map();
     
-    // Group items by base weapon name for processing
-    const groups = {};
-    
-    sortedItems.forEach(item => {
-        // Extract base weapon name by removing variant suffixes
-        let baseWeaponName = item.displayName;
-        
-        // Remove common variant indicators from display names
-        baseWeaponName = baseWeaponName
-            .replace(/\s*\(([^)]+)\)$/, '') // Remove anything in parentheses at end
-            .replace(/\s*(Black|Khaki|Desert|Woodland|Camo|Tan|Sand|Olive|Hex|MTP|Multicam|Plum|Zenitco|Block\s*II?|Carry\s*Handle|M-Stock|LMT|D\d+RS?|GL|UGL|RIS|DMR|OSW|ANPVS4|Railed|Compact|CQC|STD|SV|FG)$/i, '') // Remove texture/variant suffixes
-            .replace(/\s+\+\s+\w+$/, '') // Remove "+ attachment" suffixes like "+ M203"
-            .trim();
-        
-        // If no base name found, use the full display name
-        if (!baseWeaponName) {
-            baseWeaponName = item.displayName;
+    // First pass: collect all base weapons (items without variants)
+    items.forEach(item => {
+        if (!item.variant) {
+            // This is a base weapon
+            if (!groups.has(item.className)) {
+                groups.set(item.className, []);
+            }
+            groups.get(item.className).push(item);
         }
-        
-        // Create group if it doesn't exist
-        if (!groups[baseWeaponName]) {
-            groups[baseWeaponName] = [];
-        }
-        
-        groups[baseWeaponName].push(item);
     });
     
-    // Build result: single items as flat, multiple items as expandable groups
+    // Second pass: group variants with their base weapons using baseClass
+    items.forEach(item => {
+        if (item.variant && item.baseClass) {
+            // This is a variant - group it with its base weapon
+            if (!groups.has(item.baseClass)) {
+                groups.set(item.baseClass, []);
+            }
+            groups.get(item.baseClass).push(item);
+        }
+    });
+    
+    // Build final result structure
     const result = {};
     
-    Object.keys(groups).sort().forEach(key => {
-        const groupItems = groups[key];
+    for (const [baseClassName, groupItems] of groups) {
+        if (groupItems.length === 0) continue;
         
-        // Sort items within group - base variant first, then by variant name
+        // Sort items within group - base weapon first, then variants by name
         groupItems.sort((a, b) => {
-            // Items without variants (base weapons) come first
-            const aHasVariant = a.variant || a.displayName.includes('(') || a.displayName.includes('+');
-            const bHasVariant = b.variant || b.displayName.includes('(') || b.displayName.includes('+');
+            // Base weapon (without variant) comes first
+            if (!a.variant && b.variant) return -1;
+            if (a.variant && !b.variant) return 1;
             
-            if (!aHasVariant && bHasVariant) return -1;
-            if (aHasVariant && !bHasVariant) return 1;
-            
-            // Both have variants or both don't, sort by display name
+            // Both are variants or both are base, sort by display name
             return a.displayName.localeCompare(b.displayName);
         });
         
         if (groupItems.length === 1) {
-            // Single item - keep as array but use item's display name as key
+            // Single item - use its display name as key
             const item = groupItems[0];
             result[item.displayName] = groupItems;
         } else {
-            // Multiple items - add as expandable group using base name as key
-            result[key] = groupItems;
+            // Multiple items - use base weapon's display name as group key
+            const baseWeapon = groupItems.find(item => !item.variant) || groupItems[0];
+            result[baseWeapon.displayName] = groupItems;
         }
-    });
+    }
     
     return result;
 }
