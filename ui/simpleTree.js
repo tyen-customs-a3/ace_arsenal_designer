@@ -281,7 +281,7 @@ function renderTreeNode(node, level) {
         // For primary groups, the toggle is just visual since the whole row is clickable
         // For other groups, keep the separate toggle functionality
         const toggleHandler = isPrimaryGroupHeader ? '' : `onclick="event.stopPropagation(); toggleTreeGroup('${nodeId}');"`;
-        html += `<span class="tree-toggle" ${toggleHandler}>▼</span>`;
+        html += `<span class="tree-toggle" data-node-id="${nodeId}" ${toggleHandler}>▼</span>`;
         html += `<span class="group-name">${node.name}</span>`;
         html += `<span class="item-count-inline">(${countItems(node)})</span>`;
         html += `</div>`;
@@ -324,7 +324,7 @@ function countItems(node) {
 // Simple toggle functionality
 export function toggleTreeGroup(nodeId) {
     const element = document.getElementById(nodeId);
-    const toggle = document.querySelector(`[onclick*="toggleTreeGroup('${nodeId}')"]`);
+    const toggle = document.querySelector(`[data-node-id="${nodeId}"]`);
     
     if (element && toggle) {
         const isExpanded = element.style.display !== 'none';
