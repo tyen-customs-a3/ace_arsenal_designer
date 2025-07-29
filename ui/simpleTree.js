@@ -2,7 +2,7 @@
 // Replaces the overcomplicated TreeNode system
 
 // Build tree with proper separation of grouping and view mode concerns
-export function createTreeData(items, useGrouping, groupingFunction, sortingFunction, viewMode = 'list') {
+export function createTreeData(items, useGrouping, groupingFunction, sortingFunction, viewMode = 'list', hasPrimaryGrouping = false) {
     // Apply sorting first if specified
     const sortedItems = sortingFunction ? sortingFunction(items) : items;
     
@@ -30,7 +30,8 @@ export function createTreeData(items, useGrouping, groupingFunction, sortingFunc
                     primaryNode = {
                         name: primaryGroup,
                         item: null,
-                        children: []
+                        children: [],
+                        isPrimaryGroup: hasPrimaryGrouping
                     };
                     treeData.push(primaryNode);
                 }
@@ -41,7 +42,8 @@ export function createTreeData(items, useGrouping, groupingFunction, sortingFunc
                 const secondaryNode = {
                     name: secondaryGroup,
                     item: null,
-                    children: childrenData
+                    children: childrenData,
+                    isPrimaryGroup: hasPrimaryGrouping
                 };
                 
                 primaryNode.children.push(secondaryNode);
@@ -65,7 +67,8 @@ export function createTreeData(items, useGrouping, groupingFunction, sortingFunc
                     const groupNode = {
                         name: groupName,
                         item: null,
-                        children: childrenData
+                        children: childrenData,
+                        isPrimaryGroup: hasPrimaryGrouping
                     };
                     
                     treeData.push(groupNode);
@@ -256,20 +259,31 @@ function renderTreeNode(node, level) {
     if (hasChildren) {
         // Parent node - clickable if it has an item, with separate toggle
         const nodeId = `tree_${node.name.replace(/\s+/g, '_').replace(/[^\w]/g, '')}`;
-        const clickHandler = node.item ? `onclick="selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'` : '';
-        const itemClass = node.item ? 'tree-item tree-parent' : 'tree-item tree-base-class';
+        // Only primary groups (from Group by dropdown) should be highlighted
+        const isPrimaryGroupHeader = node.isPrimaryGroup && !node.item && hasChildren;
+        const groupClass = isPrimaryGroupHeader ? 'tree-group-header' : '';
         
-        html += `<li style="margin-left: ${indent}px;">`;
-        html += `<div class="tree-node-container">`;
+        // Primary groups should toggle when clicked, items should select when clicked
+        let clickHandler = '';
+        if (isPrimaryGroupHeader) {
+            clickHandler = `onclick="toggleTreeGroup('${nodeId}')" style="cursor: pointer;"`;
+        } else if (node.item) {
+            clickHandler = `onclick="selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'`;
+        }
         
-        // Separate toggle button that doesn't interfere with item clicking
-        html += `<span class="tree-toggle" onclick="event.stopPropagation(); toggleTreeGroup('${nodeId}');">▼</span>`;
+        const itemClass = node.item ? `tree-item tree-parent ${groupClass}` : `tree-item tree-base-class ${groupClass}`;
+        
+        html += `<li>`;
         
         // The actual item (clickable if it has data) with count on the right
         html += `<div class="${itemClass}" ${clickHandler}>`;
-        html += `${node.name} <span class="item-count-inline">(${countItems(node)})</span>`;
-        html += `</div>`;
-        
+        html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
+        // For primary groups, the toggle is just visual since the whole row is clickable
+        // For other groups, keep the separate toggle functionality
+        const toggleHandler = isPrimaryGroupHeader ? '' : `onclick="event.stopPropagation(); toggleTreeGroup('${nodeId}');"`;
+        html += `<span class="tree-toggle" ${toggleHandler}>▼</span>`;
+        html += `<span class="group-name">${node.name}</span>`;
+        html += `<span class="item-count-inline">(${countItems(node)})</span>`;
         html += `</div>`;
         html += `<ul class="tree-children" id="${nodeId}">`;
         
@@ -283,10 +297,13 @@ function renderTreeNode(node, level) {
     } else {
         // Leaf item - no toggle needed, no count needed, simple left-aligned text
         const clickHandler = node.item ? `onclick="selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'` : '';
-        const className = node.item ? 'tree-item' : 'tree-item tree-base-class';
-        html += `<li style="margin-left: ${indent}px;">`;
+        const className = node.item ? `tree-item` : `tree-item tree-base-class`;
+        html += `<li>`;
         html += `<div class="${className}" ${clickHandler}>`;
-        html += `<span class="tree-bullet">•</span> ${node.name}`;
+        html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
+        html += `<span class="tree-bullet">•</span>`;
+        html += `<span class="group-name">${node.name}</span>`;
+        html += `<span class="item-count-inline"></span>`; // Empty span for layout consistency
         html += `</div>`;
         html += '</li>';
     }
