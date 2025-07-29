@@ -1,0 +1,13 @@
+/* ACE3 Arsenal Simulation - Responsive & Accessibility Styles */
+/* Media queries, reduced motion support, and accessibility features */
+
+/* Responsive Design */
+@media (prefers-reduced-motion: reduce) {
+    body::before {
+        animation: none;
+    }
+    
+    * {
+        transition: none;
+    }
+}

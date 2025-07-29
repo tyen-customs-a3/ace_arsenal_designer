@@ -1,0 +1,44 @@
+/* ACE3 Arsenal Simulation - CSS Variables */
+/* Simplified Single Theme Color System */
+
+:root {
+    /* === SINGLE DARK THEME === */
+    /* Surface Colors */
+    --surface-primary: #0f0f0f;
+    --surface-secondary: #1a1a1a;
+    --surface-elevated: #242424;
+    --surface-glass: rgba(36, 36, 36, 0.8);
+    
+    /* Content Colors */
+    --content-primary: #e8e8e8;
+    --content-secondary: #b8b8b8;
+    --content-tertiary: #888888;
+    --content-disabled: #666666;
+    
+    /* Border Colors */
+    --border-primary: #404040;
+    --border-secondary: #2a2a2a;
+    --border-focus: #4a90e2;
+    
+    /* Action Colors */
+    --action-primary: #4a90e2;
+    --action-primary-hover: #5ba0f2;
+    --action-accent: #f5a623;
+    
+    /* State Colors */
+    --state-hover: rgba(255, 255, 255, 0.08);
+    --state-focus: rgba(74, 144, 226, 0.2);
+    --state-selected: #2d4a6b;
+    
+    /* Feedback Colors */
+    --feedback-success: #7ed321;
+    --feedback-warning: #f5a623;
+    --feedback-error: #d0021b;
+    
+    /* Gradient and Shadows */
+    --gradient-primary: linear-gradient(135deg, #101010, #151515, #1a1a1a, #1f1f1f);
+    --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --elevation-2: 0 2px 6px rgba(0, 0, 0, 0.25);
+    --elevation-3: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --elevation-4: 0 8px 24px rgba(0, 0, 0, 0.35);
+}

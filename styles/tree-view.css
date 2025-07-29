@@ -1,0 +1,98 @@
+/* ACE3 Arsenal Simulation - Tree View Styles */
+/* Tree components, items, toggles, and navigation */
+
+.tree-view {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    height: 100%;
+    font-family: monospace;
+}
+
+.tree-view ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tree-view li {
+    list-style: none;
+    margin: 0;
+    padding: 1px 0;
+}
+
+.tree-item {
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 11px;
+    color: var(--content-secondary);
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 22px;
+    line-height: 1.3;
+}
+
+.tree-item:hover {
+    background-color: var(--state-hover);
+    color: var(--content-primary);
+}
+
+.tree-item.selected {
+    background-color: var(--state-selected);
+    color: var(--content-primary);
+    font-weight: 500;
+}
+
+.tree-group-header {
+    font-weight: 600 !important;
+    color: var(--action-accent) !important;
+    background-color: var(--state-focus) !important;
+    border-radius: 1px;
+    margin: 2px 0;
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+}
+
+.tree-group-header .item-count-inline {
+    font-weight: normal;
+    color: var(--content-tertiary) !important;
+    font-size: 9px !important;
+    opacity: 0.8;
+}
+
+.tree-toggle {
+    cursor: pointer;
+    margin-right: 6px;
+    color: var(--content-tertiary);
+    font-size: 9px;
+    user-select: none;
+    flex-shrink: 0;
+    width: 14px;
+    text-align: center;
+    transition: color 0.2s ease;
+}
+
+.tree-toggle:hover {
+    color: var(--content-primary);
+}
+
+.tree-bullet {
+    color: var(--content-tertiary);
+    margin-right: 6px;
+    flex-shrink: 0;
+    width: 14px;
+    text-align: center;
+}
+
+.item-count-inline {
+    color: var(--content-disabled);
+    font-size: 9px;
+    font-weight: normal;
+    flex-shrink: 0;
+    margin-left: auto;
+    opacity: 0.8;
+}

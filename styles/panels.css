@@ -1,0 +1,205 @@
+/* ACE3 Arsenal Simulation - Side Panels Styles */
+/* Filter panels, stats panels, and collapsible UI components */
+
+/* Side Panels Container */
+.side-panels-container {
+    position: absolute;
+    left: 390px;
+    top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+}
+
+.compact-filter-panel, .compact-stats-panel {
+    width: 100px;
+    background: var(--surface-glass);
+    border: 1px solid var(--border-primary);
+    border-radius: 0.5px;
+    transition: width 0.3s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--elevation-2);
+    overflow: hidden;
+}
+
+.compact-filter-panel.expanded, .compact-stats-panel.expanded {
+    width: 220px;
+}
+
+.filter-toggle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    background: var(--surface-elevated);
+    border-bottom: 1px solid var(--border-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-toggle-header:hover {
+    background: var(--state-hover);
+}
+
+.filter-toggle-text {
+    font-size: 9px;
+    color: var(--content-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.filter-toggle-arrow {
+    font-size: 8px;
+    color: var(--content-tertiary);
+    transition: transform 0.2s;
+}
+
+.filter-content {
+    display: none;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.compact-filter-group {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.compact-filter-group:last-child {
+    border-bottom: none;
+}
+
+.compact-filter-label {
+    color: var(--content-secondary);
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.compact-filter-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.compact-filter-checkboxes::-webkit-scrollbar {
+    width: 3px;
+}
+
+.compact-filter-checkboxes::-webkit-scrollbar-track {
+    background: var(--surface-secondary);
+}
+
+.compact-filter-checkboxes::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+    border-radius: 0.5px;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 0;
+    font-size: 10px;
+    color: var(--content-secondary);
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.filter-checkbox:hover {
+    color: var(--content-primary);
+}
+
+.filter-checkbox input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--action-primary);
+    transform: scale(0.9);
+}
+
+.compact-filter-radios {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.compact-filter-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 0;
+    font-size: 10px;
+    color: var(--content-secondary);
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.compact-filter-option:hover {
+    color: var(--content-primary);
+}
+
+.compact-filter-option input[type="radio"] {
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--action-primary);
+    transform: scale(0.9);
+}
+
+.compact-filter-option input[type="radio"]:checked + span {
+    color: var(--action-primary);
+    font-weight: 600;
+}
+
+.clear-filters-btn {
+    margin: 8px 12px 12px 12px;
+    padding: 6px 12px;
+    background: var(--feedback-error);
+    border: 1px solid var(--feedback-error);
+    color: var(--content-primary);
+    cursor: pointer;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 1px;
+    transition: all 0.2s ease;
+}
+
+.clear-filters-btn:hover {
+    background: #e60428;
+    border-color: #e60428;
+    transform: translateY(-1px);
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 8px;
+    border-bottom: 1px solid var(--border-secondary);
+    font-size: 9px;
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: var(--content-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    color: var(--action-primary);
+    font-weight: normal;
+}
