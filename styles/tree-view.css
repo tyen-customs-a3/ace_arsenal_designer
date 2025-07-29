@@ -27,7 +27,7 @@
 .tree-item {
     padding: 4px 8px;
     cursor: pointer;
-    border-radius: 1px;
+    border-radius: 0;
     transition: background-color 0.2s ease, color 0.2s ease;
     font-size: 11px;
     color: var(--content-secondary);
@@ -54,7 +54,7 @@
     font-weight: 600 !important;
     color: var(--content-primary) !important;
     background-color: var(--surface-title) !important;
-    border-radius: 1px;
+    border-radius: 0;
     margin: 2px 0;
     padding: 6px 8px !important;
     font-size: 11px !important;
@@ -70,7 +70,7 @@
 
 .tree-toggle {
     cursor: pointer;
-    margin-right: 6px;
+    margin-right: 0;
     color: var(--content-tertiary);
     font-size: 9px;
     user-select: none;
@@ -86,7 +86,7 @@
 
 .tree-bullet {
     color: var(--content-tertiary);
-    margin-right: 6px;
+    margin-right: 0;
     flex-shrink: 0;
     width: 14px;
     text-align: center;
@@ -98,7 +98,9 @@
     font-weight: normal;
     flex-shrink: 0;
     margin-left: auto;
+    margin-right: 4px;
     opacity: 0.8;
+    order: 0;
 }
 
 /* Spacing Options */
@@ -120,12 +122,21 @@
     font-size: 16px;
 }
 
-/* Icon Support - Natural Flow Layout with Spacing-Based Sizing */
+/* Icon Support - Fixed width container to prevent layout shifts */
+.item-icons-container {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: auto;
+    order: 1;
+    gap: 4px; /* Add gap between icons */
+}
+
 .item-mod-icon {
-    margin-right: 4px;
+    margin-right: 0;
     flex-shrink: 0;
     background: var(--action-primary);
-    border-radius: 1px;
+    border-radius: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -134,14 +145,20 @@
 }
 
 .item-preview-icon {
-    margin-right: 6px;
+    margin-right: 0;
     flex-shrink: 0;
     background: var(--border-primary);
-    border-radius: 1px;
+    border-radius: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: var(--content-tertiary);
+}
+
+/* Hidden state - completely remove from layout */
+.item-mod-icon.hidden,
+.item-preview-icon.hidden {
+    display: none;
 }
 
 /* Compact mode - small icons (row height ~18px) */
@@ -176,7 +193,7 @@
     height: 120px;
     background: var(--surface-title);
     border: 2px solid var(--border-primary);
-    border-radius: 3px;
+    border-radius: 0;
     z-index: 1000;
     pointer-events: none;
     opacity: 0;
