@@ -371,3 +371,173 @@ export function selectTreeItem(element) {
 
 // Make selection function globally available
 window.selectTreeItem = selectTreeItem;
+
+// Focus management for keyboard navigation
+let currentFocusedElement = null;
+let activePanelId = null;
+
+// Initialize keyboard navigation for a panel
+export function initializeKeyboardNavigation(panelId) {
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+    
+    // Make panel focusable and add keyboard listeners
+    panel.setAttribute('tabindex', '0');
+    panel.addEventListener('keydown', handleKeyboardNavigation);
+    panel.addEventListener('focus', () => setActivePanel(panelId));
+    panel.addEventListener('click', () => setActivePanel(panelId));
+}
+
+// Set the active panel for navigation
+function setActivePanel(panelId) {
+    activePanelId = panelId;
+    
+    // Update visual indicators
+    document.querySelectorAll('.tree-view').forEach(panel => {
+        panel.classList.remove('panel-focused');
+    });
+    
+    const activePanel = document.getElementById(panelId);
+    if (activePanel) {
+        activePanel.classList.add('panel-focused');
+    }
+}
+
+// Get all navigable tree items in a panel
+function getNavigableItems(panelId) {
+    const panel = document.getElementById(panelId);
+    if (!panel) return [];
+    
+    // Get all visible tree items (not hidden by collapse)
+    const items = Array.from(panel.querySelectorAll('.tree-item')).filter(item => {
+        // Check if item is visible (not in collapsed tree)
+        let current = item;
+        while (current) {
+            const parentUl = current.closest('ul.tree-children');
+            if (parentUl && parentUl.style.display === 'none') {
+                return false;
+            }
+            current = parentUl ? parentUl.parentElement : null;
+        }
+        return true;
+    });
+    
+    return items;
+}
+
+// Handle keyboard navigation
+function handleKeyboardNavigation(event) {
+    if (!activePanelId) return;
+    
+    const items = getNavigableItems(activePanelId);
+    if (items.length === 0) return;
+    
+    let currentIndex = currentFocusedElement ? items.indexOf(currentFocusedElement) : -1;
+    
+    switch (event.key) {
+        case 'ArrowUp':
+            event.preventDefault();
+            currentIndex = currentIndex <= 0 ? items.length - 1 : currentIndex - 1;
+            setFocusedItem(items[currentIndex]);
+            break;
+            
+        case 'ArrowDown':
+            event.preventDefault();
+            currentIndex = currentIndex >= items.length - 1 ? 0 : currentIndex + 1;
+            setFocusedItem(items[currentIndex]);
+            break;
+            
+        case 'ArrowLeft':
+            event.preventDefault();
+            handleExpandCollapse(false);
+            break;
+            
+        case 'ArrowRight':
+            event.preventDefault();
+            handleExpandCollapse(true);
+            break;
+            
+        case 'Enter':
+        case ' ':
+            event.preventDefault();
+            if (currentFocusedElement) {
+                selectTreeItem(currentFocusedElement);
+            }
+            break;
+    }
+}
+
+// Set focused item with visual feedback
+function setFocusedItem(item) {
+    // Remove previous focus
+    if (currentFocusedElement) {
+        currentFocusedElement.classList.remove('keyboard-focused');
+    }
+    
+    // Set new focus
+    currentFocusedElement = item;
+    if (item) {
+        item.classList.add('keyboard-focused');
+        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+// Handle expand/collapse based on current focused item
+function handleExpandCollapse(expand) {
+    if (!currentFocusedElement) return;
+    
+    // Find associated toggle button or group
+    const parentLi = currentFocusedElement.closest('li');
+    if (!parentLi) return;
+    
+    const childrenUl = parentLi.querySelector('ul.tree-children');
+    const toggle = parentLi.querySelector('.tree-toggle');
+    
+    if (childrenUl && toggle) {
+        const isExpanded = childrenUl.style.display !== 'none';
+        
+        if (expand && !isExpanded) {
+            // Expand
+            childrenUl.style.display = 'block';
+            toggle.textContent = '▼';
+        } else if (!expand && isExpanded) {
+            // Collapse
+            childrenUl.style.display = 'none';
+            toggle.textContent = '▶';
+        }
+    } else if (expand && currentFocusedElement.classList.contains('tree-group-header')) {
+        // Handle primary group header clicks
+        const nodeId = extractNodeIdFromElement(currentFocusedElement);
+        if (nodeId) {
+            toggleTreeGroup(nodeId);
+        }
+    }
+}
+
+// Extract node ID from element for toggle functionality
+function extractNodeIdFromElement(element) {
+    const parentLi = element.closest('li');
+    if (!parentLi) return null;
+    
+    const childrenUl = parentLi.querySelector('ul.tree-children');
+    return childrenUl ? childrenUl.id : null;
+}
+
+// Clear focus when panel content changes
+export function clearPanelFocus(panelId) {
+    if (activePanelId === panelId) {
+        currentFocusedElement = null;
+    }
+}
+
+// Set initial focus to first item in panel
+export function focusFirstItem(panelId) {
+    const items = getNavigableItems(panelId);
+    if (items.length > 0) {
+        setActivePanel(panelId);
+        setFocusedItem(items[0]);
+    }
+}
+
+// Export navigation functions
+export { initializeKeyboardNavigation, setActivePanel, clearPanelFocus, focusFirstItem };

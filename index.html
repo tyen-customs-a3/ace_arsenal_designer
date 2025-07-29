@@ -200,7 +200,10 @@
             createTreeData,
             renderSimpleTree,
             toggleTreeGroup,
-            selectTreeItem
+            selectTreeItem,
+            initializeKeyboardNavigation,
+            clearPanelFocus,
+            focusFirstItem
         } from './ui/simpleTree.js';
         
         // Global state - simplified
@@ -450,6 +453,9 @@
             document.getElementById('timing').textContent = `${(endTime - startTime).toFixed(2)}ms`;
 
             container.innerHTML = html;
+            
+            // Clear focus when tree content changes
+            clearPanelFocus(containerId);
         }
 
         // Simple tree toggle - delegates to simpleTree.js
