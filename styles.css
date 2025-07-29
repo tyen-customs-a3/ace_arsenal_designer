@@ -802,20 +802,20 @@ body {
     margin-bottom: 8px;
 }
 
-.filter-section .clear-filters-btn {
-    margin: 8px;
-    padding: 4px 8px;
+.clear-filters-btn {
+    margin: 4px 6px;
+    padding: 3px 6px;
     background: #d32f2f;
     border: 1px solid #b71c1c;
     color: #fff;
     cursor: pointer;
-    font-size: 9px;
+    font-size: 8px;
     border-radius: 2px;
     transition: all 0.2s;
-    width: calc(100% - 16px);
+    width: calc(100% - 12px);
 }
 
-.filter-section .clear-filters-btn:hover {
+.clear-filters-btn:hover {
     background: #b71c1c;
     border-color: #8a0000;
 }
@@ -835,11 +835,11 @@ body {
 
 
 .compact-filter-group {
-    padding: 6px 8px;
+    padding: 4px 6px;
     border-bottom: 1px solid #222;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .compact-filter-label {
@@ -852,8 +852,8 @@ body {
 .compact-filter-checkboxes {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    max-height: 100px;
+    gap: 1px;
+    max-height: 80px;
     overflow-y: auto;
 }
 
@@ -921,4 +921,278 @@ body {
 .compact-filter-option input:checked + span {
     color: #4a9eff;
     font-weight: bold;
+}
+
+/* Tree Controls External */
+.tree-controls-external {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid #333;
+    font-size: 9px;
+}
+
+.tree-toggle-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: #999;
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: all 0.2s;
+}
+
+.tree-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #555;
+    color: #fff;
+}
+
+.tree-toggle-text {
+    color: #ccc;
+    font-size: 9px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* View Options Inline */
+.view-options-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+
+.view-mode-toggles {
+    display: flex;
+    gap: 2px;
+}
+
+.view-mode-toggle {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #333;
+    color: #999;
+    width: 24px;
+    height: 20px;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: all 0.2s;
+}
+
+.view-mode-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #555;
+    color: #fff;
+}
+
+.view-mode-toggle.active {
+    background: #4a9eff;
+    border-color: #4a9eff;
+    color: #fff;
+}
+
+.view-mode-toggle.active:hover {
+    background: #3d8ce6;
+    border-color: #3d8ce6;
+}
+
+/* Side Panels Container */
+.side-panels-container {
+    position: absolute;
+    left: 390px;
+    top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+}
+
+/* Compact Filter Panel */
+.compact-filter-panel {
+    width: 90px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid #333;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.compact-filter-panel.expanded {
+    width: 220px;
+}
+
+/* Compact Stats Panel */
+.compact-stats-panel {
+    width: 90px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid #333;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.compact-stats-panel.expanded {
+    width: 220px;
+}
+
+.filter-toggle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.8);
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-toggle-header:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.filter-toggle-text {
+    font-size: 10px;
+    color: #ccc;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.filter-toggle-arrow {
+    font-size: 8px;
+    color: #999;
+    transition: transform 0.2s;
+}
+
+.filter-content {
+    display: none;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.filter-content::-webkit-scrollbar {
+    width: 3px;
+}
+
+.filter-content::-webkit-scrollbar-track {
+    background: #0a0a0a;
+}
+
+.filter-content::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 1px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 6px;
+    border-bottom: 1px solid #222;
+    font-size: 8px;
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: #999;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    color: #4a9eff;
+    font-weight: normal;
+}
+
+/* Tree View Styling */
+.tree-group-header {
+    font-weight: bold !important;
+    color: #ff9500 !important; /* Orange color for group headers */
+    background-color: rgba(255, 149, 0, 0.15) !important; /* Orange background */
+    border-radius: 3px;
+    margin: 1px 0;
+    padding: 3px 6px !important;
+}
+
+.tree-group-header .item-count-inline {
+    font-weight: normal;
+    color: #999 !important;
+    font-size: 9px !important;
+}
+
+.tree-item {
+    padding: 2px 4px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background-color 0.2s;
+    font-size: 10px;
+    color: #ddd;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 20px;
+}
+
+.tree-indent {
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.tree-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tree-item.selected {
+    background-color: rgba(74, 158, 255, 0.3);
+    color: #fff;
+}
+
+
+.tree-toggle {
+    cursor: pointer;
+    margin-right: 4px;
+    color: #999;
+    font-size: 8px;
+    user-select: none;
+    flex-shrink: 0;
+    width: 12px;
+    text-align: center;
+}
+
+.tree-toggle:hover {
+    color: #fff;
+}
+
+.tree-bullet {
+    color: #666;
+    margin-right: 4px;
+    flex-shrink: 0;
+    width: 12px;
+    text-align: center;
+}
+
+.group-name {
+    flex: 1;
+    text-align: left;
+    margin-left: 4px;
+}
+
+.item-count-inline {
+    color: #666;
+    font-size: 8px;
+    font-weight: normal;
+    flex-shrink: 0;
+    margin-left: auto;
 }
