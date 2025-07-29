@@ -1159,6 +1159,28 @@ body {
     color: #fff;
 }
 
+/* Keyboard navigation focus styling - use consistent blue highlighting */
+.tree-item.keyboard-focused {
+    background-color: rgba(74, 158, 255, 0.3);
+    border: 1px solid rgba(74, 158, 255, 0.6);
+    border-radius: 2px;
+}
+
+.tree-item.keyboard-focused.selected {
+    background-color: rgba(74, 158, 255, 0.4);
+    border: 1px solid rgba(74, 158, 255, 0.8);
+}
+
+/* Panel focus indicator */
+.tree-view.panel-focused {
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 3px;
+}
+
+.tree-view {
+    outline: none; /* Remove default focus outline */
+}
+
 
 .tree-toggle {
     cursor: pointer;
