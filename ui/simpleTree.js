@@ -12,11 +12,16 @@ export function createTreeData(items, useGrouping, groupingFunction, sortingFunc
     }
     
     if (groupingFunction && groupingFunction !== 'none') {
-        // Apply top-level grouping first
-        const groups = groupingFunction(sortedItems);
+        // Apply top-level grouping first, passing the sorting function for within-group sorting
+        const groups = groupingFunction(sortedItems, sortingFunction);
         const treeData = [];
         
-        Object.keys(groups).forEach(groupName => {
+        // Sort group names themselves if we have sorting enabled
+        const sortedGroupNames = sortingFunction ? 
+            Object.keys(groups).sort((a, b) => a.localeCompare(b)) :
+            Object.keys(groups);
+        
+        sortedGroupNames.forEach(groupName => {
             const groupItems = groups[groupName];
             
             // Handle multi-level grouping (e.g., "RHS → 5.56x45mm")
@@ -247,13 +252,21 @@ export function renderSimpleTree(treeData, viewMode = 'variants') {
         return '<li>No items</li>';
     }
     
-    return treeData.map(node => renderTreeNode(node, 0, viewMode)).join('');
+    return treeData.map(node => renderTreeNode(node, 0, viewMode, false)).join('');
 }
 
-function renderTreeNode(node, level, viewMode = 'variants') {
+function renderTreeNode(node, level, viewMode = 'variants', parentIsGroup = false) {
     const hasChildren = node.children && node.children.length > 0;
     
-    const indent = level * 20; // 20px indent per level - icons flow naturally
+    // For user-selected grouping, immediate children of groups should not be indented
+    // But hierarchy and variants views should maintain full indentation for their structures
+    let effectiveLevel = level;
+    if (parentIsGroup && viewMode !== 'hierarchy' && viewMode !== 'variants') {
+        effectiveLevel = 0; // No indentation for items within user-selected groups (except hierarchy and variants views)
+        console.log(`[INDENT] Removing indentation: "${node.name}" level=${level}→${effectiveLevel}, parentIsGroup=${parentIsGroup}, viewMode=${viewMode}`);
+    }
+    
+    const indent = effectiveLevel * 20; // 20px indent per level - icons flow naturally
     
     let html = '';
     
@@ -285,25 +298,44 @@ function renderTreeNode(node, level, viewMode = 'variants') {
         const toggleHandler = isPrimaryGroupHeader ? '' : `onclick="event.stopPropagation(); toggleTreeGroup('${nodeId}');"`;
         html += `<span class="tree-toggle" data-node-id="${nodeId}" ${toggleHandler}>▼</span>`;
         
-        // Add icons inline after toggle, in order of appearance
-        if (window.displayOptions.showModIcon && node.item && node.item.mod) {
-            const modText = node.item.mod.charAt(0).toUpperCase();
-            html += `<span class="item-mod-icon">${modText}</span>`;
-        }
-        
-        if (window.displayOptions.showPreviewIcon && node.item) {
-            const previewText = node.item.category ? node.item.category.charAt(0).toUpperCase() : '?';
-            html += `<span class="item-preview-icon">${previewText}</span>`;
-        }
-        
         html += `<span class="group-name">${node.name}</span>`;
-        html += `<span class="item-count-inline">(${countItems(node)})</span>`;
+        
+        // Always add icon container to maintain consistent row layout
+        html += `<span class="item-icons-container">`;
+        const previewText = node.item && node.item.category ? node.item.category.charAt(0).toUpperCase() : '?';
+        const previewHidden = !window.displayOptions.showPreviewIcon || !node.item;
+        html += `<span class="item-preview-icon${previewHidden ? ' hidden' : ''}">${previewText}</span>`;
+        
+        // For mod groups, extract mod initial from group name if no item data
+        let modText = 'M';
+        if (node.item && node.item.mod) {
+            modText = node.item.mod.charAt(0).toUpperCase();
+        } else if (!node.item && hasChildren) {
+            // This is a group - check if it's a mod group and extract initial from group name
+            const isModGroup = window.document && 
+                window.document.querySelector('input[name="groupByOption"]:checked')?.value === 'groupByMod';
+            if (isModGroup) {
+                modText = node.name.charAt(0).toUpperCase();
+            }
+        }
+        
+        // Always show mod icon for mod group headers, regardless of user setting
+        const isModGroup = !node.item && hasChildren && window.document && 
+            window.document.querySelector('input[name="groupByOption"]:checked')?.value === 'groupByMod';
+        const shouldShowModIcon = window.displayOptions.showModIcon || isModGroup;
+        const modHidden = !shouldShowModIcon || (!node.item && !isModGroup) || 
+            (node.item && !node.item.mod && !isModGroup);
+        
+        html += `<span class="item-mod-icon${modHidden ? ' hidden' : ''}">${modText}</span>`;
+        html += `</span>`;
         html += `</div>`;
         html += `<ul class="tree-children" id="${nodeId}">`;
         
         // Render children
         node.children.forEach(child => {
-            html += renderTreeNode(child, level + 1, viewMode);
+            // Check if this node is a grouping node (has no item data)
+            const currentNodeIsGroup = !node.item && hasChildren;
+            html += renderTreeNode(child, level + 1, viewMode, currentNodeIsGroup);
         });
         
         html += '</ul>';
@@ -323,18 +355,18 @@ function renderTreeNode(node, level, viewMode = 'variants') {
             html += `<span class="tree-bullet">•</span>`;
         }
         
-        // Add icons inline after bullet, in order of appearance
-        if (window.displayOptions.showModIcon && node.item && node.item.mod) {
-            const modText = node.item.mod.charAt(0).toUpperCase();
-            html += `<span class="item-mod-icon">${modText}</span>`;
-        }
-        
-        if (window.displayOptions.showPreviewIcon && node.item) {
-            const previewText = node.item.category ? node.item.category.charAt(0).toUpperCase() : '?';
-            html += `<span class="item-preview-icon">${previewText}</span>`;
-        }
         html += `<span class="group-name">${node.name}</span>`;
-        html += `<span class="item-count-inline"></span>`; // Empty span for layout consistency
+        
+        // Always add icon container to maintain consistent row layout
+        html += `<span class="item-icons-container">`;
+        const previewText = node.item && node.item.category ? node.item.category.charAt(0).toUpperCase() : '?';
+        const previewHidden = !window.displayOptions.showPreviewIcon || !node.item;
+        html += `<span class="item-preview-icon${previewHidden ? ' hidden' : ''}">${previewText}</span>`;
+        
+        const modText = node.item && node.item.mod ? node.item.mod.charAt(0).toUpperCase() : 'M';
+        const modHidden = !window.displayOptions.showModIcon || !node.item || !node.item.mod;
+        html += `<span class="item-mod-icon${modHidden ? ' hidden' : ''}">${modText}</span>`;
+        html += `</span>`;
         html += `</div>`;
         html += '</li>';
     }

@@ -16,7 +16,7 @@
     width: 100px;
     background: var(--surface-panel);
     border: 1px solid var(--border-primary);
-    border-radius: 0.5px;
+    border-radius: 0;
     transition: width 0.3s ease;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -99,7 +99,7 @@
 
 .compact-filter-checkboxes::-webkit-scrollbar-thumb {
     background: var(--border-primary);
-    border-radius: 0.5px;
+    border-radius: 0;
 }
 
 .filter-checkbox {
@@ -159,6 +159,40 @@
     font-weight: 600;
 }
 
+.compact-filter-select {
+    display: flex;
+    flex-direction: column;
+}
+
+.compact-filter-select select {
+    padding: 4px 6px !important;
+    background: var(--button-background) !important;
+    background-color: var(--button-background) !important;
+    border: 1px solid var(--border-primary) !important;
+    color: var(--content-primary) !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    border-radius: 1px !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: none !important;
+    cursor: pointer !important;
+    transition: border-color 0.2s ease, background-color 0.2s ease !important;
+    outline: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+}
+
+.compact-filter-select select:hover,
+.compact-filter-select select:focus {
+    outline: none !important;
+    border-color: var(--border-focus) !important;
+    background: var(--active-background) !important;
+    background-color: var(--active-background) !important;
+    box-shadow: none !important;
+}
+
 .clear-filters-btn {
     margin: 8px 12px 12px 12px;
     padding: 6px 12px;
@@ -169,7 +203,7 @@
     font-size: 9px;
     font-weight: 600;
     text-transform: uppercase;
-    border-radius: 1px;
+    border-radius: 0;
     transition: all 0.2s ease;
 }
 

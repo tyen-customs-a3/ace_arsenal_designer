@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ACE3 Arsenal Simulation</title>
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/info-panel.css">
 </head>
 <body>
     
@@ -21,48 +22,25 @@
         <!-- Left Panel - Equipment List -->
         <div class="left-panel">
             <div class="left-panel-header">
-                <span class="header-title">Equipment List</span>
-                <div class="header-controls">
-                    <input type="text" class="header-search" id="leftSearch" placeholder="Search...">
-                </div>
+                <input type="text" class="header-search full-width" id="leftSearch" placeholder="Search...">
             </div>
             
-            <div class="grouping-controls">
-                
-                <!-- Grouping Controls - Property-Based Organization -->
-                <div class="control-group">
-                    <label class="control-label">Group by:</label>
-                    <select id="primaryGrouping">
-                        <option value="none">None</option>
-                        <option value="groupByMod">Mod</option>
-                        <option value="groupByCaliber">Caliber</option>
-                    </select>
-                    <div class="sort-control-group">
-                        <label class="control-label">Sort by:</label>
-                        <select id="sortingSelect">
-                            <option value="sortByName">Name</option>
-                            <option value="sortByMod">Mod</option>
-                            <option value="sortByRange">Range</option>
-                            <option value="sortByMass">Mass</option>
-                        </select>
-                        <button class="sort-order-toggle" id="sortOrderToggle" onclick="toggleSortOrder()" title="Toggle sort order">↑</button>
-                    </div>
-                </div>
-                
-            </div>
             
             <!-- Tree Controls outside and above list -->
             <div class="tree-controls-external">
-                <button class="tree-toggle-btn" id="treeToggleBtn" onclick="toggleExpandCollapse()">▶</button>
+                <button class="tree-toggle-btn" id="treeToggleBtn" onclick="toggleExpandCollapse()">+</button>
                 <span class="tree-toggle-text" id="treeToggleText">Expand All</span>
                 
-                <!-- View Options moved from filters -->
-                <div class="view-options-inline">
-                    <div class="view-mode-toggles">
-                        <button class="view-mode-toggle" data-view="list" title="Flat List">📄</button>
-                        <button class="view-mode-toggle" data-view="hierarchy" title="Inheritance Tree">🌳</button>
-                        <button class="view-mode-toggle active" data-view="variants" title="Variants">🎨</button>
-                    </div>
+                <!-- Sort controls in same row -->
+                <div class="sort-control-group">
+                    <label class="control-label">Sort by:</label>
+                    <select id="sortingSelect">
+                        <option value="sortByName">Name</option>
+                        <option value="sortByMod">Mod</option>
+                        <option value="sortByRange">Range</option>
+                        <option value="sortByMass">Mass</option>
+                    </select>
+                    <button class="sort-order-toggle" id="sortOrderToggle" onclick="toggleSortOrder()" title="Toggle sort order">↑</button>
                 </div>
             </div>
             
@@ -85,6 +63,44 @@
                 
                 <!-- Options content -->
                 <div class="filter-content" id="optionsContent">
+                    <!-- Group by Options -->
+                    <div class="compact-filter-group">
+                        <label class="compact-filter-label">Group by:</label>
+                        <div class="compact-filter-radios">
+                            <label class="compact-filter-option">
+                                <input type="radio" name="groupByOption" value="none" onchange="updateGrouping('none')">
+                                <span>None</span>
+                            </label>
+                            <label class="compact-filter-option">
+                                <input type="radio" name="groupByOption" value="groupByMod" checked onchange="updateGrouping('groupByMod')">
+                                <span>Mod</span>
+                            </label>
+                            <label class="compact-filter-option">
+                                <input type="radio" name="groupByOption" value="groupByCaliber" onchange="updateGrouping('groupByCaliber')">
+                                <span>Caliber</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- View Mode Options -->
+                    <div class="compact-filter-group">
+                        <label class="compact-filter-label">View:</label>
+                        <div class="compact-filter-radios">
+                            <label class="compact-filter-option">
+                                <input type="radio" name="viewMode" value="list" onchange="setViewMode('list')">
+                                <span>📄 List</span>
+                            </label>
+                            <label class="compact-filter-option">
+                                <input type="radio" name="viewMode" value="hierarchy" checked onchange="setViewMode('hierarchy')">
+                                <span>🌳 Tree</span>
+                            </label>
+                            <label class="compact-filter-option">
+                                <input type="radio" name="viewMode" value="variants" onchange="setViewMode('variants')">
+                                <span>🎨 Variants</span>
+                            </label>
+                        </div>
+                    </div>
+                    
                     <!-- Icon Display Options -->
                     <div class="compact-filter-group">
                         <label class="compact-filter-label">Icons:</label>
@@ -179,6 +195,18 @@
                 <!-- Stats content -->
                 <div class="filter-content" id="statsContent">
                     <div class="stat-item">
+                        <span class="stat-label">Name:</span>
+                        <span class="stat-value" id="statName">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Class Name:</span>
+                        <span class="stat-value" id="statClassName">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Mod:</span>
+                        <span class="stat-value" id="statMod">-</span>
+                    </div>
+                    <div class="stat-item">
                         <span class="stat-label">Damage:</span>
                         <span class="stat-value" id="statDamage">-</span>
                     </div>
@@ -194,10 +222,6 @@
                         <span class="stat-label">Capacity:</span>
                         <span class="stat-value" id="statCapacity">-</span>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Mod Source:</span>
-                        <span class="stat-value" id="statMod">-</span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -205,10 +229,7 @@
         <!-- Right Panel - Selected Item Options -->
         <div class="right-panel">
             <div class="right-panel-header">
-                <span class="header-title">Compatible Items</span>
-                <div class="header-controls">
-                    <input type="text" class="header-search" id="rightSearch" placeholder="Search...">
-                </div>
+                <input type="text" class="header-search full-width" id="rightSearch" placeholder="Search...">
             </div>
             <div class="right-content">
                 <ul class="tree-view" id="rightTreeView">
@@ -224,8 +245,40 @@
             <button class="attachment-tab" data-attachment="magazines" data-tooltip="Magazines">◈</button>
         </div>
 
-        <!-- Central Area - Empty space for UI layout -->
+        <!-- Central Area - Info Panel -->
         <div class="central-area">
+            <div class="info-panel-static" id="infoPanel">
+                <div class="info-panel-header">
+                    <h3>New!</h3>
+                </div>
+                <div class="info-panel-content">
+                    <div class="view-mode-info">
+                        <h4>List View</h4>
+                        <p>Simple flat list of all items. No hierarchy or grouping structure.</p>
+                    </div>
+                    <div class="view-mode-info">
+                        <h4>Tree View (Hierarchy)</h4>
+                        <p>Shows class inheritance relationships. Parent classes contain their child classes in an expandable tree structure.</p>
+                    </div>
+                    <div class="view-mode-info">
+                        <h4>Variants View</h4>
+                        <p>Groups base weapons with their texture variants. Base weapons are expandable with variants shown as children.</p>
+                    </div>
+                    <div class="grouping-info">
+                        <h4>Group By Options</h4>
+                        <p><strong>None:</strong> No additional grouping</p>
+                        <p><strong>Mod:</strong> Group items by their source mod</p>
+                        <p><strong>Caliber:</strong> Group weapons/magazines by ammunition type</p>
+                    </div>
+                    <div class="features-info">
+                        <h4>Features</h4>
+                        <p>• <strong>Options Panel:</strong> Configure icons, spacing, and view modes</p>
+                        <p>• <strong>Filters Panel:</strong> Filter by mod, caliber, and variant type</p>
+                        <p>• <strong>Icon Display:</strong> Toggle preview and mod icons on items</p>
+                        <p>• <strong>Keyboard Navigation:</strong> Use arrow keys to navigate items</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
@@ -455,10 +508,10 @@
             const startTime = performance.now();
 
             // Get current UI state
-            const viewMode = document.querySelector('.view-mode-toggle.active')?.dataset.view || 'variants';
+            const viewMode = document.querySelector('input[name="viewMode"]:checked')?.value || 'hierarchy';
             const sortMethod = document.getElementById('sortingSelect').value;
             const sortOrder = currentSortOrder;
-            const primaryGrouping = document.getElementById('primaryGrouping').value;
+            const primaryGrouping = document.querySelector('input[name="groupByOption"]:checked')?.value || 'none';
 
             let groupingFunction = null;
             let sortingFunction = null;
@@ -548,20 +601,170 @@
         }
 
         function updateStats(item) {
-            document.getElementById('statDamage').textContent = item.damage || '-';
-            document.getElementById('statRange').textContent = item.range ? `${item.range}m` : '-';
-            document.getElementById('statMass').textContent = item.mass ? `${(item.mass/1000).toFixed(2)}kg` : '-';
-            document.getElementById('statCapacity').textContent = item.capacity || '-';
+            // Clear all stat fields first
+            const allStatFields = ['statName', 'statClassName', 'statMod', 'statDamage', 'statRange', 'statMass', 'statCapacity', 'statCaliber', 'statArmor', 'statRateOfFire', 'statZoom', 'statRecoil'];
+            allStatFields.forEach(fieldId => {
+                const element = document.getElementById(fieldId);
+                if (element) {
+                    element.parentElement.style.display = 'none';
+                }
+            });
+
+            // Always show basic info
+            document.getElementById('statName').textContent = item.displayName || item.name || '-';
+            document.getElementById('statName').parentElement.style.display = 'block';
             
-            // Enhanced mod display with inheritance info
-            let modText = item.mod || '-';
-            if (item.baseClass) {
-                modText += ` (${item.baseClass})`;
+            document.getElementById('statClassName').textContent = item.className || '-';
+            document.getElementById('statClassName').parentElement.style.display = 'block';
+            
+            document.getElementById('statMod').textContent = item.mod || '-';
+            document.getElementById('statMod').parentElement.style.display = 'block';
+
+            // Show category-specific stats
+            const category = item.category || item.type;
+            
+            if (category === 'weapons' || category === 'weapon' || category === 'handguns' || category === 'handgun' || category === 'launchers' || category === 'launcher') {
+                // Weapons: range, mass, caliber, rate of fire
+                if (item.range || item.properties?.range) {
+                    document.getElementById('statRange').textContent = `${item.range || item.properties.range}m`;
+                    document.getElementById('statRange').parentElement.style.display = 'block';
+                }
+                
+                if (item.mass || item.properties?.mass) {
+                    document.getElementById('statMass').textContent = `${((item.mass || item.properties.mass)/1000).toFixed(2)}kg`;
+                    document.getElementById('statMass').parentElement.style.display = 'block';
+                }
+                
+                if (item.caliber || item.properties?.caliber) {
+                    // Create caliber field if it doesn't exist
+                    let caliberElement = document.getElementById('statCaliber');
+                    if (!caliberElement) {
+                        const caliberDiv = document.createElement('div');
+                        caliberDiv.className = 'stat-item';
+                        caliberDiv.innerHTML = '<span class="stat-label">Caliber:</span><span class="stat-value" id="statCaliber">-</span>';
+                        document.getElementById('statMod').parentElement.parentNode.appendChild(caliberDiv);
+                        caliberElement = document.getElementById('statCaliber');
+                    }
+                    caliberElement.textContent = item.caliber || item.properties.caliber;
+                    caliberElement.parentElement.style.display = 'block';
+                }
+                
+                if (item.rateOfFire || item.properties?.rateOfFire) {
+                    // Create rate of fire field if it doesn't exist
+                    let rofElement = document.getElementById('statRateOfFire');
+                    if (!rofElement) {
+                        const rofDiv = document.createElement('div');
+                        rofDiv.className = 'stat-item';
+                        rofDiv.innerHTML = '<span class="stat-label">Rate of Fire:</span><span class="stat-value" id="statRateOfFire">-</span>';
+                        document.getElementById('statMod').parentElement.parentNode.appendChild(rofDiv);
+                        rofElement = document.getElementById('statRateOfFire');
+                    }
+                    rofElement.textContent = `${item.rateOfFire || item.properties.rateOfFire} rpm`;
+                    rofElement.parentElement.style.display = 'block';
+                }
+                
+            } else if (category === 'vests' || category === 'vest') {
+                // Vests: armor, maximumLoad, mass
+                if (item.armor || item.properties?.armor) {
+                    // Create armor field if it doesn't exist
+                    let armorElement = document.getElementById('statArmor');
+                    if (!armorElement) {
+                        const armorDiv = document.createElement('div');
+                        armorDiv.className = 'stat-item';
+                        armorDiv.innerHTML = '<span class="stat-label">Armor:</span><span class="stat-value" id="statArmor">-</span>';
+                        document.getElementById('statMod').parentElement.parentNode.appendChild(armorDiv);
+                        armorElement = document.getElementById('statArmor');
+                    }
+                    armorElement.textContent = item.armor || item.properties.armor;
+                    armorElement.parentElement.style.display = 'block';
+                }
+                
+                if (item.maximumLoad || item.properties?.maximumLoad) {
+                    document.getElementById('statCapacity').parentElement.querySelector('.stat-label').textContent = 'Max Load:';
+                    document.getElementById('statCapacity').textContent = `${item.maximumLoad || item.properties.maximumLoad}kg`;
+                    document.getElementById('statCapacity').parentElement.style.display = 'block';
+                }
+                
+                if (item.mass || item.properties?.mass) {
+                    document.getElementById('statMass').textContent = `${((item.mass || item.properties.mass)/1000).toFixed(2)}kg`;
+                    document.getElementById('statMass').parentElement.style.display = 'block';
+                }
+                
+            } else if (category === 'backpacks' || category === 'backpack') {
+                // Backpacks: maximumLoad, mass
+                if (item.maximumLoad || item.properties?.maximumLoad) {
+                    document.getElementById('statCapacity').parentElement.querySelector('.stat-label').textContent = 'Max Load:';
+                    document.getElementById('statCapacity').textContent = `${item.maximumLoad || item.properties.maximumLoad}kg`;
+                    document.getElementById('statCapacity').parentElement.style.display = 'block';
+                }
+                
+                if (item.mass || item.properties?.mass) {
+                    document.getElementById('statMass').textContent = `${((item.mass || item.properties.mass)/1000).toFixed(2)}kg`;
+                    document.getElementById('statMass').parentElement.style.display = 'block';
+                }
+                
+            } else if (category === 'magazines' || category === 'magazine') {
+                // Magazines: caliber, capacity, mass
+                if (item.caliber || item.properties?.caliber) {
+                    // Create caliber field if it doesn't exist
+                    let caliberElement = document.getElementById('statCaliber');
+                    if (!caliberElement) {
+                        const caliberDiv = document.createElement('div');
+                        caliberDiv.className = 'stat-item';
+                        caliberDiv.innerHTML = '<span class="stat-label">Caliber:</span><span class="stat-value" id="statCaliber">-</span>';
+                        document.getElementById('statMod').parentElement.parentNode.appendChild(caliberDiv);
+                        caliberElement = document.getElementById('statCaliber');
+                    }
+                    caliberElement.textContent = item.caliber || item.properties.caliber;
+                    caliberElement.parentElement.style.display = 'block';
+                }
+                
+                if (item.capacity || item.properties?.capacity) {
+                    document.getElementById('statCapacity').parentElement.querySelector('.stat-label').textContent = 'Capacity:';
+                    document.getElementById('statCapacity').textContent = item.capacity || item.properties.capacity;
+                    document.getElementById('statCapacity').parentElement.style.display = 'block';
+                }
+                
+                if (item.mass || item.properties?.mass) {
+                    document.getElementById('statMass').textContent = `${((item.mass || item.properties.mass)/1000).toFixed(2)}kg`;
+                    document.getElementById('statMass').parentElement.style.display = 'block';
+                }
+                
+            } else if (category === 'attachments' || category === 'attachment') {
+                // Attachments: mass, zoom, recoil modifier, sway modifier
+                if (item.mass || item.properties?.mass) {
+                    document.getElementById('statMass').textContent = `${((item.mass || item.properties.mass)/1000).toFixed(2)}kg`;
+                    document.getElementById('statMass').parentElement.style.display = 'block';
+                }
+                
+                if (item.zoom || item.properties?.zoom) {
+                    // Create zoom field if it doesn't exist
+                    let zoomElement = document.getElementById('statZoom');
+                    if (!zoomElement) {
+                        const zoomDiv = document.createElement('div');
+                        zoomDiv.className = 'stat-item';
+                        zoomDiv.innerHTML = '<span class="stat-label">Zoom:</span><span class="stat-value" id="statZoom">-</span>';
+                        document.getElementById('statMod').parentElement.parentNode.appendChild(zoomDiv);
+                        zoomElement = document.getElementById('statZoom');
+                    }
+                    zoomElement.textContent = `${item.zoom || item.properties.zoom}x`;
+                    zoomElement.parentElement.style.display = 'block';
+                }
+                
+                if (item.recoilModifier || item.properties?.recoilModifier) {
+                    // Create recoil field if it doesn't exist
+                    let recoilElement = document.getElementById('statRecoil');
+                    if (!recoilElement) {
+                        const recoilDiv = document.createElement('div');
+                        recoilDiv.className = 'stat-item';
+                        recoilDiv.innerHTML = '<span class="stat-label">Recoil:</span><span class="stat-value" id="statRecoil">-</span>';
+                        document.getElementById('statMod').parentElement.parentNode.appendChild(recoilDiv);
+                        recoilElement = document.getElementById('statRecoil');
+                    }
+                    recoilElement.textContent = `${((item.recoilModifier || item.properties.recoilModifier) * 100).toFixed(0)}%`;
+                    recoilElement.parentElement.style.display = 'block';
+                }
             }
-            if (item.variant) {
-                modText += ` [${item.variant}]`;
-            }
-            document.getElementById('statMod').textContent = modText;
         }
 
 
@@ -653,10 +856,8 @@
         }
         
         function setViewMode(mode) {
-            // Remove active class from all view mode toggles
-            document.querySelectorAll('.view-mode-toggle').forEach(btn => btn.classList.remove('active'));
-            // Add active class to selected mode
-            document.querySelector(`[data-view="${mode}"]`).classList.add('active');
+            // Update radio button selection
+            document.querySelector(`input[name="viewMode"][value="${mode}"]`).checked = true;
             
             // Show/hide collapse toggle based on view mode
             const collapseToggleContainer = document.getElementById('treeToggleBtn').parentElement;
@@ -680,6 +881,12 @@
             renderTreeView(filteredItems, 'leftTreeView');
         }
 
+        function updateGrouping(value) {
+            // Update radio button selection
+            document.querySelector(`input[name="groupByOption"][value="${value}"]`).checked = true;
+            renderTreeView(filteredItems, 'leftTreeView');
+        }
+
         function clearSelection() {
             // Clear visual selection
             document.querySelectorAll('.tree-item').forEach(item => item.classList.remove('selected'));
@@ -689,7 +896,7 @@
             selectedItem = null;
             
             // Clear stats
-            ['statDamage', 'statRange', 'statMass', 'statCapacity', 'statMod'].forEach(id => {
+            ['statName', 'statClassName', 'statMod', 'statDamage', 'statRange', 'statMass', 'statCapacity'].forEach(id => {
                 document.getElementById(id).textContent = '-';
             });
 
@@ -739,12 +946,12 @@
             const text = document.getElementById('treeToggleText');
             if (currentExpandState) {
                 collapseAllGroups();
-                button.textContent = '▶';
+                button.textContent = '+';
                 text.textContent = 'Expand All';
                 currentExpandState = false;
             } else {
                 expandAllGroups();
-                button.textContent = '▼';
+                button.textContent = '−';
                 text.textContent = 'Collapse All';
                 currentExpandState = true;
             }
@@ -960,6 +1167,8 @@
         window.changeSpacing = changeSpacing;
         window.showItemPreview = showItemPreview;
         window.hideItemPreview = hideItemPreview;
+        window.updateGrouping = updateGrouping;
+        
 
         // Event listeners for new UI controls
         document.getElementById('sortingSelect').addEventListener('change', (e) => {
@@ -967,16 +1176,22 @@
         });
         
         
-        document.getElementById('primaryGrouping').addEventListener('change', (e) => {
-            renderTreeView(filteredItems, 'leftTreeView');
+        // Group by radio button listeners (now in Options panel)
+        document.querySelectorAll('input[name="groupByOption"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    updateGrouping(e.target.value);
+                }
+            });
         });
         
         
-        // View mode toggle button listeners
-        document.querySelectorAll('.view-mode-toggle').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const mode = e.target.dataset.view;
-                setViewMode(mode);
+        // View mode radio button listeners (now in Options panel)
+        document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    setViewMode(e.target.value);
+                }
             });
         });
 
@@ -1034,12 +1249,12 @@
                 const button = document.getElementById('treeToggleBtn');
                 const text = document.getElementById('treeToggleText');
                 if (button && text) {
-                    button.textContent = '▼';
+                    button.textContent = '−';
                     text.textContent = 'Collapse All';
                 }
                 
-                // Initialize toggle visibility for default variant view
-                setViewMode('variants');
+                // Initialize toggle visibility for default hierarchy view
+                setViewMode('hierarchy');
                 
                 // Initialize keyboard navigation for both panels
                 initializeKeyboardNavigation('leftTreeView');

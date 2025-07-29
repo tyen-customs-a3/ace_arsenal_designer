@@ -10,7 +10,7 @@
     height: auto;
     background: transparent;
     border: none;
-    border-radius: 0.5px;
+    border-radius: 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -20,9 +20,9 @@
 .category-tab {
     width: 40px;
     height: 40px;
-    border: 1px solid var(--border-primary);
+    border: none;
     background: var(--button-background);
-    color: var(--content-tertiary);
+    color: rgba(255, 255, 255, 1.0);
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 16px;
@@ -30,7 +30,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    border-radius: 0.5px;
+    border-radius: 0;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
@@ -43,9 +43,11 @@
 .category-tab.active {
     background: var(--surface-title);
     color: var(--content-header);
-    border-color: var(--surface-title);
     width: 50px; /* Wider than inactive tabs */
-    padding-right: 15px; /* Extended padding to reach panel edge */
+    /* Keep icon centered in original 40px area - background expands right */
+    justify-content: center;
+    padding-left: 0px;
+    padding-right: 10px; /* Push content leftward to stay in original 40px center */
 }
 
 .category-tab::after {
@@ -57,13 +59,13 @@
     background: var(--surface-elevated);
     color: var(--content-primary);
     padding: 4px 8px;
-    border-radius: 1px;
+    border-radius: 0;
     font-size: 10px;
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s;
-    border: 1px solid var(--border-primary);
+    border: none;
     z-index: 1000;
     box-shadow: var(--elevation-2);
 }
@@ -76,13 +78,13 @@
 /* Left Panel */
 .left-panel {
     position: absolute;
-    left: 60px;
+    left: 60px;  /* 10px (sidebar position) + 50px (active tab width) = 60px */
     top: 10px;
     width: 320px;
     height: calc(100vh - 20px);
     background: var(--surface-panel);
-    border: 1px solid var(--border-primary);
-    border-radius: 3px;
+    border: none;
+    border-radius: 0;
     display: flex;
     flex-direction: column;
     z-index: 100;
@@ -93,8 +95,7 @@
 
 .left-panel-header {
     background: var(--surface-title);
-    border-bottom: 1px solid var(--border-secondary);
-    padding: 12px 16px;
+    padding: 4px 12px;
     font-size: 11px;
     color: var(--content-header);
     text-transform: uppercase;
@@ -104,6 +105,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 40px;
 }
 
 .header-title {
@@ -118,13 +120,17 @@
 
 .header-search {
     width: 120px;
-    padding: 6px 10px;
+    padding: 4px 10px;
     background: var(--button-background);
     border: 1px solid var(--border-secondary);
     color: var(--content-primary);
     font-size: 10px;
     border-radius: 1.5px;
     transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.header-search.full-width {
+    width: 100%;
 }
 
 .header-search:focus {
@@ -144,13 +150,13 @@
 /* Right Panel */
 .right-panel {
     position: absolute;
-    right: 60px;
+    right: 60px;  /* 10px (sidebar position) + 50px (active tab width) = 60px */
     top: 10px;
     width: 320px;
     height: calc(100vh - 20px);
     background: var(--surface-panel);
-    border: 1px solid var(--border-primary);
-    border-radius: 3px;
+    border: none;
+    border-radius: 0;
     display: flex;
     flex-direction: column;
     z-index: 100;
@@ -161,8 +167,7 @@
 
 .right-panel-header {
     background: var(--surface-title);
-    border-bottom: 1px solid var(--border-secondary);
-    padding: 12px 16px;
+    padding: 4px 12px;
     font-size: 11px;
     color: var(--content-header);
     text-transform: uppercase;
@@ -172,6 +177,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 40px;
 }
 
 .right-content {
@@ -189,7 +195,7 @@
     height: auto;
     background: transparent;
     border: none;
-    border-radius: 0.5px;
+    border-radius: 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -198,9 +204,9 @@
 .attachment-tab {
     width: 40px;
     height: 40px;
-    border: 1px solid var(--border-primary);
+    border: none;
     background: var(--button-background);
-    color: var(--content-tertiary);
+    color: rgba(255, 255, 255, 1.0);
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 16px;
@@ -208,7 +214,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    border-radius: 0.5px;
+    border-radius: 0;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
@@ -221,9 +227,13 @@
 .attachment-tab.active {
     background: var(--surface-title);
     color: var(--content-header);
-    border-color: var(--surface-title);
     width: 50px; /* Wider than inactive tabs */
-    padding-left: 15px; /* Extended padding to reach panel edge */
+    /* Expand leftward toward the panel by moving the entire tab left */
+    transform: translateX(-10px); /* Move 10px leftward to close gap with panel */
+    /* Keep icon centered in original 40px area - background expands left */
+    justify-content: center;
+    padding-left: 10px; /* Push content rightward to stay in original 40px center */
+    padding-right: 0px;
 }
 
 .attachment-tab::after {
@@ -235,13 +245,13 @@
     background: var(--surface-elevated);
     color: var(--content-primary);
     padding: 4px 8px;
-    border-radius: 1px;
+    border-radius: 0;
     font-size: 10px;
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s;
-    border: 1px solid var(--border-primary);
+    border: none;
     z-index: 1000;
     box-shadow: var(--elevation-2);
 }

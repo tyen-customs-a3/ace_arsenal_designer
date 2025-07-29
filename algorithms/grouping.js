@@ -1,7 +1,7 @@
 // Basic grouping algorithms
 import { VariantManager, groupWithVariantAwareness, createArsenalHierarchy } from './variantCore.js';
 
-export function groupByMod(items) {
+export function groupByMod(items, sortingFunction = null) {
     const groups = {};
     
     items.forEach(item => {
@@ -10,15 +10,19 @@ export function groupByMod(items) {
         groups[mod].push(item);
     });
     
-    // Sort items within each group
+    // Sort items within each group using provided sorting function or default to name
     Object.keys(groups).forEach(key => {
-        groups[key].sort((a, b) => a.displayName.localeCompare(b.displayName));
+        if (sortingFunction) {
+            groups[key] = sortingFunction(groups[key]);
+        } else {
+            groups[key].sort((a, b) => a.displayName.localeCompare(b.displayName));
+        }
     });
     
     return groups;
 }
 
-export function groupByCaliber(items) {
+export function groupByCaliber(items, sortingFunction = null) {
     const groups = {};
     
     items.forEach(item => {
@@ -33,9 +37,13 @@ export function groupByCaliber(items) {
         }
     });
     
-    // Sort items within each group
+    // Sort items within each group using provided sorting function or default to name
     Object.keys(groups).forEach(key => {
-        groups[key].sort((a, b) => a.displayName.localeCompare(b.displayName));
+        if (sortingFunction) {
+            groups[key] = sortingFunction(groups[key]);
+        } else {
+            groups[key].sort((a, b) => a.displayName.localeCompare(b.displayName));
+        }
     });
     
     return groups;
