@@ -1,33 +1,33 @@
 {
   "schema": {
     "weapon": [
-      "subcategory", "caliber", "range", "rateOfFire", "mass", "modes", 
+      "caliber", "range", "rateOfFire", "mass", "modes", 
       "magazines", "magazineWells", "weaponSlots", "faction", "dlc", 
       "underbarrel", "features", "variant", "texture", "hiddenSelections", 
       "hiddenSelectionsTextures", "model", "picture", "icon"
     ],
     "handgun": [
-      "subcategory", "caliber", "range", "rateOfFire", "mass", "modes", 
+      "caliber", "range", "rateOfFire", "mass", "modes", 
       "magazines", "faction", "variant", "texture", "features", "model", "picture", "icon"
     ],
     "launcher": [
-      "subcategory", "caliber", "range", "rateOfFire", "mass", "modes", 
+      "caliber", "range", "rateOfFire", "mass", "modes", 
       "magazines", "type", "variant", "texture"
     ],
     "vest": [
-      "subcategory", "armor", "maximumLoad", "mass", "faction", "variant", 
+      "armor", "maximumLoad", "mass", "faction", "variant", 
       "texture", "hiddenSelections", "hiddenSelectionsTextures"
     ],
     "backpack": [
-      "subcategory", "maximumLoad", "mass", "faction", "variant", "texture", 
+      "maximumLoad", "mass", "faction", "variant", "texture", 
       "hiddenSelections", "hiddenSelectionsTextures"
     ],
     "magazine": [
-      "subcategory", "caliber", "capacity", "mass", "magazineWells", "faction", 
+      "caliber", "capacity", "mass", "magazineWells", "faction", 
       "variant", "texture", "tracer", "picture", "icon"
     ],
     "attachment": [
-      "subcategory", "mass", "weaponSlots", "faction", "features", "variant", 
+      "mass", "weaponSlots", "faction", "features", "variant", 
       "texture", "zoom", "recoilModifier", "swayModifier", "picture", "icon"
     ]
   },
@@ -40,7 +40,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "6.5×39 mm",
         "range": 500,
         "rateOfFire": 625,
@@ -115,7 +114,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "6.5×39 mm",
         "range": 400,
         "rateOfFire": 650,
@@ -161,7 +159,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "6.5×39 mm",
         "range": 700,
         "rateOfFire": 500,
@@ -180,7 +177,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "6.5×39 mm",
         "range": 550,
         "rateOfFire": 650,
@@ -200,7 +196,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "6.5×39 mm",
         "range": 550,
         "rateOfFire": 650,
@@ -218,7 +213,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "6.5×39 mm",
         "range": 450,
         "rateOfFire": 700,
@@ -235,7 +229,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.56×45 mm",
         "range": 500,
         "rateOfFire": 750,
@@ -255,7 +248,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.56×45 mm",
         "range": 500,
         "rateOfFire": 750,
@@ -272,7 +264,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "machine_guns",
         "caliber": "7.62×51 mm",
         "range": 1000,
         "rateOfFire": 750,
@@ -290,7 +281,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "machine_guns",
         "caliber": "6.5×39 mm",
         "range": 800,
         "rateOfFire": 800,
@@ -308,7 +298,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "sniper_rifles",
         "caliber": "12.7×108 mm",
         "range": 1500,
         "rateOfFire": 60,
@@ -326,7 +315,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "sniper_rifles",
         "caliber": ".408 CheyTac",
         "range": 1800,
         "rateOfFire": 80,
@@ -344,7 +332,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "7.62×51 mm",
         "range": 500,
         "rateOfFire": 600,
@@ -362,7 +349,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "7.62×51 mm",
         "range": 600,
         "rateOfFire": 600,
@@ -406,7 +392,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "sniper_rifles",
         "caliber": ".338 Lapua Magnum",
         "range": 900,
         "rateOfFire": 450,
@@ -461,7 +446,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "sniper_rifles",
         "caliber": "7.62×51 mm",
         "range": 750,
         "rateOfFire": 500,
@@ -492,7 +476,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "sniper_rifles",
         "caliber": "12.7×54 mm",
         "range": 1200,
         "rateOfFire": 400,
@@ -523,7 +506,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "machine_guns",
         "caliber": "9.3×64 mm",
         "range": 1100,
         "rateOfFire": 600,
@@ -554,7 +536,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "handguns",
         "caliber": "9×19 mm",
         "range": 180,
         "rateOfFire": 450,
@@ -596,7 +577,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "handguns",
         "caliber": ".45 ACP",
         "range": 200,
         "rateOfFire": 350,
@@ -613,7 +593,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "handguns",
         "caliber": "9×19 mm",
         "range": 160,
         "rateOfFire": 400,
@@ -631,7 +610,6 @@
       "mod": "RHS_AFRF",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.45×39 mm",
         "range": 500,
         "rateOfFire": 650,
@@ -687,7 +665,6 @@
       "mod": "RHS_AFRF",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.45×39 mm",
         "range": 400,
         "rateOfFire": 700,
@@ -704,7 +681,6 @@
       "mod": "RHS_AFRF",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "7.62×39 mm",
         "range": 450,
         "rateOfFire": 600,
@@ -723,7 +699,6 @@
       "mod": "RHS_AFRF",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "7.62×39 mm",
         "range": 450,
         "rateOfFire": 600,
@@ -741,7 +716,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.56×45 mm",
         "range": 500,
         "rateOfFire": 700,
@@ -811,7 +785,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.56×45 mm",
         "range": 550,
         "rateOfFire": 700,
@@ -853,7 +826,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.56×45 mm",
         "range": 500,
         "rateOfFire": 750,
@@ -895,7 +867,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.56×45 mm",
         "range": 500,
         "rateOfFire": 750,
@@ -965,7 +936,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.56×45 mm",
         "range": 500,
         "rateOfFire": 680,
@@ -995,7 +965,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "7.62×51 mm",
         "range": 600,
         "rateOfFire": 650,
@@ -1024,7 +993,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.56×45 mm",
         "range": 500,
         "rateOfFire": 650,
@@ -1055,7 +1023,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "sniper_rifles",
         "caliber": "7.62×51 mm",
         "range": 700,
         "rateOfFire": 400,
@@ -1072,7 +1039,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.56×45 mm",
         "range": 450,
         "rateOfFire": 750,
@@ -1103,7 +1069,6 @@
       "mod": "RHS_AFRF",
       "scope": 2,
       "properties": {
-        "subcategory": "sniper_rifles",
         "caliber": "7.62×54R mm",
         "range": 800,
         "rateOfFire": 300,
@@ -1135,7 +1100,6 @@
       "mod": "RHS_AFRF",
       "scope": 2,
       "properties": {
-        "subcategory": "machine_guns",
         "caliber": "7.62×54R mm",
         "range": 1000,
         "rateOfFire": 700,
@@ -1165,7 +1129,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "machine_guns",
         "caliber": "7.62×51 mm",
         "range": 1100,
         "rateOfFire": 650,
@@ -1197,7 +1160,6 @@
       "mod": "RHS_AFRF",
       "scope": 2,
       "properties": {
-        "subcategory": "handguns",
         "caliber": "9×18 mm",
         "range": 150,
         "rateOfFire": 300,
@@ -1215,7 +1177,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "handguns",
         "caliber": "9×19 mm",
         "range": 180,
         "rateOfFire": 400,
@@ -1233,7 +1194,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "handguns",
         "caliber": ".45 ACP",
         "range": 170,
         "rateOfFire": 350,
@@ -1250,7 +1210,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "handguns",
         "caliber": "9×19 mm",
         "range": 180,
         "rateOfFire": 450,
@@ -1279,7 +1238,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "handguns",
         "caliber": ".45 ACP",
         "range": 170,
         "rateOfFire": 350,
@@ -1296,7 +1254,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "handguns",
         "caliber": "9×19 mm",
         "range": 180,
         "rateOfFire": 400,
@@ -1313,7 +1270,6 @@
       "mod": "CUP_Weapons",
       "scope": 2,
       "properties": {
-        "subcategory": "handguns",
         "caliber": ".50 AE",
         "range": 200,
         "rateOfFire": 280,
@@ -1330,7 +1286,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "launchers",
         "caliber": "NLAW Missile",
         "range": 600,
         "rateOfFire": 1,
@@ -1348,7 +1303,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "launchers",
         "caliber": "Titan Missile",
         "range": 4000,
         "rateOfFire": 1,
@@ -1366,7 +1320,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "launchers",
         "caliber": "Titan Missile",
         "range": 2000,
         "rateOfFire": 1,
@@ -1384,7 +1337,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "launchers",
         "caliber": "RPG-42 Rocket",
         "range": 700,
         "rateOfFire": 1,
@@ -1402,7 +1354,6 @@
       "mod": "RHS_AFRF",
       "scope": 2,
       "properties": {
-        "subcategory": "launchers",
         "caliber": "RPG-7 Rocket",
         "range": 500,
         "rateOfFire": 1,
@@ -1420,7 +1371,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "launchers",
         "caliber": "84mm HEAT",
         "range": 300,
         "rateOfFire": 1,
@@ -1438,7 +1388,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "launchers",
         "caliber": "Javelin Missile",
         "range": 4750,
         "rateOfFire": 1,
@@ -1456,7 +1405,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "vests",
         "armor": 80,
         "maximumLoad": 180,
         "mass": 6000,
@@ -1483,7 +1431,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "vests",
         "armor": 100,
         "maximumLoad": 220,
         "mass": 7500
@@ -1497,7 +1444,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "vests",
         "armor": 120,
         "maximumLoad": 250,
         "mass": 8500
@@ -1511,7 +1457,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "vests",
         "armor": 60,
         "maximumLoad": 160,
         "mass": 5000
@@ -1549,7 +1494,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "vests",
         "armor": 40,
         "maximumLoad": 140,
         "mass": 3500
@@ -1575,7 +1519,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "vests",
         "armor": 20,
         "maximumLoad": 120,
         "mass": 2500
@@ -1601,7 +1544,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "vests",
         "armor": 35,
         "maximumLoad": 130,
         "mass": 3000
@@ -1628,7 +1570,6 @@
       "mod": "RHS_AFRF",
       "scope": 2,
       "properties": {
-        "subcategory": "vests",
         "armor": 90,
         "maximumLoad": 200,
         "mass": 7000,
@@ -1655,7 +1596,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "vests",
         "armor": 110,
         "maximumLoad": 240,
         "mass": 8000,
@@ -1682,7 +1622,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "backpacks",
         "maximumLoad": 160,
         "mass": 2000,
         "faction": "NATO"
@@ -1720,7 +1659,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "backpacks",
         "maximumLoad": 200,
         "mass": 3000
       }
@@ -1745,7 +1683,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "backpacks",
         "maximumLoad": 280,
         "mass": 4500
       }
@@ -1770,7 +1707,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "backpacks",
         "maximumLoad": 320,
         "mass": 5500
       }
@@ -1795,7 +1731,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "backpacks",
         "maximumLoad": 300,
         "mass": 5000,
         "faction": "NATO"
@@ -1821,7 +1756,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "backpacks",
         "maximumLoad": 240,
         "mass": 4000
       }
@@ -1846,7 +1780,6 @@
       "mod": "RHS_AFRF",
       "scope": 2,
       "properties": {
-        "subcategory": "backpacks",
         "maximumLoad": 180,
         "mass": 2500,
         "faction": "RUS"
@@ -1873,7 +1806,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "backpacks",
         "maximumLoad": 200,
         "mass": 3200,
         "faction": "USA"
@@ -1899,7 +1831,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "6.5×39 mm",
         "capacity": 30,
         "mass": 100,
@@ -1915,7 +1846,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "6.5×39 mm",
         "capacity": 30,
         "mass": 100,
@@ -1933,7 +1863,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "optics",
         "mass": 300,
         "weaponSlots": ["asdg_OpticRail"],
         "faction": "NATO",
@@ -1949,7 +1878,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "optics",
         "mass": 250,
         "weaponSlots": ["asdg_OpticRail"],
         "faction": "NATO",
@@ -1964,7 +1892,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "muzzle",
         "mass": 200,
         "weaponSlots": ["asdg_MuzzleSlot"],
         "faction": "NATO",
@@ -1980,7 +1907,6 @@
       "mod": "A3", 
       "scope": 2,
       "properties": {
-        "subcategory": "underbarrel",
         "mass": 150,
         "weaponSlots": ["asdg_UnderBarrelSlot"],
         "faction": "NATO",
@@ -1996,7 +1922,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "rifles",
         "caliber": "5.56×45 mm",
         "capacity": 30,
         "mass": 120,
@@ -2012,7 +1937,6 @@
       "mod": "RHS_USAF",
       "scope": 2,
       "properties": {
-        "subcategory": "optics",
         "mass": 320,
         "weaponSlots": ["asdg_OpticRail"],
         "faction": "USA",
@@ -2027,7 +1951,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "lmg",
         "caliber": "6.5×39 mm",
         "capacity": 100,
         "mass": 350,
@@ -2043,7 +1966,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "optics",
         "mass": 150,
         "weaponSlots": ["asdg_OpticRail"],
         "faction": "NATO",
@@ -2058,7 +1980,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "muzzle",
         "mass": 250,
         "weaponSlots": ["asdg_MuzzleSlot_762"],
         "faction": "NATO",
@@ -2074,7 +1995,6 @@
       "mod": "A3",
       "scope": 2,
       "properties": {
-        "subcategory": "optics",
         "mass": 400,
         "weaponSlots": ["asdg_OpticRail_AK"],
         "faction": "CSAT",
