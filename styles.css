@@ -26,27 +26,27 @@ body {
 /* Compact Category Tabs - Vertical on far left */
 .category-sidebar {
     position: absolute;
-    left: 20px;
-    top: 20px;
-    width: 50px;
-    height: calc(100vh - 40px);
+    left: 10px;
+    top: 10px;
+    width: 40px;
+    height: calc(100vh - 20px);
     background: rgba(0, 0, 0, 0.95);
-    border: 2px solid #333;
-    border-radius: 4px;
+    border: 1px solid #333;
+    border-radius: 2px;
     display: flex;
     flex-direction: column;
     z-index: 100;
 }
 
 .category-tab {
-    width: 46px;
-    height: 46px;
+    width: 38px;
+    height: 38px;
     border: none;
     background: transparent;
     color: #666;
     cursor: pointer;
     transition: all 0.2s;
-    font-size: 18px;
+    font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,14 +68,14 @@ body {
 .category-tab::after {
     content: attr(data-tooltip);
     position: absolute;
-    left: 60px;
+    left: 50px;
     top: 50%;
     transform: translateY(-50%);
     background: rgba(0, 0, 0, 0.9);
     color: #fff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 10px;
+    padding: 3px 6px;
+    border-radius: 2px;
+    font-size: 9px;
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
@@ -92,13 +92,13 @@ body {
 /* Left Panel - Equipment List */
 .left-panel {
     position: absolute;
-    left: 80px;
-    top: 20px;
-    width: 340px;
-    height: calc(100vh - 40px);
+    left: 60px;
+    top: 10px;
+    width: 320px;
+    height: calc(100vh - 20px);
     background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #333;
-    border-radius: 4px;
+    border: 1px solid #333;
+    border-radius: 2px;
     display: flex;
     flex-direction: column;
     z-index: 100;
@@ -107,8 +107,8 @@ body {
 .left-panel-header {
     background: #1a1a1a;
     border-bottom: 1px solid #333;
-    padding: 8px 12px;
-    font-size: 12px;
+    padding: 6px 8px;
+    font-size: 11px;
     color: #999;
     text-transform: uppercase;
     flex-shrink: 0;
@@ -128,12 +128,12 @@ body {
 }
 
 .header-search {
-    width: 120px;
-    padding: 4px 6px;
+    width: 100px;
+    padding: 3px 4px;
     background: #0a0a0a;
     border: 1px solid #333;
     color: #fff;
-    font-size: 10px;
+    font-size: 9px;
     border-radius: 2px;
 }
 
@@ -147,13 +147,13 @@ body {
 .filter-tab {
     position: absolute;
     top: 0;
-    right: -60px;
-    width: 60px;
-    height: 30px;
+    right: -50px;
+    width: 50px;
+    height: 24px;
     background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #333;
+    border: 1px solid #333;
     border-left: none;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 2px 2px 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -173,7 +173,7 @@ body {
 }
 
 .filter-tab-text {
-    font-size: 10px;
+    font-size: 9px;
     color: #999;
     font-weight: 500;
     text-transform: uppercase;
@@ -190,25 +190,25 @@ body {
 
 .grouping-controls {
     background: #1a1a1a;
-    padding: 8px 12px;
+    padding: 6px 8px;
     border-bottom: 1px solid #333;
-    font-size: 10px;
+    font-size: 9px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .control-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 /* View mode radio button styling */
 .view-mode-container {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
 }
 
@@ -216,12 +216,12 @@ body {
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 3px 6px;
     border: 1px solid #444;
-    border-radius: 3px;
+    border-radius: 2px;
     background: rgba(0, 0, 0, 0.3);
     transition: all 0.2s;
-    font-size: 11px;
+    font-size: 10px;
 }
 
 .view-mode-option:hover {
@@ -231,8 +231,8 @@ body {
 
 .view-mode-option input[type="radio"] {
     margin: 0;
-    margin-right: 4px;
-    transform: scale(0.8);
+    margin-right: 3px;
+    transform: scale(0.7);
 }
 
 .view-mode-option input[type="radio"]:checked + span {
@@ -241,7 +241,7 @@ body {
 }
 
 .control-label {
-    font-size: 9px;
+    font-size: 8px;
     color: #aaa;
     font-weight: 500;
     text-transform: uppercase;
@@ -266,11 +266,11 @@ body {
 }
 
 .grouping-controls select {
-    padding: 4px 6px;
+    padding: 3px 4px;
     background: #0a0a0a;
     border: 1px solid #333;
     color: #fff;
-    font-size: 10px;
+    font-size: 9px;
     border-radius: 2px;
     flex: 1;
 }
@@ -278,43 +278,45 @@ body {
 .control-group:has(select) {
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .control-group:has(select) .control-label {
-    min-width: 50px;
+    min-width: 40px;
     flex-shrink: 0;
 }
 
-.control-group select:first-of-type {
-    min-width: 120px;
+.control-group #primaryGrouping {
+    width: 120px;
+    flex: 0 0 120px;
 }
 
-.control-group select:last-of-type {
-    min-width: 90px;
+.control-group .sort-control-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 120px;
+    flex: 0 0 120px;
 }
 
-#sortingControls {
-    transition: opacity 0.3s ease;
+.control-group .sort-control-group select {
+    flex: 1;
+    min-width: 0;
 }
 
-#groupingControls {
-    transition: opacity 0.3s ease;
+.control-group .sort-control-group .control-label {
+    font-size: 8px;
+    color: #aaa;
+    font-weight: 500;
+    text-transform: uppercase;
+    min-width: 30px;
+    flex-shrink: 0;
 }
 
-#sortingControls.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-#groupingControls.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-}
 
 
 .search-container {
-    padding: 8px;
+    padding: 6px;
     border-bottom: 1px solid #333;
     background: #1a1a1a;
     flex-shrink: 0;
@@ -322,11 +324,11 @@ body {
 
 .search-input {
     width: 100%;
-    padding: 6px 8px;
+    padding: 4px 6px;
     background: #0a0a0a;
     border: 1px solid #333;
     color: #fff;
-    font-size: 11px;
+    font-size: 10px;
     border-radius: 2px;
 }
 
@@ -344,13 +346,13 @@ body {
 /* Right Panel - Attachments & Magazines */
 .right-panel {
     position: absolute;
-    right: 80px;
-    top: 20px;
-    width: 300px;
-    height: calc(100vh - 40px);
+    right: 60px;
+    top: 10px;
+    width: 320px;
+    height: calc(100vh - 20px);
     background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #333;
-    border-radius: 4px;
+    border: 1px solid #333;
+    border-radius: 2px;
     display: flex;
     flex-direction: column;
     z-index: 100;
@@ -359,11 +361,14 @@ body {
 .right-panel-header {
     background: #1a1a1a;
     border-bottom: 1px solid #333;
-    padding: 8px 12px;
-    font-size: 12px;
+    padding: 6px 8px;
+    font-size: 11px;
     color: #999;
     text-transform: uppercase;
     flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .right-content {
@@ -375,26 +380,26 @@ body {
 /* Attachment Category Tabs - Vertical on far right */
 .attachment-sidebar {
     position: absolute;
-    right: 20px;
-    top: 20px;
-    width: 50px;
-    height: calc(100vh - 40px);
+    right: 10px;
+    top: 10px;
+    width: 40px;
+    height: calc(100vh - 20px);
     background: rgba(0, 0, 0, 0.95);
-    border: 2px solid #333;
-    border-radius: 4px;
+    border: 1px solid #333;
+    border-radius: 2px;
     display: flex;
     flex-direction: column;
 }
 
 .attachment-tab {
-    width: 46px;
-    height: 46px;
+    width: 38px;
+    height: 38px;
     border: none;
     background: transparent;
     color: #666;
     cursor: pointer;
     transition: all 0.2s;
-    font-size: 18px;
+    font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -416,14 +421,14 @@ body {
 .attachment-tab::after {
     content: attr(data-tooltip);
     position: absolute;
-    right: 60px;
+    right: 50px;
     top: 50%;
     transform: translateY(-50%);
     background: rgba(0, 0, 0, 0.9);
     color: #fff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 10px;
+    padding: 3px 6px;
+    border-radius: 2px;
+    font-size: 9px;
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
@@ -440,10 +445,10 @@ body {
 /* Central Area - Invisible layout placeholder */
 .central-area {
     position: absolute;
-    left: 440px;
-    top: 20px;
-    right: 610px;
-    bottom: 280px;
+    left: 390px;
+    top: 10px;
+    right: 590px;
+    bottom: 200px;
     background: transparent;
     border: none;
     display: flex;
@@ -455,29 +460,29 @@ body {
 /* Stats Panel */
 .stats-panel {
     position: absolute;
-    left: 440px;
-    bottom: 20px;
-    width: 280px;
-    height: 240px;
+    left: 390px;
+    bottom: 10px;
+    width: 260px;
+    height: 180px;
     background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #333;
-    border-radius: 4px;
-    padding: 12px;
+    border: 1px solid #333;
+    border-radius: 2px;
+    padding: 8px;
     z-index: 100;
 }
 
 .stats-title {
     color: #4a9eff;
-    font-size: 12px;
-    margin-bottom: 8px;
+    font-size: 11px;
+    margin-bottom: 6px;
     text-transform: uppercase;
 }
 
 .stat-item {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 4px;
-    font-size: 10px;
+    margin-bottom: 3px;
+    font-size: 9px;
 }
 
 .stat-label {
@@ -491,27 +496,27 @@ body {
 /* Equipment Preview Panel */
 .preview-area {
     position: absolute;
-    right: 610px;
-    bottom: 20px;
-    width: 280px;
-    height: 240px;
+    right: 590px;
+    bottom: 10px;
+    width: 260px;
+    height: 180px;
     background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #333;
-    border-radius: 4px;
-    padding: 12px;
+    border: 1px solid #333;
+    border-radius: 2px;
+    padding: 8px;
     z-index: 100;
 }
 
 .preview-title {
     color: #4a9eff;
-    font-size: 12px;
-    margin-bottom: 8px;
+    font-size: 11px;
+    margin-bottom: 6px;
     text-transform: uppercase;
 }
 
 .preview-item {
-    font-size: 10px;
-    margin-bottom: 4px;
+    font-size: 9px;
+    margin-bottom: 3px;
     color: #ccc;
 }
 
@@ -534,25 +539,25 @@ body {
 .tree-view li {
     list-style: none;
     margin: 0;
-    padding: 2px 0;
+    padding: 1px 0;
 }
 
 /* Tree node container for parent items with children */
 .tree-node-container {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
     border-bottom: 1px solid #1a1a1a;
-    height: 24px; /* Match tree-item height */
-    min-height: 24px;
+    height: 20px; /* Match tree-item height */
+    min-height: 20px;
 }
 
 .tree-group {
     cursor: pointer;
     user-select: none;
-    padding: 4px 8px;
+    padding: 3px 6px;
     color: #ccc;
-    font-size: 12px;
+    font-size: 11px;
     flex: 1;
 }
 
@@ -565,12 +570,12 @@ body {
 .tree-parent {
     cursor: pointer;
     user-select: none;
-    padding: 4px 8px;
+    padding: 3px 6px;
     color: #ccc;
-    font-size: 12px;
+    font-size: 11px;
     flex: 1;
-    height: 24px; /* Match tree-item height */
-    min-height: 24px;
+    height: 20px; /* Match tree-item height */
+    min-height: 20px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -589,14 +594,14 @@ body {
 
 .tree-toggle {
     color: #999;
-    font-size: 10px;
+    font-size: 9px;
     cursor: pointer;
-    padding: 2px 4px;
+    padding: 1px 3px;
     user-select: none;
-    min-width: 16px;
+    min-width: 14px;
     text-align: center;
     flex-shrink: 0;
-    height: 16px; /* Constrain toggle height */
+    height: 14px; /* Constrain toggle height */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -612,7 +617,7 @@ body {
 /* Item count styling - positioned on the right */
 .item-count-inline {
     color: #666;
-    font-size: 10px;
+    font-size: 9px;
     margin-left: auto;
     flex-shrink: 0;
     line-height: 1;
@@ -624,12 +629,12 @@ body {
 
 .tree-item {
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 3px 6px;
     color: #ccc;
-    font-size: 12px;
+    font-size: 11px;
     border-bottom: 1px solid #1a1a1a;
-    height: 24px; /* Explicit height for consistency */
-    min-height: 24px;
+    height: 20px; /* Explicit height for consistency */
+    min-height: 20px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -648,21 +653,11 @@ body {
 
 .tree-bullet {
     color: #666;
-    margin-right: 6px;
+    margin-right: 4px;
     line-height: 1;
     flex-shrink: 0;
 }
 
-.tree-base-class {
-    color: #888;
-    font-style: italic;
-    cursor: default;
-}
-
-.tree-base-class:hover {
-    background: none;
-    color: #888;
-}
 
 /* Visual hierarchy indicators */
 .tree-item[data-item*='"variant"'] {
@@ -672,88 +667,26 @@ body {
 .tree-item[data-item*='"variant"']:before {
     content: "↳ ";
     color: #666;
-    margin-left: -12px;
-    margin-right: 4px;
-}
-
-
-.tree-item:hover {
-    background: #1a1a1a;
-    color: #fff;
-}
-
-.tree-item.selected {
-    background: #2a4a6a;
-    color: #fff;
+    margin-left: -8px;
+    margin-right: 3px;
 }
 
 
 
-.inheritance-indicator {
-    font-size: 8px;
-    color: #4a9eff;
-    margin-right: 4px;
-}
 
-.variant-indicator {
-    font-size: 8px;
-    color: #ff9a4a;
-    margin-right: 4px;
-}
 
-.tree-item.variant {
-    background: #0f0f0f;
-    border-left: 2px solid #ff9a4a;
-}
 
-.tree-item.inherited {
-    border-left: 2px solid #4a9eff;
-}
 
-/* Multi-level tree hierarchy */
-/* Dead CSS removed - using simple tree structure now */
 
-/* Compact Sort Controls */
-.compact-sort-controls {
-    background: #1a1a1a;
-    padding: 6px 12px;
-    border-bottom: 1px solid #333;
-    flex-shrink: 0;
-}
 
-.sort-control-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.sort-label {
-    font-size: 9px;
-    color: #aaa;
-    font-weight: 500;
-    text-transform: uppercase;
-    min-width: 50px;
-    flex-shrink: 0;
-}
-
-.sort-control-group select {
-    padding: 4px 6px;
-    background: #0a0a0a;
-    border: 1px solid #333;
-    color: #fff;
-    font-size: 10px;
-    border-radius: 2px;
-    flex: 1;
-}
-
-.sort-order-toggle {
-    width: 24px;
-    height: 24px;
+.control-group .sort-order-toggle {
+    width: 18px;
+    height: 18px;
     background: #0a0a0a;
     border: 1px solid #333;
     color: #999;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 10px;
     border-radius: 2px;
     transition: all 0.2s;
     display: flex;
@@ -762,7 +695,7 @@ body {
     flex-shrink: 0;
 }
 
-.sort-order-toggle:hover {
+.control-group .sort-order-toggle:hover {
     background: #2a2a2a;
     color: #fff;
     border-color: #4a9eff;
@@ -771,22 +704,22 @@ body {
 /* Tree Controls External - Outside list view */
 .tree-controls-external {
     background: #1a1a1a;
-    padding: 6px 12px;
+    padding: 4px 8px;
     border-bottom: 1px solid #333;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-shrink: 0;
 }
 
 .tree-toggle-btn {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background: #0a0a0a;
     border: 1px solid #333;
     color: #999;
     cursor: pointer;
-    font-size: 10px;
+    font-size: 9px;
     border-radius: 2px;
     transition: all 0.2s;
     display: flex;
@@ -802,7 +735,7 @@ body {
 }
 
 .tree-toggle-text {
-    font-size: 10px;
+    font-size: 9px;
     color: #999;
     font-weight: 500;
     text-transform: uppercase;
@@ -811,13 +744,13 @@ body {
 /* Expandable Filter Panel */
 .expandable-filter-panel {
     position: absolute;
-    left: 430px; /* Right of left panel */
-    top: 20px;
-    width: 280px;
-    max-height: calc(100vh - 40px);
+    left: 390px; /* Right of left panel */
+    top: 10px;
+    width: 260px;
+    max-height: calc(100vh - 20px);
     background: rgba(0, 0, 0, 0.95);
-    border: 2px solid #333;
-    border-radius: 4px;
+    border: 1px solid #333;
+    border-radius: 2px;
     z-index: 200;
     transform: translateX(-100%);
     opacity: 0;
@@ -846,8 +779,8 @@ body {
 
 .filter-section-header {
     background: #1a1a1a;
-    padding: 8px 12px;
-    font-size: 11px;
+    padding: 6px 8px;
+    font-size: 10px;
     color: #4a9eff;
     text-transform: uppercase;
     font-weight: 500;
@@ -855,31 +788,31 @@ body {
 }
 
 .filter-section .view-mode-container {
-    padding: 12px;
+    padding: 8px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .filter-section .compact-filter-group {
-    padding: 8px 12px;
+    padding: 6px 8px;
 }
 
 .filter-section .compact-filter-group:last-child {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .filter-section .clear-filters-btn {
-    margin: 12px;
-    padding: 6px 12px;
+    margin: 8px;
+    padding: 4px 8px;
     background: #d32f2f;
     border: 1px solid #b71c1c;
     color: #fff;
     cursor: pointer;
-    font-size: 10px;
+    font-size: 9px;
     border-radius: 2px;
     transition: all 0.2s;
-    width: calc(100% - 24px);
+    width: calc(100% - 16px);
 }
 
 .filter-section .clear-filters-btn:hover {
@@ -890,28 +823,28 @@ body {
 /* Timing Display */
 .timing {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 5px;
+    right: 5px;
     background: rgba(0, 0, 0, 0.8);
-    padding: 4px 8px;
+    padding: 3px 6px;
     border-radius: 2px;
-    font-size: 10px;
+    font-size: 9px;
     color: #4a9eff;
     border: 1px solid #333;
 }
 
 
 .compact-filter-group {
-    padding: 8px 12px;
+    padding: 6px 8px;
     border-bottom: 1px solid #222;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 .compact-filter-label {
     color: #999;
-    font-size: 9px;
+    font-size: 8px;
     font-weight: bold;
     text-transform: uppercase;
 }
@@ -919,13 +852,13 @@ body {
 .compact-filter-checkboxes {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    max-height: 120px;
+    gap: 2px;
+    max-height: 100px;
     overflow-y: auto;
 }
 
 .compact-filter-checkboxes::-webkit-scrollbar {
-    width: 3px;
+    width: 2px;
 }
 
 .compact-filter-checkboxes::-webkit-scrollbar-track {
@@ -934,15 +867,15 @@ body {
 
 .compact-filter-checkboxes::-webkit-scrollbar-thumb {
     background: #333;
-    border-radius: 2px;
+    border-radius: 1px;
 }
 
 .filter-checkbox {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 2px 0;
-    font-size: 9px;
+    gap: 4px;
+    padding: 1px 0;
+    font-size: 8px;
     color: #ddd;
     cursor: pointer;
     user-select: none;
@@ -961,15 +894,15 @@ body {
 .compact-filter-radios {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 .compact-filter-option {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 2px 0;
-    font-size: 9px;
+    gap: 4px;
+    padding: 1px 0;
+    font-size: 8px;
     color: #ddd;
     cursor: pointer;
     user-select: none;
