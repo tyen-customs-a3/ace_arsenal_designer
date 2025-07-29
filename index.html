@@ -263,9 +263,6 @@
                     return false;
                 }
 
-                    return false;
-                }
-
                 return true;
             });
         }
@@ -296,12 +293,6 @@
                 </label>
             `).join('');
 
-            // Populate subcategory filters
-            const subcategoryContainer = document.getElementById('subcategoryFilters');
-                <label class="filter-checkbox">
-                    <span>${subcategory}</span>
-                </label>
-            `).join('');
         }
 
         // Toggle individual filter
@@ -849,8 +840,34 @@
                 document.getElementById('timing').textContent = 'Ready';
                 
             } catch (error) {
-                console.error('Failed to load arsenal data:', error);
-                document.getElementById('timing').textContent = 'Error loading data';
+                console.error('🚨 Failed to load arsenal data:', error);
+                
+                // Show user-friendly error message
+                const timing = document.getElementById('timing');
+                timing.textContent = 'Error loading data';
+                timing.style.color = '#ff4444';
+                timing.style.cursor = 'pointer';
+                timing.title = `Click for details: ${error.message}`;
+                
+                // Show error in left panel
+                const leftTreeView = document.getElementById('leftTreeView');
+                if (leftTreeView) {
+                    leftTreeView.innerHTML = `
+                        <div style="padding: 20px; color: #ff4444; text-align: center;">
+                            <h3>⚠️ Data Loading Error</h3>
+                            <p style="margin: 10px 0; font-size: 12px;">${error.message}</p>
+                            <p style="font-size: 10px; color: #999;">Check browser console for details</p>
+                            <button onclick="location.reload()" style="margin-top: 10px; padding: 5px 10px; background: #333; color: #fff; border: 1px solid #666; border-radius: 3px; cursor: pointer;">
+                                Reload Page
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                // Optional: Show error details on click
+                timing.onclick = () => {
+                    alert(`Arsenal Loading Error:\n\n${error.message}\n\nCheck the browser console (F12) for more details.`);
+                };
             }
         }
         

@@ -11,58 +11,143 @@ class DataLoader {
         if (this.loaded) return this.data;
         
         try {
+            console.log('📦 Loading items.json...');
             const response = await fetch('./data/items.json');
+            
             if (!response.ok) {
-                throw new Error(`Failed to load items.json: ${response.status}`);
+                throw new Error(`HTTP ${response.status}: Failed to load items.json - ${response.statusText}`);
             }
             
-            this.data = await response.json();
+            const text = await response.text();
+            
+            // Validate JSON syntax before parsing
+            try {
+                this.data = JSON.parse(text);
+                console.log('✅ JSON parsed successfully');
+            } catch (parseError) {
+                console.error('❌ JSON Parse Error:', parseError.message);
+                console.error('🔍 JSON content preview:', text.substring(0, 200) + '...');
+                throw new Error(`Invalid JSON syntax: ${parseError.message}`);
+            }
+            
+            // Validate data structure and content
             this.validateSchema();
             this.loaded = true;
             
+            console.log(`🎯 Loaded ${this.data.items.length} items successfully`);
             return this.data;
+            
         } catch (error) {
-            console.error('Error loading data:', error);
+            console.error('🚨 Data Loading Error:', error.message);
+            console.error('📍 Full error:', error);
+            
+            // Provide fallback or rethrow with context
+            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                throw new Error('Network error: Could not fetch items.json. Please check if the file exists and the server is running.');
+            }
+            
             throw error;
         }
     }
 
     validateSchema() {
-        if (!this.data.schema || !this.data.items) {
-            throw new Error('Invalid data format: missing schema or items');
+        console.log('🔍 Validating data schema...');
+        
+        // Check top-level structure
+        if (!this.data || typeof this.data !== 'object') {
+            throw new Error('Invalid data format: root must be an object');
         }
-
+        
+        if (!this.data.schema || typeof this.data.schema !== 'object') {
+            throw new Error('Invalid data format: missing or invalid schema object');
+        }
+        
+        if (!this.data.items || !Array.isArray(this.data.items)) {
+            throw new Error('Invalid data format: missing or invalid items array');
+        }
+        
+        if (this.data.items.length === 0) {
+            console.warn('⚠️ Warning: No items found in data');
+            return;
+        }
+        
+        console.log(`📋 Validating ${this.data.items.length} items...`);
+        
         // Validate each item against its type schema
-        for (const item of this.data.items) {
-            this.validateItem(item);
+        let validItems = 0;
+        let errors = [];
+        
+        for (let i = 0; i < this.data.items.length; i++) {
+            try {
+                this.validateItem(this.data.items[i], i);
+                validItems++;
+            } catch (error) {
+                errors.push(`Item ${i}: ${error.message}`);
+                if (errors.length > 10) {
+                    errors.push('... (truncated, too many errors)');
+                    break;
+                }
+            }
         }
+        
+        if (errors.length > 0) {
+            console.error('❌ Validation errors found:');
+            errors.forEach(error => console.error('  -', error));
+            throw new Error(`Schema validation failed: ${errors.length} items have errors`);
+        }
+        
+        console.log(`✅ Schema validation passed: ${validItems} valid items`);
     }
 
-    validateItem(item) {
+    validateItem(item, index) {
+        const itemId = item.className || `item[${index}]`;
+        
+        // Check if item is an object
+        if (!item || typeof item !== 'object') {
+            throw new Error(`${itemId}: Item must be an object`);
+        }
+        
         const required = ['className', 'parentClass', 'name', 'type', 'mod', 'scope', 'properties'];
         
         // Check required fields
         for (const field of required) {
             if (!(field in item)) {
-                throw new Error(`Item ${item.className || 'unknown'} missing required field: ${field}`);
+                throw new Error(`${itemId}: Missing required field '${field}'`);
             }
+            
+            // Check field types
+            if (field === 'properties' && typeof item[field] !== 'object') {
+                throw new Error(`${itemId}: '${field}' must be an object`);
+            } else if (field === 'scope' && typeof item[field] !== 'number') {
+                throw new Error(`${itemId}: '${field}' must be a number`);
+            } else if (field !== 'properties' && field !== 'scope' && typeof item[field] !== 'string') {
+                throw new Error(`${itemId}: '${field}' must be a string`);
+            }
+        }
+        
+        // Validate className is unique (basic check)
+        if (!item.className.trim()) {
+            throw new Error(`${itemId}: className cannot be empty`);
         }
 
         // Validate type exists in schema
         if (!this.data.schema[item.type]) {
-            throw new Error(`Unknown item type: ${item.type} for item ${item.className}`);
+            throw new Error(`${itemId}: Unknown item type '${item.type}'. Valid types: ${Object.keys(this.data.schema).join(', ')}`);
         }
 
-        // Validate properties against schema (optional - for development)
-        // Skip property validation in browser for now
-        const isDevelopment = typeof window === 'undefined'; // Only validate in Node.js
-        if (isDevelopment) {
-            const validProperties = this.data.schema[item.type];
-            for (const prop in item.properties) {
-                if (!validProperties.includes(prop)) {
-                    console.warn(`Item ${item.className}: unknown property "${prop}" for type "${item.type}"`);
-                }
+        // Validate properties against schema
+        const validProperties = this.data.schema[item.type];
+        const itemProperties = Object.keys(item.properties);
+        
+        for (const prop of itemProperties) {
+            if (!validProperties.includes(prop)) {
+                console.warn(`⚠️ ${itemId}: Unknown property '${prop}' for type '${item.type}'. Valid properties: ${validProperties.join(', ')}`);
             }
+        }
+        
+        // Check for completely empty properties
+        if (itemProperties.length === 0) {
+            console.warn(`⚠️ ${itemId}: No properties defined`);
         }
     }
 
