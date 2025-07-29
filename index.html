@@ -203,7 +203,8 @@
             selectTreeItem,
             initializeKeyboardNavigation,
             clearPanelFocus,
-            focusFirstItem
+            focusFirstItem,
+            restoreFocusAfterViewChange
         } from './ui/simpleTree.js';
         
         // Global state - simplified
@@ -454,8 +455,13 @@
 
             container.innerHTML = html;
             
-            // Clear focus when tree content changes
+            // Clear focus when tree content changes, then restore it
             clearPanelFocus(containerId);
+            
+            // Use setTimeout to allow DOM to update before restoring focus
+            setTimeout(() => {
+                restoreFocusAfterViewChange(containerId);
+            }, 0);
         }
 
         // Simple tree toggle - delegates to simpleTree.js
