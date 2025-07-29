@@ -27,10 +27,6 @@
                 </div>
             </div>
             
-            <!-- Filter Tab docked to top right -->
-            <div class="filter-tab" id="filterTab" onclick="toggleFilterPanel()" title="Toggle filters">
-                <span class="filter-tab-text">Filters</span>
-            </div>
             <div class="grouping-controls">
                 
                 <!-- Grouping Controls - Property-Based Organization -->
@@ -59,6 +55,15 @@
             <div class="tree-controls-external">
                 <button class="tree-toggle-btn" id="treeToggleBtn" onclick="toggleExpandCollapse()">▶</button>
                 <span class="tree-toggle-text" id="treeToggleText">Expand All</span>
+                
+                <!-- View Options moved from filters -->
+                <div class="view-options-inline">
+                    <div class="view-mode-toggles">
+                        <button class="view-mode-toggle" data-view="list" title="Flat List">📄</button>
+                        <button class="view-mode-toggle" data-view="hierarchy" title="Inheritance Tree">🌳</button>
+                        <button class="view-mode-toggle active" data-view="variants" title="Variants">🎨</button>
+                    </div>
+                </div>
             </div>
             
             <div class="left-content">
@@ -68,32 +73,18 @@
             </div>
         </div>
 
-        <!-- Expandable Filter Panel -->
-        <div class="expandable-filter-panel" id="expandableFilterPanel">
-            <div class="filter-panel-content">
-                <!-- View Mode Section -->
-                <div class="filter-section">
-                    <div class="filter-section-header">View Options</div>
-                    <div class="view-mode-container">
-                        <label class="view-mode-option">
-                            <input type="radio" name="viewMode" value="list">
-                            <span>Flat List</span>
-                        </label>
-                        <label class="view-mode-option">
-                            <input type="radio" name="viewMode" value="hierarchy">
-                            <span>Inheritance Tree</span>
-                        </label>
-                        <label class="view-mode-option">
-                            <input type="radio" name="viewMode" value="variants" checked>
-                            <span>🎨 Variants</span>
-                        </label>
-                    </div>
+        <!-- Vertical Panel Container -->
+        <div class="side-panels-container">
+            <!-- Compact Filter Panel -->
+            <div class="compact-filter-panel" id="compactFilterPanel">
+                <!-- Filter toggle header -->
+                <div class="filter-toggle-header" onclick="toggleFilterPanel()">
+                    <span class="filter-toggle-text">Filters</span>
+                    <span class="filter-toggle-arrow" id="filterToggleArrow">▶</span>
                 </div>
-
-                <!-- Filters Section -->
-                <div class="filter-section">
-                    <div class="filter-section-header">Filters</div>
-                    
+                
+                <!-- Filter content -->
+                <div class="filter-content" id="filterContent">
                     <!-- Compact Filter Groups -->
                     <div class="compact-filter-group">
                         <label class="compact-filter-label">Mod:</label>
@@ -127,8 +118,40 @@
                         </div>
                     </div>
                     
-                    
                     <button class="clear-filters-btn" onclick="clearAllFilters()" title="Clear all filters">Clear All Filters</button>
+                </div>
+            </div>
+
+            <!-- Compact Stats Panel -->
+            <div class="compact-stats-panel" id="compactStatsPanel">
+                <!-- Stats toggle header -->
+                <div class="filter-toggle-header" onclick="toggleStatsPanel()">
+                    <span class="filter-toggle-text">Statistics</span>
+                    <span class="filter-toggle-arrow" id="statsToggleArrow">▶</span>
+                </div>
+                
+                <!-- Stats content -->
+                <div class="filter-content" id="statsContent">
+                    <div class="stat-item">
+                        <span class="stat-label">Damage:</span>
+                        <span class="stat-value" id="statDamage">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Range:</span>
+                        <span class="stat-value" id="statRange">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Mass:</span>
+                        <span class="stat-value" id="statMass">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Capacity:</span>
+                        <span class="stat-value" id="statCapacity">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Mod Source:</span>
+                        <span class="stat-value" id="statMod">-</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -159,40 +182,7 @@
         <div class="central-area">
         </div>
 
-        <!-- Stats Panel -->
-        <div class="stats-panel">
-            <div class="stats-title">Item Statistics</div>
-            <div class="stat-item">
-                <span class="stat-label">Damage:</span>
-                <span class="stat-value" id="statDamage">-</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Range:</span>
-                <span class="stat-value" id="statRange">-</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Mass:</span>
-                <span class="stat-value" id="statMass">-</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Capacity:</span>
-                <span class="stat-value" id="statCapacity">-</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Mod Source:</span>
-                <span class="stat-value" id="statMod">-</span>
-            </div>
-        </div>
 
-        <!-- Equipment Preview Panel -->
-        <div class="preview-area">
-            <div class="preview-title">Current Loadout</div>
-            <div class="preview-item" id="previewWeapon">Primary: None</div>
-            <div class="preview-item" id="previewHandgun">Handgun: None</div>
-            <div class="preview-item" id="previewBackpack">Backpack: None</div>
-            <div class="preview-item" id="previewVest">Vest: None</div>
-            <div class="preview-item" id="previewAttachments">Attachments: None</div>
-        </div>
 
         <div class="timing" id="timing">Ready</div>
     </div>
@@ -221,13 +211,6 @@
         let selectedItem = null;
         let currentSortOrder = 'asc';
         let currentExpandState = false;
-        let currentLoadout = {
-            weapon: null,
-            handgun: null,
-            backpack: null,
-            vest: null,
-            attachments: []
-        };
 
         // Filter state
         let activeFilters = {
@@ -423,7 +406,7 @@
             const startTime = performance.now();
 
             // Get current UI state
-            const viewMode = document.querySelector('input[name="viewMode"]:checked')?.value || 'list';
+            const viewMode = document.querySelector('.view-mode-toggle.active')?.dataset.view || 'variants';
             const sortMethod = document.getElementById('sortingSelect').value;
             const sortOrder = currentSortOrder;
             const primaryGrouping = document.getElementById('primaryGrouping').value;
@@ -457,7 +440,8 @@
             }
 
             // Create tree data structure - view mode determines how items are displayed within groups
-            const treeData = createTreeData(items, useGrouping, groupingFunction, sortingFunction, viewMode);
+            const hasPrimaryGrouping = primaryGrouping !== 'none';
+            const treeData = createTreeData(items, useGrouping, groupingFunction, sortingFunction, viewMode, hasPrimaryGrouping);
             
             // Render simple tree
             const html = `<ul class="tree-view">${renderSimpleTree(treeData)}</ul>`;
@@ -487,7 +471,6 @@
                 console.log('✅ Item parsed:', selectedItem.displayName, 'Category:', selectedItem.category);
                 
                 updateStats(selectedItem);
-                updateLoadout(selectedItem);
                 
                 
                 // Update right panel with compatible accessories when weapon is selected
@@ -524,25 +507,6 @@
             document.getElementById('statMod').textContent = modText;
         }
 
-        function updateLoadout(item) {
-            // Update current loadout based on item type
-            if (item.category === 'weapons') {
-                currentLoadout.weapon = item;
-                document.getElementById('previewWeapon').textContent = `Primary: ${item.displayName}`;
-            } else if (item.category === 'handguns') {
-                currentLoadout.handgun = item;
-                document.getElementById('previewHandgun').textContent = `Handgun: ${item.displayName}`;
-            } else if (item.category === 'backpacks') {
-                currentLoadout.backpack = item;
-                document.getElementById('previewBackpack').textContent = `Backpack: ${item.displayName}`;
-            } else if (item.category === 'vests') {
-                currentLoadout.vest = item;
-                document.getElementById('previewVest').textContent = `Vest: ${item.displayName}`;
-            } else if (item.category === 'attachments') {
-                currentLoadout.attachments.push(item);
-                document.getElementById('previewAttachments').textContent = `Attachments: ${currentLoadout.attachments.length} items`;
-            }
-        }
 
         // Category tab handling
         function switchCategory(category) {
@@ -623,11 +587,33 @@
         
         function toggleInheritanceView() {
             // Toggle between flat list and inheritance hierarchy
-            const currentView = document.querySelector('input[name="viewMode"]:checked').value;
+            const currentView = document.querySelector('.view-mode-toggle.active')?.dataset.view;
             if (currentView === 'list') {
-                document.querySelector('input[name="viewMode"][value="hierarchy"]').checked = true;
+                setViewMode('hierarchy');
             } else {
-                document.querySelector('input[name="viewMode"][value="list"]').checked = true;
+                setViewMode('list');
+            }
+        }
+        
+        function setViewMode(mode) {
+            // Remove active class from all view mode toggles
+            document.querySelectorAll('.view-mode-toggle').forEach(btn => btn.classList.remove('active'));
+            // Add active class to selected mode
+            document.querySelector(`[data-view="${mode}"]`).classList.add('active');
+            
+            // Show/hide collapse toggle based on view mode
+            const collapseToggleContainer = document.getElementById('treeToggleBtn').parentElement;
+            const collapseToggleBtn = document.getElementById('treeToggleBtn');
+            const collapseToggleText = document.getElementById('treeToggleText');
+            
+            if (mode === 'list') {
+                // Hide collapse toggle for flat list view
+                collapseToggleBtn.style.display = 'none';
+                collapseToggleText.style.display = 'none';
+            } else {
+                // Show collapse toggle for hierarchy and variants views
+                collapseToggleBtn.style.display = 'flex';
+                collapseToggleText.style.display = 'inline';
             }
             
             renderTreeView(filteredItems, 'leftTreeView');
@@ -708,10 +694,35 @@
         }
 
         function toggleFilterPanel() {
-            const panel = document.getElementById('expandableFilterPanel');
-            const tab = document.getElementById('filterTab');
-            panel.classList.toggle('active');
-            tab.classList.toggle('active');
+            const panel = document.getElementById('compactFilterPanel');
+            const content = document.getElementById('filterContent');
+            const arrow = document.getElementById('filterToggleArrow');
+            
+            panel.classList.toggle('expanded');
+            
+            if (panel.classList.contains('expanded')) {
+                content.style.display = 'block';
+                arrow.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                arrow.textContent = '▶';
+            }
+        }
+
+        function toggleStatsPanel() {
+            const panel = document.getElementById('compactStatsPanel');
+            const content = document.getElementById('statsContent');
+            const arrow = document.getElementById('statsToggleArrow');
+            
+            panel.classList.toggle('expanded');
+            
+            if (panel.classList.contains('expanded')) {
+                content.style.display = 'block';
+                arrow.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                arrow.textContent = '▶';
+            }
         }
 
         // Global functions for buttons and tree interaction
@@ -722,6 +733,7 @@
         window.toggleTreeGroup = toggleTreeGroup;
         window.selectTreeItem = selectTreeItem;
         window.toggleInheritanceView = toggleInheritanceView;
+        window.setViewMode = setViewMode;
         window.expandAllGroups = expandAllGroups;
         window.collapseAllGroups = collapseAllGroups;
         window.toggleFilter = toggleFilter;
@@ -729,6 +741,7 @@
         window.toggleSortOrder = toggleSortOrder;
         window.toggleExpandCollapse = toggleExpandCollapse;
         window.toggleFilterPanel = toggleFilterPanel;
+        window.toggleStatsPanel = toggleStatsPanel;
 
         // Event listeners for new UI controls
         document.getElementById('sortingSelect').addEventListener('change', (e) => {
@@ -741,10 +754,11 @@
         });
         
         
-        // View mode radio button listeners
-        document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                renderTreeView(filteredItems, 'leftTreeView');
+        // View mode toggle button listeners
+        document.querySelectorAll('.view-mode-toggle').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const mode = e.target.dataset.view;
+                setViewMode(mode);
             });
         });
 
@@ -805,6 +819,9 @@
                     button.textContent = '▼';
                     text.textContent = 'Collapse All';
                 }
+                
+                // Initialize toggle visibility for default variant view
+                setViewMode('variants');
 
                 console.log('🎯 ACE3 Arsenal Simulation Ready!');
                 console.log('💡 Select a weapon to see compatible attachments and magazines.');
