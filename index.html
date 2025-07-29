@@ -828,6 +828,10 @@
                 
                 // Initialize toggle visibility for default variant view
                 setViewMode('variants');
+                
+                // Initialize keyboard navigation for both panels
+                initializeKeyboardNavigation('leftTreeView');
+                initializeKeyboardNavigation('rightTreeView');
 
                 console.log('🎯 ACE3 Arsenal Simulation Ready!');
                 console.log('💡 Select a weapon to see compatible attachments and magazines.');
