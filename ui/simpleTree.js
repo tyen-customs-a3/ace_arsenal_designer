@@ -242,17 +242,18 @@ function buildInheritanceHierarchy(items) {
 }
 
 // Simple tree renderer - creates proper vertical HTML structure
-export function renderSimpleTree(treeData) {
+export function renderSimpleTree(treeData, viewMode = 'variants') {
     if (!treeData || treeData.length === 0) {
         return '<li>No items</li>';
     }
     
-    return treeData.map(node => renderTreeNode(node, 0)).join('');
+    return treeData.map(node => renderTreeNode(node, 0, viewMode)).join('');
 }
 
-function renderTreeNode(node, level) {
+function renderTreeNode(node, level, viewMode = 'variants') {
     const hasChildren = node.children && node.children.length > 0;
-    const indent = level * 20; // 20px indent per level
+    
+    const indent = level * 20; // 20px indent per level - icons flow naturally
     
     let html = '';
     
@@ -276,12 +277,25 @@ function renderTreeNode(node, level) {
         html += `<li>`;
         
         // The actual item (clickable if it has data) with count on the right
-        html += `<div class="${itemClass}" ${clickHandler}>`;
+        html += `<div class="${itemClass}" ${clickHandler} onmouseenter="showItemPreview(event, this)" onmouseleave="hideItemPreview()">`;
         html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
+        
         // For primary groups, the toggle is just visual since the whole row is clickable
         // For other groups, keep the separate toggle functionality
         const toggleHandler = isPrimaryGroupHeader ? '' : `onclick="event.stopPropagation(); toggleTreeGroup('${nodeId}');"`;
         html += `<span class="tree-toggle" data-node-id="${nodeId}" ${toggleHandler}>▼</span>`;
+        
+        // Add icons inline after toggle, in order of appearance
+        if (window.displayOptions.showModIcon && node.item && node.item.mod) {
+            const modText = node.item.mod.charAt(0).toUpperCase();
+            html += `<span class="item-mod-icon">${modText}</span>`;
+        }
+        
+        if (window.displayOptions.showPreviewIcon && node.item) {
+            const previewText = node.item.category ? node.item.category.charAt(0).toUpperCase() : '?';
+            html += `<span class="item-preview-icon">${previewText}</span>`;
+        }
+        
         html += `<span class="group-name">${node.name}</span>`;
         html += `<span class="item-count-inline">(${countItems(node)})</span>`;
         html += `</div>`;
@@ -289,7 +303,7 @@ function renderTreeNode(node, level) {
         
         // Render children
         node.children.forEach(child => {
-            html += renderTreeNode(child, level + 1);
+            html += renderTreeNode(child, level + 1, viewMode);
         });
         
         html += '</ul>';
@@ -297,11 +311,28 @@ function renderTreeNode(node, level) {
     } else {
         // Leaf item - no toggle needed, no count needed, simple left-aligned text
         const clickHandler = node.item ? `onclick="selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'` : '';
+        
         const className = node.item ? `tree-item` : `tree-item tree-base-class`;
+            
         html += `<li>`;
-        html += `<div class="${className}" ${clickHandler}>`;
+        html += `<div class="${className}" ${clickHandler} onmouseenter="showItemPreview(event, this)" onmouseleave="hideItemPreview()">`;
         html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
-        html += `<span class="tree-bullet">•</span>`;
+        
+        // Only show bullet if not in flat list view mode
+        if (viewMode !== 'list') {
+            html += `<span class="tree-bullet">•</span>`;
+        }
+        
+        // Add icons inline after bullet, in order of appearance
+        if (window.displayOptions.showModIcon && node.item && node.item.mod) {
+            const modText = node.item.mod.charAt(0).toUpperCase();
+            html += `<span class="item-mod-icon">${modText}</span>`;
+        }
+        
+        if (window.displayOptions.showPreviewIcon && node.item) {
+            const previewText = node.item.category ? node.item.category.charAt(0).toUpperCase() : '?';
+            html += `<span class="item-preview-icon">${previewText}</span>`;
+        }
         html += `<span class="group-name">${node.name}</span>`;
         html += `<span class="item-count-inline"></span>`; // Empty span for layout consistency
         html += `</div>`;

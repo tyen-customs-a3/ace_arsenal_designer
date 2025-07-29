@@ -11,11 +11,11 @@
     <div class="arsenal-container">
         <!-- Compact Category Sidebar -->
         <div class="category-sidebar">
-            <button class="category-tab active" data-category="weapons" data-tooltip="Primary Weapons">🔫</button>
-            <button class="category-tab" data-category="handguns" data-tooltip="Handguns">🔫</button>
-            <button class="category-tab" data-category="launchers" data-tooltip="Launchers">🚀</button>
-            <button class="category-tab" data-category="backpacks" data-tooltip="Backpacks">🎒</button>
-            <button class="category-tab" data-category="vests" data-tooltip="Vests">🎽</button>
+            <button class="category-tab active" data-category="weapons" data-tooltip="Primary Weapons">◈</button>
+            <button class="category-tab" data-category="handguns" data-tooltip="Handguns">◐</button>
+            <button class="category-tab" data-category="launchers" data-tooltip="Launchers">◎</button>
+            <button class="category-tab" data-category="backpacks" data-tooltip="Backpacks">◢</button>
+            <button class="category-tab" data-category="vests" data-tooltip="Vests">◧</button>
         </div>
 
         <!-- Left Panel - Equipment List -->
@@ -75,6 +75,52 @@
 
         <!-- Vertical Panel Container -->
         <div class="side-panels-container">
+            <!-- Compact Options Panel -->
+            <div class="compact-options-panel" id="compactOptionsPanel">
+                <!-- Options toggle header -->
+                <div class="filter-toggle-header" onclick="toggleOptionsPanel()">
+                    <span class="filter-toggle-text">Options</span>
+                    <span class="filter-toggle-arrow" id="optionsToggleArrow">▶</span>
+                </div>
+                
+                <!-- Options content -->
+                <div class="filter-content" id="optionsContent">
+                    <!-- Icon Display Options -->
+                    <div class="compact-filter-group">
+                        <label class="compact-filter-label">Icons:</label>
+                        <div class="compact-filter-checkboxes">
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="showPreviewIcon" onchange="togglePreviewIcon(this.checked)">
+                                <span>Preview Icon</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="showModIcon" onchange="toggleModIcon(this.checked)">
+                                <span>Mod Icon</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Row Spacing Options -->
+                    <div class="compact-filter-group">
+                        <label class="compact-filter-label">Spacing:</label>
+                        <div class="compact-filter-radios">
+                            <label class="compact-filter-option">
+                                <input type="radio" name="spacingOption" value="compact" onchange="changeSpacing('compact')">
+                                <span>Compact</span>
+                            </label>
+                            <label class="compact-filter-option">
+                                <input type="radio" name="spacingOption" value="general" checked onchange="changeSpacing('general')">
+                                <span>General</span>
+                            </label>
+                            <label class="compact-filter-option">
+                                <input type="radio" name="spacingOption" value="spacious" onchange="changeSpacing('spacious')">
+                                <span>Spacious</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Compact Filter Panel -->
             <div class="compact-filter-panel" id="compactFilterPanel">
                 <!-- Filter toggle header -->
@@ -174,8 +220,8 @@
 
         <!-- Attachment Category Sidebar -->
         <div class="attachment-sidebar">
-            <button class="attachment-tab active" data-attachment="attachments" data-tooltip="Attachments">🔧</button>
-            <button class="attachment-tab" data-attachment="magazines" data-tooltip="Magazines">📦</button>
+            <button class="attachment-tab active" data-attachment="attachments" data-tooltip="Attachments">⚙</button>
+            <button class="attachment-tab" data-attachment="magazines" data-tooltip="Magazines">◈</button>
         </div>
 
         <!-- Central Area - Empty space for UI layout -->
@@ -447,7 +493,7 @@
             const treeData = createTreeData(items, useGrouping, groupingFunction, sortingFunction, viewMode, hasPrimaryGrouping);
             
             // Render simple tree
-            const html = `<ul class="tree-view">${renderSimpleTree(treeData)}</ul>`;
+            const html = `<ul class="tree-view">${renderSimpleTree(treeData, viewMode)}</ul>`;
             
             const endTime = performance.now();
             document.getElementById('timing').textContent = `${(endTime - startTime).toFixed(2)}ms`;
@@ -736,6 +782,160 @@
             }
         }
 
+        function toggleOptionsPanel() {
+            const panel = document.getElementById('compactOptionsPanel');
+            const content = document.getElementById('optionsContent');
+            const arrow = document.getElementById('optionsToggleArrow');
+            
+            panel.classList.toggle('expanded');
+            
+            if (panel.classList.contains('expanded')) {
+                content.style.display = 'block';
+                arrow.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                arrow.textContent = '▶';
+            }
+        }
+
+        // Options state
+        let displayOptions = {
+            showPreviewIcon: false,
+            showModIcon: false,
+            spacing: 'general'
+        };
+        
+        // Make display options globally available
+        window.displayOptions = displayOptions;
+
+        function togglePreviewIcon(enabled) {
+            displayOptions.showPreviewIcon = enabled;
+            renderTreeView(filteredItems, 'leftTreeView');
+            // Update right panel if it has items
+            const rightTreeView = document.getElementById('rightTreeView');
+            if (rightTreeView && rightTreeView.children.length > 0) {
+                if (selectedItem && selectedItem.category === 'weapons') {
+                    updateCompatibleAccessories(selectedItem);
+                } else {
+                    const rightItems = filterItemsByCategory(selectedRightCategory);
+                    renderTreeView(rightItems, 'rightTreeView', false);
+                }
+            }
+        }
+
+        function toggleModIcon(enabled) {
+            displayOptions.showModIcon = enabled;
+            renderTreeView(filteredItems, 'leftTreeView');
+            // Update right panel if it has items
+            const rightTreeView = document.getElementById('rightTreeView');
+            if (rightTreeView && rightTreeView.children.length > 0) {
+                if (selectedItem && selectedItem.category === 'weapons') {
+                    updateCompatibleAccessories(selectedItem);
+                } else {
+                    const rightItems = filterItemsByCategory(selectedRightCategory);
+                    renderTreeView(rightItems, 'rightTreeView', false);
+                }
+            }
+        }
+
+        function changeSpacing(spacing) {
+            displayOptions.spacing = spacing;
+            
+            // Update left panel
+            const leftTreeView = document.getElementById('leftTreeView');
+            leftTreeView.className = `tree-view spacing-${spacing}`;
+            
+            // Update right panel
+            const rightTreeView = document.getElementById('rightTreeView');
+            rightTreeView.className = `tree-view spacing-${spacing}`;
+        }
+
+
+        // Hover preview functionality
+        let hoverPreviewElement = null;
+        let hoverPreviewTimeout = null;
+
+        function showItemPreview(event, element) {
+            // Only show preview for items with data
+            if (!element.dataset.item) return;
+            
+            // Clear any existing timeout
+            clearTimeout(hoverPreviewTimeout);
+            
+            // Add small delay to prevent flickering
+            hoverPreviewTimeout = setTimeout(() => {
+                try {
+                    const itemData = JSON.parse(element.dataset.item);
+                    
+                    // Create preview element if it doesn't exist
+                    if (!hoverPreviewElement) {
+                        hoverPreviewElement = document.createElement('div');
+                        hoverPreviewElement.className = 'item-hover-preview';
+                        document.body.appendChild(hoverPreviewElement);
+                    }
+                    
+                    // Get category for icon styling
+                    const category = itemData.category || 'unknown';
+                    const categoryIcon = getCategoryIcon(category);
+                    
+                    // Build preview content
+                    hoverPreviewElement.innerHTML = `
+                        <div class="item-hover-preview-icon ${category}">
+                            ${categoryIcon}
+                        </div>
+                        <div class="item-hover-preview-text">
+                            ${itemData.displayName}
+                        </div>
+                    `;
+                    
+                    // Position preview near cursor
+                    const rect = element.getBoundingClientRect();
+                    const previewWidth = 120;
+                    const previewHeight = 120;
+                    
+                    let left = rect.right + 10; // 10px offset from element
+                    let top = rect.top;
+                    
+                    // Adjust if preview would go off screen
+                    if (left + previewWidth > window.innerWidth) {
+                        left = rect.left - previewWidth - 10; // Show on left side
+                    }
+                    
+                    if (top + previewHeight > window.innerHeight) {
+                        top = window.innerHeight - previewHeight - 10;
+                    }
+                    
+                    hoverPreviewElement.style.left = `${left}px`;
+                    hoverPreviewElement.style.top = `${top}px`;
+                    hoverPreviewElement.classList.add('visible');
+                    
+                } catch (e) {
+                    console.warn('Could not show item preview:', e);
+                }
+            }, 100); // 100ms delay - much faster
+        }
+
+        function hideItemPreview() {
+            clearTimeout(hoverPreviewTimeout);
+            
+            if (hoverPreviewElement) {
+                hoverPreviewElement.classList.remove('visible');
+            }
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'weapons': '⚔',
+                'handguns': '🔫',
+                'launchers': '🚀',
+                'backpacks': '🎒',
+                'vests': '🛡',
+                'attachments': '🔧',
+                'magazines': '📦',
+                'unknown': '❓'
+            };
+            return icons[category] || icons['unknown'];
+        }
 
         // Global functions for buttons and tree interaction
         window.regenerateData = regenerateData;
@@ -754,6 +954,12 @@
         window.toggleExpandCollapse = toggleExpandCollapse;
         window.toggleFilterPanel = toggleFilterPanel;
         window.toggleStatsPanel = toggleStatsPanel;
+        window.toggleOptionsPanel = toggleOptionsPanel;
+        window.togglePreviewIcon = togglePreviewIcon;
+        window.toggleModIcon = toggleModIcon;
+        window.changeSpacing = changeSpacing;
+        window.showItemPreview = showItemPreview;
+        window.hideItemPreview = hideItemPreview;
 
         // Event listeners for new UI controls
         document.getElementById('sortingSelect').addEventListener('change', (e) => {
@@ -838,6 +1044,14 @@
                 // Initialize keyboard navigation for both panels
                 initializeKeyboardNavigation('leftTreeView');
                 initializeKeyboardNavigation('rightTreeView');
+                
+                // Initialize spacing classes on tree views
+                changeSpacing('general'); // Set initial spacing
+                
+                // Sync initial checkbox states with displayOptions
+                document.getElementById('showPreviewIcon').checked = displayOptions.showPreviewIcon;
+                document.getElementById('showModIcon').checked = displayOptions.showModIcon;
+                document.querySelector(`input[name="spacingOption"][value="${displayOptions.spacing}"]`).checked = true;
 
 
                 console.log('🎯 ACE3 Arsenal Simulation Ready!');

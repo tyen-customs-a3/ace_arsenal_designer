@@ -3,7 +3,7 @@
 
 /* Controls and Additional UI Elements */
 .grouping-controls {
-    background: var(--surface-elevated);
+    background: var(--surface-title);
     padding: 8px 12px;
     border-bottom: 1px solid var(--border-secondary);
     font-size: 10px;
@@ -22,7 +22,7 @@
 
 .control-label {
     font-size: 9px;
-    color: var(--content-secondary);
+    color: var(--content-header);
     font-weight: 500;
     text-transform: uppercase;
     min-width: 40px;
@@ -31,12 +31,29 @@
 
 .grouping-controls select {
     padding: 4px 6px;
-    background: var(--surface-secondary);
-    border: 1px solid var(--border-primary);
-    color: var(--content-primary);
+    background: var(--button-background) !important;
+    border: 1px solid var(--border-primary) !important;
+    color: var(--content-primary) !important;
     font-size: 10px;
-    border-radius: 1px;
+    font-weight: 600;
+    border-radius: 1px !important;
     flex: 1;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: none !important;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    outline: none;
+    box-shadow: none !important;
+}
+
+.grouping-controls select:hover,
+.grouping-controls select:focus {
+    outline: none !important;
+    border-color: var(--border-focus) !important;
+    background: var(--active-background) !important;
+    box-shadow: none !important;
 }
 
 .sort-control-group {
@@ -49,12 +66,35 @@
 .sort-control-group select {
     flex: 1;
     min-width: 0;
+    padding: 4px 6px;
+    background: var(--button-background) !important;
+    border: 1px solid var(--border-primary) !important;
+    color: var(--content-primary) !important;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 1px !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: none !important;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    outline: none;
+    box-shadow: none !important;
+}
+
+.sort-control-group select:hover,
+.sort-control-group select:focus {
+    outline: none !important;
+    border-color: var(--border-focus) !important;
+    background: var(--active-background) !important;
+    box-shadow: none !important;
 }
 
 .sort-order-toggle {
     width: 20px;
     height: 20px;
-    background: var(--surface-secondary);
+    background: var(--button-background);
     border: 1px solid var(--border-primary);
     color: var(--content-tertiary);
     cursor: pointer;
@@ -74,7 +114,7 @@
 }
 
 .tree-controls-external {
-    background: var(--surface-elevated);
+    background: var(--surface-title);
     padding: 6px 12px;
     border-bottom: 1px solid var(--border-secondary);
     display: flex;
@@ -86,7 +126,7 @@
 .tree-toggle-btn {
     width: 18px;
     height: 18px;
-    background: var(--surface-secondary);
+    background: var(--button-background);
     border: 1px solid var(--border-primary);
     color: var(--content-tertiary);
     cursor: pointer;
@@ -107,7 +147,7 @@
 
 .tree-toggle-text {
     font-size: 9px;
-    color: var(--content-secondary);
+    color: var(--content-header);
     font-weight: 500;
     text-transform: uppercase;
 }
@@ -125,7 +165,7 @@
 }
 
 .view-mode-toggle {
-    background: var(--surface-secondary);
+    background: var(--button-background);
     border: 1px solid var(--border-primary);
     color: var(--content-tertiary);
     width: 20px;

@@ -7,7 +7,9 @@
     margin: 0;
     overflow-y: auto;
     height: 100%;
-    font-family: monospace;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-weight: 600;
+    background: var(--surface-secondary);
 }
 
 .tree-view ul {
@@ -42,19 +44,21 @@
 }
 
 .tree-item.selected {
-    background-color: var(--state-selected);
+    background-color: var(--selection-background);
     color: var(--content-primary);
     font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .tree-group-header {
     font-weight: 600 !important;
-    color: var(--action-accent) !important;
-    background-color: var(--state-focus) !important;
+    color: var(--content-primary) !important;
+    background-color: var(--surface-title) !important;
     border-radius: 1px;
     margin: 2px 0;
     padding: 6px 8px !important;
     font-size: 11px !important;
+    border: 1px solid var(--border-secondary);
 }
 
 .tree-group-header .item-count-inline {
@@ -95,4 +99,157 @@
     flex-shrink: 0;
     margin-left: auto;
     opacity: 0.8;
+}
+
+/* Spacing Options */
+.tree-view.spacing-compact .tree-item {
+    min-height: 18px;
+    padding: 2px 6px;
+    font-size: 10px;
+}
+
+.tree-view.spacing-general .tree-item {
+    min-height: 22px;
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+.tree-view.spacing-spacious .tree-item {
+    min-height: 36px;
+    padding: 8px 13px;
+    font-size: 16px;
+}
+
+/* Icon Support - Natural Flow Layout with Spacing-Based Sizing */
+.item-mod-icon {
+    margin-right: 4px;
+    flex-shrink: 0;
+    background: var(--action-primary);
+    border-radius: 1px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.item-preview-icon {
+    margin-right: 6px;
+    flex-shrink: 0;
+    background: var(--border-primary);
+    border-radius: 1px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--content-tertiary);
+}
+
+/* Compact mode - small icons (row height ~18px) */
+.tree-view.spacing-compact .item-mod-icon,
+.tree-view.spacing-compact .item-preview-icon {
+    width: 12px;
+    height: 12px;
+    font-size: 7px;
+}
+
+/* General mode - medium icons (row height ~22px) */
+.tree-view.spacing-general .item-mod-icon,
+.tree-view.spacing-general .item-preview-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 9px;
+}
+
+/* Spacious mode - large icons that nearly fill row height (~36px) */
+.tree-view.spacing-spacious .item-mod-icon,
+.tree-view.spacing-spacious .item-preview-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+    margin-right: 8px;
+}
+
+/* Hover Preview Popup */
+.item-hover-preview {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background: var(--surface-title);
+    border: 2px solid var(--border-primary);
+    border-radius: 3px;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+}
+
+.item-hover-preview.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.item-hover-preview-icon {
+    width: 100%;
+    height: 96px;  /* Nearly fills space, leaving room for name bar */
+    background: var(--border-primary);
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;  /* Much larger icon */
+    color: var(--content-primary);
+    font-weight: bold;
+    flex: 1;
+}
+
+.item-hover-preview-text {
+    height: 24px;  /* Small name bar */
+    background: rgba(0, 0, 0, 0.8);  /* Dark background for name bar */
+    font-size: 9px;
+    color: var(--content-header);
+    text-align: center;
+    font-weight: 600;
+    line-height: 24px;  /* Center text vertically */
+    padding: 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-top: 1px solid var(--border-secondary);
+}
+
+/* Category-specific icon backgrounds */
+.item-hover-preview-icon.weapons {
+    background: var(--action-primary);
+}
+
+.item-hover-preview-icon.handguns {
+    background: var(--action-accent);
+}
+
+.item-hover-preview-icon.launchers {
+    background: var(--feedback-error);
+}
+
+.item-hover-preview-icon.backpacks {
+    background: var(--feedback-success);
+}
+
+.item-hover-preview-icon.vests {
+    background: var(--favorites-color);
+    color: var(--content-stats);
+}
+
+.item-hover-preview-icon.attachments {
+    background: var(--border-primary);
+}
+
+.item-hover-preview-icon.magazines {
+    background: var(--content-tertiary);
 }
