@@ -41,28 +41,18 @@
                         <option value="groupByMod">Mod</option>
                         <option value="groupByCaliber">Caliber</option>
                     </select>
-                    <select id="secondaryGrouping">
-                        <option value="none">Then by: None</option>
-                        <option value="groupByMod">Then by Mod</option>
-                        <option value="groupByCaliber">Then by Caliber</option>
-                    </select>
+                    <div class="sort-control-group">
+                        <label class="control-label">Sort by:</label>
+                        <select id="sortingSelect">
+                            <option value="sortByName">Name</option>
+                            <option value="sortByMod">Mod</option>
+                            <option value="sortByRange">Range</option>
+                            <option value="sortByMass">Mass</option>
+                        </select>
+                        <button class="sort-order-toggle" id="sortOrderToggle" onclick="toggleSortOrder()" title="Toggle sort order">↑</button>
+                    </div>
                 </div>
                 
-            </div>
-            
-            <!-- Compact Sort Controls -->
-            <div class="compact-sort-controls">
-                <div class="sort-control-group">
-                    <label class="sort-label">Sort by:</label>
-                    <select id="sortingSelect">
-                        <option value="sortByName">Name</option>
-                        <option value="sortByMod">Mod</option>
-                        <option value="sortByRange">Range</option>
-                        <option value="sortByMass">Mass</option>
-                        <option value="sortByCategory">Category</option>
-                    </select>
-                    <button class="sort-order-toggle" id="sortOrderToggle" onclick="toggleSortOrder()" title="Toggle sort order">↑</button>
-                </div>
             </div>
             
             <!-- Tree Controls outside and above list -->
@@ -137,12 +127,6 @@
                         </div>
                     </div>
                     
-                    <div class="compact-filter-group">
-                        <label class="compact-filter-label">Type:</label>
-                        <div class="compact-filter-checkboxes" id="subcategoryFilters">
-                            <!-- Populated dynamically -->
-                        </div>
-                    </div>
                     
                     <button class="clear-filters-btn" onclick="clearAllFilters()" title="Clear all filters">Clear All Filters</button>
                 </div>
@@ -151,9 +135,11 @@
 
         <!-- Right Panel - Selected Item Options -->
         <div class="right-panel">
-            <div class="right-panel-header">Compatible Items</div>
-            <div class="search-container">
-                <input type="text" class="search-input" id="rightSearch" placeholder="Search items...">
+            <div class="right-panel-header">
+                <span class="header-title">Compatible Items</span>
+                <div class="header-controls">
+                    <input type="text" class="header-search" id="rightSearch" placeholder="Search...">
+                </div>
             </div>
             <div class="right-content">
                 <ul class="tree-view" id="rightTreeView">
@@ -248,7 +234,6 @@
             mods: new Set(),
             calibers: new Set(),
             variants: 'all',
-            subcategories: new Set()
         };
 
         // Category filtering
@@ -278,8 +263,6 @@
                     return false;
                 }
 
-                // Subcategory filter
-                if (activeFilters.subcategories.size > 0 && !activeFilters.subcategories.has(item.subcategory || 'Unknown')) {
                     return false;
                 }
 
@@ -294,7 +277,6 @@
             // Get unique values for each filter type
             const mods = [...new Set(categoryItems.map(item => item.mod || 'Unknown'))].sort();
             const calibers = [...new Set(categoryItems.map(item => item.caliber).filter(c => c))].sort();
-            const subcategories = [...new Set(categoryItems.map(item => item.subcategory).filter(c => c))].sort();
 
             // Populate mod filters
             const modContainer = document.getElementById('modFilters');
@@ -316,9 +298,7 @@
 
             // Populate subcategory filters
             const subcategoryContainer = document.getElementById('subcategoryFilters');
-            subcategoryContainer.innerHTML = subcategories.map(subcategory => `
                 <label class="filter-checkbox">
-                    <input type="checkbox" value="${subcategory}" onchange="toggleFilter('subcategories', '${subcategory}', this.checked)">
                     <span>${subcategory}</span>
                 </label>
             `).join('');
@@ -338,7 +318,6 @@
         function clearAllFilters() {
             activeFilters.mods.clear();
             activeFilters.calibers.clear();
-            activeFilters.subcategories.clear();
             activeFilters.variants = 'all';
 
             // Reset UI
@@ -457,7 +436,6 @@
             const sortMethod = document.getElementById('sortingSelect').value;
             const sortOrder = currentSortOrder;
             const primaryGrouping = document.getElementById('primaryGrouping').value;
-            const secondaryGrouping = document.getElementById('secondaryGrouping').value;
 
             let groupingFunction = null;
             let sortingFunction = null;
@@ -474,13 +452,7 @@
                 // User has selected a grouping - apply it as top-level grouping
                 // View mode will be applied within each group
                 useGrouping = true;
-                if (secondaryGrouping !== 'none') {
-                    // Multi-level grouping
-                    groupingFunction = (items) => applyMultiGrouping(items, primaryGrouping, secondaryGrouping);
-                } else {
-                    // Single level grouping
-                    groupingFunction = algorithms[primaryGrouping];
-                }
+                groupingFunction = algorithms[primaryGrouping];
             } else {
                 // No user grouping selected - let view mode handle all organization
                 if (viewMode === 'variants' || viewMode === 'hierarchy') {
@@ -777,9 +749,6 @@
             renderTreeView(filteredItems, 'leftTreeView');
         });
         
-        document.getElementById('secondaryGrouping').addEventListener('change', (e) => {
-            renderTreeView(filteredItems, 'leftTreeView');
-        });
         
         // View mode radio button listeners
         document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
