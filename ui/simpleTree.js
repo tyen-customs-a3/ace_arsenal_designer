@@ -375,6 +375,7 @@ window.selectTreeItem = selectTreeItem;
 // Focus management for keyboard navigation
 let currentFocusedElement = null;
 let activePanelId = null;
+let lastSelectedItemId = null; // Track selected item to preserve focus across view changes
 
 // Initialize keyboard navigation for a panel
 export function initializeKeyboardNavigation(panelId) {
@@ -386,6 +387,13 @@ export function initializeKeyboardNavigation(panelId) {
     panel.addEventListener('keydown', handleKeyboardNavigation);
     panel.addEventListener('focus', () => setActivePanel(panelId));
     panel.addEventListener('click', () => setActivePanel(panelId));
+    
+    // Focus first item when panel is clicked or focused
+    panel.addEventListener('focus', () => {
+        if (!currentFocusedElement || activePanelId !== panelId) {
+            focusFirstItem(panelId);
+        }
+    });
 }
 
 // Set the active panel for navigation
@@ -439,12 +447,20 @@ function handleKeyboardNavigation(event) {
             event.preventDefault();
             currentIndex = currentIndex <= 0 ? items.length - 1 : currentIndex - 1;
             setFocusedItem(items[currentIndex]);
+            // Immediately select the focused item
+            if (items[currentIndex] && items[currentIndex].dataset.item) {
+                selectTreeItem(items[currentIndex]);
+            }
             break;
             
         case 'ArrowDown':
             event.preventDefault();
             currentIndex = currentIndex >= items.length - 1 ? 0 : currentIndex + 1;
             setFocusedItem(items[currentIndex]);
+            // Immediately select the focused item
+            if (items[currentIndex] && items[currentIndex].dataset.item) {
+                selectTreeItem(items[currentIndex]);
+            }
             break;
             
         case 'ArrowLeft':
@@ -469,16 +485,27 @@ function handleKeyboardNavigation(event) {
 
 // Set focused item with visual feedback
 function setFocusedItem(item) {
-    // Remove previous focus
-    if (currentFocusedElement) {
-        currentFocusedElement.classList.remove('keyboard-focused');
-    }
+    // Remove previous focus from all items
+    document.querySelectorAll('.tree-item.keyboard-focused').forEach(el => {
+        el.classList.remove('keyboard-focused');
+    });
     
     // Set new focus
     currentFocusedElement = item;
     if (item) {
         item.classList.add('keyboard-focused');
         item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        // Track the selected item ID for persistence across view changes
+        if (item.dataset.item) {
+            try {
+                const itemData = JSON.parse(item.dataset.item);
+                lastSelectedItemId = itemData.className || itemData.displayName;
+            } catch (e) {
+                // Fallback to element text content
+                lastSelectedItemId = item.textContent.trim();
+            }
+        }
     }
 }
 
@@ -486,31 +513,105 @@ function setFocusedItem(item) {
 function handleExpandCollapse(expand) {
     if (!currentFocusedElement) return;
     
-    // Find associated toggle button or group
-    const parentLi = currentFocusedElement.closest('li');
-    if (!parentLi) return;
-    
-    const childrenUl = parentLi.querySelector('ul.tree-children');
-    const toggle = parentLi.querySelector('.tree-toggle');
-    
-    if (childrenUl && toggle) {
-        const isExpanded = childrenUl.style.display !== 'none';
+    if (expand) {
+        // Right arrow - expand current group if it's a group header
+        if (currentFocusedElement.classList.contains('tree-group-header')) {
+            const nodeId = extractNodeIdFromElement(currentFocusedElement);
+            if (nodeId) {
+                toggleTreeGroup(nodeId);
+            }
+        } else {
+            // If it's a regular item, try to expand its own group if it has one
+            const parentLi = currentFocusedElement.closest('li');
+            if (!parentLi) return;
+            
+            const childrenUl = parentLi.querySelector('ul.tree-children');
+            const toggle = parentLi.querySelector('.tree-toggle');
+            
+            if (childrenUl && toggle && childrenUl.style.display === 'none') {
+                childrenUl.style.display = 'block';
+                toggle.textContent = '▼';
+            }
+        }
+    } else {
+        // Left arrow - collapse the group this item is in and move to parent group
+        const parentGroup = findParentGroup(currentFocusedElement);
         
-        if (expand && !isExpanded) {
-            // Expand
-            childrenUl.style.display = 'block';
-            toggle.textContent = '▼';
-        } else if (!expand && isExpanded) {
-            // Collapse
-            childrenUl.style.display = 'none';
-            toggle.textContent = '▶';
+        if (parentGroup) {
+            const { groupElement, toggleElement, groupHeader } = parentGroup;
+            
+            // Collapse the group
+            if (groupElement.style.display !== 'none') {
+                groupElement.style.display = 'none';
+                if (toggleElement) {
+                    toggleElement.textContent = '▶';
+                }
+            }
+            
+            // Move focus to the group header and clear item selection
+            if (groupHeader) {
+                setFocusedItem(groupHeader);
+                clearItemSelection();
+            }
         }
-    } else if (expand && currentFocusedElement.classList.contains('tree-group-header')) {
-        // Handle primary group header clicks
-        const nodeId = extractNodeIdFromElement(currentFocusedElement);
-        if (nodeId) {
-            toggleTreeGroup(nodeId);
+    }
+}
+
+// Find the parent group containing the current item
+function findParentGroup(element) {
+    if (!element) return null;
+    
+    // Find the closest parent ul.tree-children
+    const parentUl = element.closest('ul.tree-children');
+    if (!parentUl) return null;
+    
+    // Find the parent li that contains this ul
+    const parentLi = parentUl.parentElement;
+    if (!parentLi) return null;
+    
+    // Find the group header (div with tree-item class) and toggle
+    const groupHeader = parentLi.querySelector('div.tree-item');
+    const toggleElement = parentLi.querySelector('.tree-toggle');
+    
+    if (groupHeader && toggleElement) {
+        return {
+            groupElement: parentUl,
+            toggleElement: toggleElement,
+            groupHeader: groupHeader
+        };
+    }
+    
+    return null;
+}
+
+// Clear item selection (stats, right panel, etc.)
+function clearItemSelection() {
+    // Clear visual selection
+    document.querySelectorAll('.tree-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    document.querySelectorAll('.tree-parent').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Clear stats display safely
+    const statElements = ['statDamage', 'statRange', 'statMass', 'statCapacity', 'statMod'];
+    statElements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = '-';
         }
+    });
+    
+    // Clear right panel to show all items of current category
+    try {
+        if (window.selectedRightCategory && window.filterItemsByCategory && window.renderTreeView) {
+            const rightItems = window.filterItemsByCategory(window.selectedRightCategory);
+            window.renderTreeView(rightItems, 'rightTreeView', false);
+        }
+    } catch (e) {
+        // Silently fail if functions aren't available
+        console.warn('Could not clear right panel:', e);
     }
 }
 
@@ -530,6 +631,44 @@ export function clearPanelFocus(panelId) {
     }
 }
 
+// Restore focus to previously selected item after view changes
+export function restoreFocusAfterViewChange(panelId) {
+    if (activePanelId !== panelId || !lastSelectedItemId) return;
+    
+    const items = getNavigableItems(panelId);
+    let targetItem = null;
+    
+    // Try to find the item by className or displayName
+    for (const item of items) {
+        if (item.dataset.item) {
+            try {
+                const itemData = JSON.parse(item.dataset.item);
+                if (itemData.className === lastSelectedItemId || itemData.displayName === lastSelectedItemId) {
+                    targetItem = item;
+                    break;
+                }
+            } catch (e) {
+                // Fallback: compare text content
+                if (item.textContent.trim().includes(lastSelectedItemId)) {
+                    targetItem = item;
+                    break;
+                }
+            }
+        }
+    }
+    
+    // If found, set focus and select it
+    if (targetItem) {
+        setFocusedItem(targetItem);
+        if (targetItem.dataset.item) {
+            selectTreeItem(targetItem);
+        }
+    } else if (items.length > 0) {
+        // Fallback to first item
+        setFocusedItem(items[0]);
+    }
+}
+
 // Set initial focus to first item in panel
 export function focusFirstItem(panelId) {
     const items = getNavigableItems(panelId);
@@ -539,5 +678,3 @@ export function focusFirstItem(panelId) {
     }
 }
 
-// Export navigation functions
-export { initializeKeyboardNavigation, setActivePanel, clearPanelFocus, focusFirstItem };
