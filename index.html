@@ -54,15 +54,15 @@
         <!-- Vertical Panel Container -->
         <div class="side-panels-container">
             <!-- Compact Options Panel -->
-            <div class="compact-options-panel" id="compactOptionsPanel">
+            <div class="compact-options-panel expanded" id="compactOptionsPanel">
                 <!-- Options toggle header -->
                 <div class="filter-toggle-header" onclick="toggleOptionsPanel()">
                     <span class="filter-toggle-text">Options</span>
-                    <span class="filter-toggle-arrow" id="optionsToggleArrow">▶</span>
+                    <span class="filter-toggle-arrow" id="optionsToggleArrow">▼</span>
                 </div>
                 
                 <!-- Options content -->
-                <div class="filter-content" id="optionsContent">
+                <div class="filter-content" id="optionsContent" style="display: block;">
                     <!-- Group by Options -->
                     <div class="compact-filter-group">
                         <label class="compact-filter-label">Group by:</label>
@@ -143,15 +143,15 @@
 
 
             <!-- Compact Stats Panel -->
-            <div class="compact-stats-panel" id="compactStatsPanel">
+            <div class="compact-stats-panel expanded" id="compactStatsPanel">
                 <!-- Stats toggle header -->
                 <div class="filter-toggle-header" onclick="toggleStatsPanel()">
                     <span class="filter-toggle-text">Statistics</span>
-                    <span class="filter-toggle-arrow" id="statsToggleArrow">▶</span>
+                    <span class="filter-toggle-arrow" id="statsToggleArrow">▼</span>
                 </div>
                 
                 <!-- Stats content -->
-                <div class="filter-content" id="statsContent">
+                <div class="filter-content" id="statsContent" style="display: block;">
                     <div class="stat-item">
                         <span class="stat-label">Name:</span>
                         <span class="stat-value" id="statName">-</span>
@@ -254,15 +254,15 @@
 
 
         <!-- Bottom Right Filters Panel -->
-        <div class="bottom-right-filter-panel" id="bottomRightFilterPanel">
+        <div class="bottom-right-filter-panel expanded" id="bottomRightFilterPanel">
             <!-- Filter toggle header -->
             <div class="filter-toggle-header" onclick="toggleFilterPanel()">
                 <span class="filter-toggle-text">Filters</span>
-                <span class="filter-toggle-arrow" id="filterToggleArrow">▶</span>
+                <span class="filter-toggle-arrow" id="filterToggleArrow">▼</span>
             </div>
             
             <!-- Filter content -->
-            <div class="filter-content" id="filterContent">
+            <div class="filter-content" id="filterContent" style="display: block;">
                 <!-- Compact Filter Groups -->
                 <div class="compact-filter-group">
                     <label class="compact-filter-label">Mod:</label>
@@ -1190,6 +1190,15 @@
             }
             
             renderTreeView(filteredItems, 'leftTreeView');
+            
+            // Update right panel based on current selection
+            if (selectedItem) {
+                updateRightPanel(selectedItem);
+            } else {
+                // No item selected, refresh right panel with current category
+                const rightItems = filterItemsByCategory(selectedRightCategory);
+                renderTreeView(rightItems, 'rightTreeView', false);
+            }
         }
 
         function runGrouping() {
@@ -1200,6 +1209,15 @@
             // Update radio button selection
             document.querySelector(`input[name="groupByOption"][value="${value}"]`).checked = true;
             renderTreeView(filteredItems, 'leftTreeView');
+            
+            // Update right panel based on current selection
+            if (selectedItem) {
+                updateRightPanel(selectedItem);
+            } else {
+                // No item selected, refresh right panel with current category
+                const rightItems = filterItemsByCategory(selectedRightCategory);
+                renderTreeView(rightItems, 'rightTreeView', false);
+            }
         }
 
         function clearSelection() {
