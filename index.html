@@ -110,11 +110,11 @@
                         <label class="compact-filter-label">Icons:</label>
                         <div class="compact-filter-checkboxes">
                             <label class="filter-checkbox">
-                                <input type="checkbox" id="showPreviewIcon" onchange="togglePreviewIcon(this.checked)">
+                                <input type="checkbox" id="showPreviewIcon" onchange="togglePreviewIcon(this.checked)" checked>
                                 <span>Preview Icon</span>
                             </label>
                             <label class="filter-checkbox">
-                                <input type="checkbox" id="showModIcon" onchange="toggleModIcon(this.checked)">
+                                <input type="checkbox" id="showModIcon" onchange="toggleModIcon(this.checked)" checked>
                                 <span>Mod Icon</span>
                             </label>
                         </div>
@@ -317,6 +317,7 @@
         import * as groupingAlgorithms from './algorithms/grouping.js';
         import * as multiGrouping from './algorithms/multiGrouping.js';
         import * as hierarchyAlgorithms from './algorithms/hierarchy.js';
+        import { TOGGLE_ICONS, MASTER_TOGGLE, DEFAULT_DISPLAY_OPTIONS } from './ui/constants.js';
         
         // Import enhanced tree components  
         import { 
@@ -1069,7 +1070,7 @@
                 el.style.display = 'block';
             });
             document.querySelectorAll('.tree-toggle').forEach(el => {
-                el.textContent = '▼';
+                el.textContent = TOGGLE_ICONS.EXPANDED;
             });
         }
 
@@ -1078,7 +1079,7 @@
                 el.style.display = 'none';
             });
             document.querySelectorAll('.tree-toggle').forEach(el => {
-                el.textContent = '▶';
+                el.textContent = TOGGLE_ICONS.COLLAPSED;
             });
         }
 
@@ -1096,12 +1097,12 @@
             const text = document.getElementById('treeToggleText');
             if (currentExpandState) {
                 collapseAllGroups();
-                button.textContent = '+';
+                button.textContent = MASTER_TOGGLE.EXPAND_ALL;
                 text.textContent = 'Expand All';
                 currentExpandState = false;
             } else {
                 expandAllGroups();
-                button.textContent = '−';
+                button.textContent = MASTER_TOGGLE.COLLAPSE_ALL;
                 text.textContent = 'Collapse All';
                 currentExpandState = true;
             }
@@ -1171,11 +1172,11 @@
             }
         }
 
-        // Options state
+        // Options state - initialized from constants
         let displayOptions = {
-            showPreviewIcon: false,
-            showModIcon: false,
-            spacing: 'general'
+            showPreviewIcon: DEFAULT_DISPLAY_OPTIONS.showPreviewIcon,
+            showModIcon: DEFAULT_DISPLAY_OPTIONS.showModIcon,
+            spacing: DEFAULT_DISPLAY_OPTIONS.spacing
         };
         
         // Make display options globally available
@@ -1517,7 +1518,7 @@
                 const button = document.getElementById('treeToggleBtn');
                 const text = document.getElementById('treeToggleText');
                 if (button && text) {
-                    button.textContent = '−';
+                    button.textContent = MASTER_TOGGLE.COLLAPSE_ALL;
                     text.textContent = 'Collapse All';
                 }
                 

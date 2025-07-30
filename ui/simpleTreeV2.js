@@ -3,6 +3,7 @@
 
 import { TreeNode, NodeType, TreeUtils } from './treeNode.js';
 import { TreeNavigationState, NavigationHandlers, TreeVisualFeedback, TreeEvents } from './treeNavigation.js';
+import { TOGGLE_ICONS } from './constants.js';
 
 // Global navigation states for each panel
 const navigationStates = new Map();
@@ -87,7 +88,7 @@ export class TreeRenderer {
         html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
         
         // Toggle button - clickable with stopPropagation to prevent row selection
-        html += `<span class="tree-toggle" data-node-id="${nodeId}" onclick="event.stopPropagation(); window.toggleTreeGroup('${nodeId}');">▼</span>`;
+        html += `<span class="tree-toggle" data-node-id="${nodeId}" onclick="event.stopPropagation(); window.toggleTreeGroup('${nodeId}');">${TOGGLE_ICONS.EXPANDED}</span>`;
         
         html += `<span class="group-name">${node.name}</span>`;
         
@@ -562,7 +563,7 @@ export class TreeManager {
             html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
             
             // Toggle button - clickable with stopPropagation to prevent row selection
-            html += `<span class="tree-toggle" data-node-id="${nodeId}" onclick="event.stopPropagation(); toggleTreeGroup('${nodeId}');">▼</span>`;
+            html += `<span class="tree-toggle" data-node-id="${nodeId}" onclick="event.stopPropagation(); toggleTreeGroup('${nodeId}');">${TOGGLE_ICONS.EXPANDED}</span>`;
             
             html += `<span class="group-name">${node.name}</span>`;
             
@@ -734,11 +735,11 @@ export function toggleTreeGroup(nodeId) {
     if (isCurrentlyExpanded) {
         // Collapse
         childrenContainer.style.display = 'none';
-        toggleButton.textContent = '▶';
+        toggleButton.textContent = TOGGLE_ICONS.COLLAPSED;
     } else {
         // Expand
         childrenContainer.style.display = 'block';
-        toggleButton.textContent = '▼';
+        toggleButton.textContent = TOGGLE_ICONS.EXPANDED;
     }
     
     // Also try the navigation system approach as fallback for newer elements
