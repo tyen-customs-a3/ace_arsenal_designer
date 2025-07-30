@@ -4,7 +4,7 @@
       "caliber", "range", "rateOfFire", "mass", "modes", 
       "magazines", "magazineWells", "weaponSlots", "faction", "dlc", 
       "underbarrel", "features", "variant", "texture", "hiddenSelections", 
-      "hiddenSelectionsTextures", "model", "picture", "icon"
+      "hiddenSelectionsTextures", "model", "picture", "icon", "cursorAim"
     ],
     "handgun": [
       "caliber", "range", "rateOfFire", "mass", "modes", 
@@ -28,7 +28,7 @@
     ],
     "attachment": [
       "mass", "weaponSlots", "faction", "features", "variant", 
-      "texture", "zoom", "recoilModifier", "swayModifier", "picture", "icon"
+      "texture", "zoom", "recoilModifier", "swayModifier", "picture", "icon", "magnification"
     ]
   },
   "items": [
@@ -51,7 +51,8 @@
         "dlc": "A3",
         "model": "\\a3\\weapons_f\\rifles\\mx\\mx_f.p3d",
         "picture": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\gear_mx_x_ca.paa",
-        "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mx_ca.paa"
+        "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mx_ca.paa",
+        "cursorAim": "rifle"
       }
     },
     {
@@ -103,7 +104,8 @@
         "rateOfFire": 550,
         "model": "\\a3\\weapons_f\\rifles\\mx\\mx_sw_f.p3d",
         "picture": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\gear_mx_sw_x_ca.paa",
-        "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mx_sw_ca.paa"
+        "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mx_sw_ca.paa",
+        "cursorAim": "mg"
       }
     },
     {
@@ -124,7 +126,8 @@
         "weaponSlots": ["asdg_OpticRail", "asdg_MuzzleSlot", "asdg_UnderBarrelSlot"],
         "model": "\\a3\\weapons_f\\rifles\\mx\\mx_c_f.p3d",
         "picture": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\gear_mxc_x_ca.paa",
-        "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mxc_ca.paa"
+        "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mxc_ca.paa",
+        "cursorAim": "rifle"
       }
     },
     {
@@ -166,7 +169,8 @@
         "modes": ["Single"],
         "magazines": ["30Rnd_65x39_caseless_mag"],
         "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
-        "weaponSlots": ["asdg_OpticRail", "asdg_MuzzleSlot", "asdg_UnderBarrelSlot"]
+        "weaponSlots": ["asdg_OpticRail", "asdg_MuzzleSlot", "asdg_UnderBarrelSlot"],
+        "cursorAim": "sniper"
       }
     },
     {
@@ -185,7 +189,8 @@
         "magazines": ["30Rnd_65x39_caseless_green_mag"],
         "magazineWells": ["CBA_65x39_KATIBA", "STANAG_65x39"],
         "weaponSlots": ["asdg_OpticRail", "asdg_MuzzleSlot", "asdg_UnderBarrelSlot"],
-        "faction": "CSAT"
+        "faction": "CSAT",
+        "cursorAim": "rifle"
       }
     },
     {
@@ -237,7 +242,8 @@
         "magazines": ["30Rnd_556x45_Stanag"],
         "magazineWells": ["CBA_556x45_STANAG", "STANAG_556x45"],
         "weaponSlots": ["asdg_OpticRail", "asdg_MuzzleSlot", "asdg_UnderBarrelSlot"],
-        "faction": "AAF"
+        "faction": "AAF",
+        "cursorAim": "rifle"
       }
     },
     {
@@ -270,7 +276,8 @@
         "mass": 8500,
         "modes": ["FullAuto"],
         "magazines": ["150Rnd_762x51_Box"],
-        "magazineWells": ["CBA_762x51_LINKS", "M240_762x51"]
+        "magazineWells": ["CBA_762x51_LINKS", "M240_762x51"],
+        "cursorAim": "mg"
       }
     },
     {
@@ -287,7 +294,8 @@
         "mass": 7800,
         "modes": ["FullAuto"],
         "magazines": ["200Rnd_65x39_cased_Box"],
-        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"]
+        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
+        "cursorAim": "mg"
       }
     },
     {
@@ -304,7 +312,8 @@
         "mass": 11800,
         "modes": ["Single"],
         "magazines": ["5Rnd_127x108_Mag"],
-        "magazineWells": ["CBA_127x108_LINKS"]
+        "magazineWells": ["CBA_127x108_LINKS"],
+        "cursorAim": "sniper"
       }
     },
     {
@@ -321,7 +330,8 @@
         "mass": 9500,
         "modes": ["Single"],
         "magazines": ["7Rnd_408_Mag"],
-        "magazineWells": ["CBA_408_CheyTac"]
+        "magazineWells": ["CBA_408_CheyTac"],
+        "cursorAim": "sniper"
       }
     },
     {
@@ -1867,7 +1877,8 @@
         "weaponSlots": ["asdg_OpticRail"],
         "faction": "NATO",
         "features": ["thermal", "nightvision"],
-        "zoom": [4, 2]
+        "zoom": [4, 2],
+        "magnification": "4x"
       }
     },
     {
@@ -1881,7 +1892,8 @@
         "mass": 250,
         "weaponSlots": ["asdg_OpticRail"],
         "faction": "NATO",
-        "zoom": [4]
+        "zoom": [4],
+        "magnification": "4x"
       }
     },
     {

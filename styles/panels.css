@@ -236,3 +236,39 @@
     color: var(--favorites-color);
     font-weight: normal;
 }
+
+/* Bottom Right Filter Panel - Anchored to bottom right of left panel with offset */
+.bottom-right-filter-panel {
+    position: absolute;
+    bottom: 70px; /* Aligns with actual bottom of left panel (100vh - 70px from top) */
+    left: 390px; /* Right edge of left panel + 10px offset (60px + 320px + 10px) */
+    width: 100px;
+    background: var(--surface-panel);
+    border: none;
+    border-radius: 0;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    z-index: 150;
+}
+
+.bottom-right-filter-panel.expanded {
+    width: 220px;
+}
+
+/* Right Panel Filter - Anchored to bottom left of right panel with offset (mirrored) */
+.right-panel-filter {
+    position: absolute;
+    bottom: 70px; /* Aligns with actual bottom of right panel (100vh - 70px from top) */
+    right: 390px; /* Left edge of right panel + 10px offset (60px + 320px + 10px from right) */
+    width: 100px;
+    background: var(--surface-panel);
+    border: none;
+    border-radius: 0;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    z-index: 110;
+}
+
+.right-panel-filter.expanded {
+    width: 220px;
+}

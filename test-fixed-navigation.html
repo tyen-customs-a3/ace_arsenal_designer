@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Tree Navigation Test</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        body {
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            font-family: 'Consolas', monospace;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-tree {
+            height: 400px;
+            border: 1px solid #333;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 3px;
+        }
+        .success { background: #1e5f1e; }
+        .error { background: #5f1e1e; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Fixed Tree Navigation Test</h1>
+        
+        <div class="status" id="testStatus">
+            Testing new tree system...
+        </div>
+        
+        <div class="test-tree" id="testTree">
+            <!-- Tree will be populated here -->
+        </div>
+        
+        <div class="status">
+            <strong>Focus:</strong> <span id="focusInfo">None</span><br>
+            <strong>Selection:</strong> <span id="selectionInfo">None</span>
+        </div>
+    </div>
+
+    <script type="module">
+        try {
+            // Test imports
+            console.log('Testing imports...');
+            const { initializeTreeManager, getTreeManager } = await import('./ui/simpleTreeV2.js');
+            console.log('✅ Imports successful');
+            
+            // Mock data
+            const testItems = [
+                { className: 'weapon1', displayName: 'M4A1', category: 'weapons', mod: 'Vanilla' },
+                { className: 'weapon2', displayName: 'AK-74M', category: 'weapons', mod: 'RHS' },
+                { className: 'weapon3', displayName: 'M16A4', category: 'weapons', mod: 'Vanilla' }
+            ];
+            
+            // Mock algorithms for testing
+            window.algorithms = {
+                groupByMod: (items) => {
+                    const groups = {};
+                    items.forEach(item => {
+                        const mod = item.mod || 'Unknown';
+                        if (!groups[mod]) groups[mod] = [];
+                        groups[mod].push(item);
+                    });
+                    return groups;
+                },
+                sortByName: (items) => {
+                    return [...items].sort((a, b) => a.displayName.localeCompare(b.displayName));
+                }
+            };
+            
+            // Mock display options
+            window.displayOptions = {
+                showPreviewIcon: false,
+                showModIcon: false
+            };
+            
+            console.log('Testing tree manager initialization...');
+            const treeManager = initializeTreeManager('testTree');
+            console.log('✅ Tree manager initialized');
+            
+            console.log('Testing tree rendering...');
+            treeManager.renderTree(testItems, {
+                groupBy: window.algorithms.groupByMod,
+                viewMode: 'list',
+                sortBy: 'sortByName',
+                sortOrder: 'asc'
+            });
+            console.log('✅ Tree rendered');
+            
+            // Check if tree was rendered
+            const treeContainer = document.getElementById('testTree');
+            if (treeContainer.innerHTML.includes('tree-view')) {
+                document.getElementById('testStatus').textContent = '✅ Tree system working correctly!';
+                document.getElementById('testStatus').className = 'status success';
+                console.log('✅ Test completed successfully');
+            } else {
+                throw new Error('Tree was not rendered properly');
+            }
+            
+        } catch (error) {
+            console.error('❌ Test failed:', error);
+            document.getElementById('testStatus').textContent = `❌ Test failed: ${error.message}`;
+            document.getElementById('testStatus').className = 'status error';
+        }
+    </script>
+</body>
+</html>

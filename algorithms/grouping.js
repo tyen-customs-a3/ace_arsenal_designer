@@ -51,26 +51,32 @@ export function groupByCaliber(items, sortingFunction = null) {
 
 // groupByMassRange removed - not realistic for Arma 3 configs
 
-export function groupByWeaponType(items) {
+export function groupByWeaponType(items, sortingFunction = null) {
     const groups = {};
     
     items.forEach(item => {
         let groupName = 'Other';
         
         if (item.category === 'weapons') {
-            if (item.subcategory === 'rifles') {
-                if (item.caliber === '5.56x45mm') {
-                    groupName = 'Assault Rifles (5.56mm)';
-                } else if (item.caliber === '7.62x39mm') {
-                    groupName = 'Battle Rifles (7.62x39mm)';
-                } else if (item.caliber === '7.62x51mm') {
-                    groupName = 'Battle Rifles (7.62x51mm)';
-                }
-            } else if (item.subcategory === 'machine_guns') {
-                groupName = 'Machine Guns';
+            // Use cursorAim property to determine weapon type
+            const weaponType = item.cursorAim || (item.properties && item.properties.cursorAim) || 'other';
+            
+            switch (weaponType) {
+                case 'rifle':
+                    groupName = 'Rifles';
+                    break;
+                case 'mg':
+                    groupName = 'Machine Guns';
+                    break;
+                case 'sniper':
+                    groupName = 'Sniper Rifles';
+                    break;
+                default:
+                    groupName = 'Other Weapons';
+                    break;
             }
         } else if (item.category === 'handguns') {
-            groupName = 'Sidearms';
+            groupName = 'Handguns';
         } else if (item.category === 'backpacks') {
             if (item.maximumLoad > 250) {
                 groupName = 'Large Backpacks';
@@ -89,9 +95,13 @@ export function groupByWeaponType(items) {
         groups[groupName].push(item);
     });
     
-    // Sort items within each group
+    // Sort items within each group using provided sorting function or default to name
     Object.keys(groups).forEach(key => {
-        groups[key].sort((a, b) => a.displayName.localeCompare(b.displayName));
+        if (sortingFunction) {
+            groups[key] = sortingFunction(groups[key]);
+        } else {
+            groups[key].sort((a, b) => a.displayName.localeCompare(b.displayName));
+        }
     });
     
     return groups;
