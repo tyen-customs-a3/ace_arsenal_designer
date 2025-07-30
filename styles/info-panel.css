@@ -35,7 +35,7 @@
 
 .info-panel-content {
     padding: 16px;
-    max-height: calc(80vh - 60px);
+    max-height: calc(80vh - 42px);
     overflow-y: auto;
 }
 

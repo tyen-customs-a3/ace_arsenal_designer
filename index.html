@@ -315,7 +315,6 @@
         import { getMockItems } from './data.js';
         import * as algorithms from './algorithms.js';
         import * as groupingAlgorithms from './algorithms/grouping.js';
-        import * as multiGrouping from './algorithms/multiGrouping.js';
         import * as hierarchyAlgorithms from './algorithms/hierarchy.js';
         import { TOGGLE_ICONS, MASTER_TOGGLE, DEFAULT_DISPLAY_OPTIONS } from './ui/constants.js';
         
@@ -974,27 +973,6 @@
             return items;
         }
         
-        function applyMultiGrouping(items, primary, secondary) {
-            // Convert string names to actual grouping functions
-            const primaryFunction = algorithms[primary];
-            const secondaryFunction = getSecondaryGroupingFunction(secondary);
-            
-            if (primaryFunction && secondaryFunction) {
-                return multiGrouping.groupByMultiple(items, primaryFunction, secondaryFunction);
-            } else if (primaryFunction) {
-                return primaryFunction(items);
-            }
-            
-            return { 'All Items': items };
-        }
-        
-        function getSecondaryGroupingFunction(secondaryName) {
-            const mapping = {
-                'groupByMod': algorithms.groupByMod,
-                'groupByCaliber': algorithms.groupByCaliber
-            };
-            return mapping[secondaryName] || null;
-        }
         
         function toggleInheritanceView() {
             // Toggle between flat list and inheritance hierarchy

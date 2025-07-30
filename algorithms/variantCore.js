@@ -292,11 +292,3 @@ export function groupWithVariantAwareness(items, groupFn) {
     return VariantManager.groupWithVariantAwareness(items, groupFn);
 }
 
-// Legacy compatibility
-export function isVariant(item) {
-    return VariantManager.isTextureVariant(item);
-}
-
-export function createVariantHierarchy(items) {
-    return VariantManager.createArsenalHierarchy(items);
-}

@@ -79,7 +79,7 @@
     left: 60px;  /* 10px (sidebar position) + 50px (active tab width) = 60px */
     top: 10px;
     width: 320px;
-    height: calc(100vh - 80px);  /* 10px top + 60px bottom button row + 10px margin */
+    height: calc(100vh - 62px);  /* 10px top + 42px bottom button row + 10px margin */
     background: var(--surface-panel);
     border: none;
     border-radius: 0;
@@ -149,7 +149,7 @@
     right: 60px;  /* 10px (sidebar position) + 50px (active tab width) = 60px */
     top: 10px;
     width: 320px;
-    height: calc(100vh - 80px);  /* 10px top + 60px bottom button row + 10px margin */
+    height: calc(100vh - 62px);  /* 10px top + 42px bottom button row + 10px margin */
     background: var(--surface-panel);
     border: none;
     border-radius: 0;
@@ -259,7 +259,7 @@
     left: 390px;
     top: 10px;
     right: 590px;
-    bottom: 270px;  /* Increased to account for 60px button row */
+    bottom: 252px;  /* Increased to account for 42px button row */
     background: transparent;
     border: none;
     display: flex;
@@ -275,7 +275,7 @@
     left: 0;
     right: 0;
     width: 100vw;
-    height: 60px;
+    height: 42px;
     display: flex;
     gap: 8px;
     z-index: 200;
@@ -285,7 +285,7 @@
 }
 
 .arsenal-bottom-btn {
-    height: 44px;
+    height: 26px;
     flex: 1;
     border: none;
     background: #000000;

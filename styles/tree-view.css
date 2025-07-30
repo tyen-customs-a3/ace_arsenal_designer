@@ -305,7 +305,7 @@
 
 /* All other categories maintain 1x1 aspect ratio (default styling above) */
 
-/* Hover Preview Popup */
+/* Hover Preview Popup - Base styling */
 .item-hover-preview {
     position: absolute;
     width: 120px;
@@ -324,6 +324,22 @@
     overflow: hidden;
 }
 
+/* Category-specific popup dimensions */
+.item-hover-preview.weapons {
+    width: 180px;
+    height: 84px; /* 3x1 aspect ratio: 180x60 + 24px text bar */
+}
+
+.item-hover-preview.handguns,
+.item-hover-preview.launchers,
+.item-hover-preview.backpacks,
+.item-hover-preview.vests,
+.item-hover-preview.attachments,
+.item-hover-preview.magazines {
+    width: 120px;
+    height: 120px; /* 1x1 aspect ratio: 120x96 + 24px text bar */
+}
+
 .item-hover-preview.visible {
     opacity: 1;
     transform: scale(1);
@@ -331,7 +347,7 @@
 
 .item-hover-preview-icon {
     width: 100%;
-    height: 96px;  /* Nearly fills space, leaving room for name bar */
+    height: 96px;  /* Default height for square categories */
     background: var(--border-primary);
     border-radius: 0;
     display: flex;
@@ -341,6 +357,22 @@
     color: var(--content-primary);
     font-weight: bold;
     flex: 1;
+}
+
+/* Category-specific icon area heights */
+.item-hover-preview.weapons .item-hover-preview-icon {
+    height: 60px;  /* 3x1 aspect ratio: total 84px - 24px text = 60px */
+    font-size: 24px; /* Smaller font for the wider, shorter area */
+}
+
+.item-hover-preview.handguns .item-hover-preview-icon,
+.item-hover-preview.launchers .item-hover-preview-icon,
+.item-hover-preview.backpacks .item-hover-preview-icon,
+.item-hover-preview.vests .item-hover-preview-icon,
+.item-hover-preview.attachments .item-hover-preview-icon,
+.item-hover-preview.magazines .item-hover-preview-icon {
+    height: 96px;  /* 1x1 aspect ratio: total 120px - 24px text = 96px */
+    font-size: 36px; /* Larger font for square area */
 }
 
 .item-hover-preview-text {

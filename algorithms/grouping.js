@@ -49,8 +49,6 @@ export function groupByCaliber(items, sortingFunction = null) {
     return groups;
 }
 
-// groupByMassRange removed - not realistic for Arma 3 configs
-
 export function groupByWeaponType(items, sortingFunction = null) {
     const groups = {};
     
@@ -107,25 +105,6 @@ export function groupByWeaponType(items, sortingFunction = null) {
     return groups;
 }
 
-export function groupByModDetailed(items) {
-    const groups = {};
-    
-    items.forEach(item => {
-        const mod = item.mod || 'Unknown';
-        const category = item.category || 'misc';
-        const groupKey = `${mod} - ${category.charAt(0).toUpperCase() + category.slice(1)}`;
-        
-        if (!groups[groupKey]) groups[groupKey] = [];
-        groups[groupKey].push(item);
-    });
-    
-    // Sort items within each group by name
-    Object.keys(groups).forEach(key => {
-        groups[key].sort((a, b) => a.displayName.localeCompare(b.displayName));
-    });
-    
-    return groups;
-}
 
 export function groupByVariants(items) {
     return createArsenalHierarchy(items);
@@ -176,20 +155,5 @@ export function groupByVariantsWithRole(items) {
     });
 }
 
-// Simple flat list with variant ordering (for testing)
-export function sortVariantsFlat(items) {
-    return VariantManager.createVariantOrderedList(items);
-}
 
-// Demonstration of the exact structure shown in user example
-export function groupByArsenalDemo(items) {
-    // This creates the exact structure:
-    // • AK-105 (single weapon)
-    // AK-74M (4) <- collapsible group
-    //   • AK-74M
-    //   • AK-74M (Desert) 
-    //   • AK-74M (Plum)
-    //   • AK-74M (Zenitco)
-    return createArsenalHierarchy(items);
-}
 

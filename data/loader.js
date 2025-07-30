@@ -210,25 +210,6 @@ class DataLoader {
         return items.filter(item => item.category === category);
     }
 
-    async getWeapons() {
-        return this.getItemsByCategory('weapons');
-    }
-
-    async getHandguns() {
-        return this.getItemsByCategory('handguns');
-    }
-
-    async getLaunchers() {
-        return this.getItemsByCategory('launchers');
-    }
-
-    async getVests() {
-        return this.getItemsByCategory('vests');
-    }
-
-    async getBackpacks() {
-        return this.getItemsByCategory('backpacks');
-    }
 
     // Get all items for testing
     async getAllItems() {
@@ -239,26 +220,6 @@ class DataLoader {
 // Global instance
 const dataLoader = new DataLoader();
 
-// Export functions that match the old API
-export async function generateWeapons() {
-    return dataLoader.getWeapons();
-}
-
-export async function generateHandguns() {
-    return dataLoader.getHandguns();
-}
-
-export async function generateLaunchers() {
-    return dataLoader.getLaunchers();
-}
-
-export async function generateVests() {
-    return dataLoader.getVests();
-}
-
-export async function generateBackpacks() {
-    return dataLoader.getBackpacks();
-}
 
 // New unified function
 export async function generateAllItems() {
