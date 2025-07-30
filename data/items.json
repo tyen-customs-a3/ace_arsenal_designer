@@ -1,34 +1,97 @@
 {
   "schema": {
     "weapon": [
-      "caliber", "range", "rateOfFire", "mass", "modes", 
-      "magazines", "magazineWells", "weaponSlots", "faction", "dlc", 
-      "underbarrel", "features", "variant", "texture", "hiddenSelections", 
-      "hiddenSelectionsTextures", "model", "picture", "icon", "cursorAim"
+      "caliber",
+      "range",
+      "rateOfFire",
+      "mass",
+      "modes",
+      "magazines",
+      "magazineWells",
+      "weaponSlots",
+      "faction",
+      "dlc",
+      "underbarrel",
+      "features",
+      "variant",
+      "texture",
+      "hiddenSelections",
+      "hiddenSelectionsTextures",
+      "model",
+      "picture",
+      "icon",
+      "cursorAim"
     ],
     "handgun": [
-      "caliber", "range", "rateOfFire", "mass", "modes", 
-      "magazines", "faction", "variant", "texture", "features", "model", "picture", "icon"
+      "caliber",
+      "range",
+      "rateOfFire",
+      "mass",
+      "modes",
+      "magazines",
+      "faction",
+      "variant",
+      "texture",
+      "features",
+      "model",
+      "picture",
+      "icon"
     ],
     "launcher": [
-      "caliber", "range", "rateOfFire", "mass", "modes", 
-      "magazines", "type", "variant", "texture"
+      "caliber",
+      "range",
+      "rateOfFire",
+      "mass",
+      "modes",
+      "magazines",
+      "type",
+      "variant",
+      "texture"
     ],
     "vest": [
-      "armor", "maximumLoad", "mass", "faction", "variant", 
-      "texture", "hiddenSelections", "hiddenSelectionsTextures"
+      "armor",
+      "maximumLoad",
+      "mass",
+      "faction",
+      "variant",
+      "texture",
+      "hiddenSelections",
+      "hiddenSelectionsTextures"
     ],
     "backpack": [
-      "maximumLoad", "mass", "faction", "variant", "texture", 
-      "hiddenSelections", "hiddenSelectionsTextures"
+      "maximumLoad",
+      "mass",
+      "faction",
+      "variant",
+      "texture",
+      "hiddenSelections",
+      "hiddenSelectionsTextures"
     ],
     "magazine": [
-      "caliber", "capacity", "mass", "magazineWells", "faction", 
-      "variant", "texture", "tracer", "picture", "icon"
+      "caliber",
+      "capacity",
+      "mass",
+      "magazineWells",
+      "faction",
+      "variant",
+      "texture",
+      "tracer",
+      "picture",
+      "icon"
     ],
     "attachment": [
-      "mass", "weaponSlots", "faction", "features", "variant", 
-      "texture", "zoom", "recoilModifier", "swayModifier", "picture", "icon", "magnification"
+      "mass",
+      "weaponSlots",
+      "faction",
+      "features",
+      "variant",
+      "texture",
+      "zoom",
+      "recoilModifier",
+      "swayModifier",
+      "picture",
+      "icon",
+      "magnification"
     ]
   },
   "items": [
@@ -44,10 +107,26 @@
         "range": 500,
         "rateOfFire": 625,
         "mass": 3700,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["30Rnd_65x39_caseless_mag"],
-        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
-        "weaponSlots": ["asdg_OpticRail", "asdg_MuzzleSlot", "asdg_UnderBarrelSlot"],
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ],
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ],
         "dlc": "A3",
         "model": "\\a3\\weapons_f\\rifles\\mx\\mx_f.p3d",
         "picture": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\gear_mx_x_ca.paa",
@@ -65,11 +144,32 @@
       "properties": {
         "variant": "Black",
         "texture": "black",
-        "hiddenSelections": ["camo"],
-        "hiddenSelectionsTextures": ["\\a3\\weapons_f\\rifles\\mx\\data\\mx_black_co.paa"],
+        "hiddenSelections": [
+          "camo"
+        ],
+        "hiddenSelectionsTextures": [
+          "\\a3\\weapons_f\\rifles\\mx\\data\\mx_black_co.paa"
+        ],
         "model": "\\a3\\weapons_f\\rifles\\mx\\mx_f.p3d",
         "picture": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\gear_mx_black_x_ca.paa",
-        "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mx_ca.paa"
+        "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mx_ca.paa",
+        "caliber": "6.5×39 mm",
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ],
+        "magazines": [
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ]
       }
     },
     {
@@ -82,11 +182,32 @@
       "properties": {
         "variant": "Khaki",
         "texture": "khaki",
-        "hiddenSelections": ["camo"],
-        "hiddenSelectionsTextures": ["\\a3\\weapons_f\\rifles\\mx\\data\\mx_khaki_co.paa"],
+        "hiddenSelections": [
+          "camo"
+        ],
+        "hiddenSelectionsTextures": [
+          "\\a3\\weapons_f\\rifles\\mx\\data\\mx_khaki_co.paa"
+        ],
         "model": "\\a3\\weapons_f\\rifles\\mx\\mx_f.p3d",
         "picture": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\gear_mx_khaki_x_ca.paa",
-        "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mx_ca.paa"
+        "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mx_ca.paa",
+        "caliber": "6.5×39 mm",
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ],
+        "magazines": [
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ]
       }
     },
     {
@@ -105,7 +226,24 @@
         "model": "\\a3\\weapons_f\\rifles\\mx\\mx_sw_f.p3d",
         "picture": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\gear_mx_sw_x_ca.paa",
         "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mx_sw_ca.paa",
-        "cursorAim": "mg"
+        "cursorAim": "mg",
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ],
+        "caliber": "6.5×39 mm",
+        "magazines": [
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ]
       }
     },
     {
@@ -120,10 +258,26 @@
         "range": 400,
         "rateOfFire": 650,
         "mass": 3200,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["30Rnd_65x39_caseless_mag"],
-        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
-        "weaponSlots": ["asdg_OpticRail", "asdg_MuzzleSlot", "asdg_UnderBarrelSlot"],
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ],
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ],
         "model": "\\a3\\weapons_f\\rifles\\mx\\mx_c_f.p3d",
         "picture": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\gear_mxc_x_ca.paa",
         "icon": "\\a3\\weapons_f\\rifles\\mx\\data\\ui\\icon_mxc_ca.paa",
@@ -139,7 +293,24 @@
       "scope": 2,
       "properties": {
         "variant": "Black",
-        "texture": "black"
+        "texture": "black",
+        "caliber": "6.5×39 mm",
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ],
+        "magazines": [
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ]
       }
     },
     {
@@ -151,7 +322,24 @@
       "scope": 2,
       "properties": {
         "variant": "Khaki",
-        "texture": "khaki"
+        "texture": "khaki",
+        "caliber": "6.5×39 mm",
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ],
+        "magazines": [
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ]
       }
     },
     {
@@ -166,10 +354,25 @@
         "range": 700,
         "rateOfFire": 500,
         "mass": 4100,
-        "modes": ["Single"],
-        "magazines": ["30Rnd_65x39_caseless_mag"],
-        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
-        "weaponSlots": ["asdg_OpticRail", "asdg_MuzzleSlot", "asdg_UnderBarrelSlot"],
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ],
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ],
         "cursorAim": "sniper"
       }
     },
@@ -185,10 +388,27 @@
         "range": 550,
         "rateOfFire": 650,
         "mass": 3800,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["30Rnd_65x39_caseless_green_mag"],
-        "magazineWells": ["CBA_65x39_KATIBA", "STANAG_65x39"],
-        "weaponSlots": ["asdg_OpticRail", "asdg_MuzzleSlot", "asdg_UnderBarrelSlot"],
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "30Rnd_65x39_caseless_green_mag",
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ],
+        "magazineWells": [
+          "CBA_65x39_KATIBA",
+          "STANAG_65x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ],
         "faction": "CSAT",
         "cursorAim": "rifle"
       }
@@ -205,9 +425,28 @@
         "range": 550,
         "rateOfFire": 650,
         "mass": 4500,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["30Rnd_65x39_caseless_green_mag"],
-        "underbarrel": "UGL_F"
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "30Rnd_65x39_caseless_green_mag",
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ],
+        "underbarrel": "UGL_F",
+        "magazineWells": [
+          "STANAG_65x39",
+          "CBA_65x39_Katiba"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -222,8 +461,27 @@
         "range": 450,
         "rateOfFire": 700,
         "mass": 3300,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["30Rnd_65x39_caseless_green_mag"]
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "30Rnd_65x39_caseless_green_mag",
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ],
+        "magazineWells": [
+          "STANAG_65x39",
+          "CBA_65x39_Katiba"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -238,10 +496,25 @@
         "range": 500,
         "rateOfFire": 750,
         "mass": 3400,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["30Rnd_556x45_Stanag"],
-        "magazineWells": ["CBA_556x45_STANAG", "STANAG_556x45"],
-        "weaponSlots": ["asdg_OpticRail", "asdg_MuzzleSlot", "asdg_UnderBarrelSlot"],
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "30Rnd_556x45_Stanag",
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ],
+        "magazineWells": [
+          "CBA_556x45_STANAG",
+          "STANAG_556x45"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ],
         "faction": "AAF",
         "cursorAim": "rifle"
       }
@@ -258,8 +531,25 @@
         "range": 500,
         "rateOfFire": 750,
         "mass": 3600,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["30Rnd_556x45_Stanag"]
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "30Rnd_556x45_Stanag",
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ],
+        "magazineWells": [
+          "CBA_556x45_STANAG",
+          "STANAG_556x45"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -274,10 +564,22 @@
         "range": 1000,
         "rateOfFire": 750,
         "mass": 8500,
-        "modes": ["FullAuto"],
-        "magazines": ["150Rnd_762x51_Box"],
-        "magazineWells": ["CBA_762x51_LINKS", "M240_762x51"],
-        "cursorAim": "mg"
+        "modes": [
+          "FullAuto"
+        ],
+        "magazines": [
+          "150Rnd_762x51_Box"
+        ],
+        "magazineWells": [
+          "CBA_762x51_LINKS",
+          "M240_762x51"
+        ],
+        "cursorAim": "mg",
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -292,10 +594,27 @@
         "range": 800,
         "rateOfFire": 800,
         "mass": 7800,
-        "modes": ["FullAuto"],
-        "magazines": ["200Rnd_65x39_cased_Box"],
-        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
-        "cursorAim": "mg"
+        "modes": [
+          "FullAuto"
+        ],
+        "magazines": [
+          "200Rnd_65x39_cased_Box",
+          "30Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_Tracer",
+          "100Rnd_65x39_caseless_mag",
+          "30Rnd_65x39_caseless_mag_tracer",
+          "30Rnd_65x39_caseless_mag_green_tracer"
+        ],
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
+        "cursorAim": "mg",
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -310,10 +629,20 @@
         "range": 1500,
         "rateOfFire": 60,
         "mass": 11800,
-        "modes": ["Single"],
-        "magazines": ["5Rnd_127x108_Mag"],
-        "magazineWells": ["CBA_127x108_LINKS"],
-        "cursorAim": "sniper"
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "5Rnd_127x108_Mag"
+        ],
+        "magazineWells": [
+          "CBA_127x108_LINKS"
+        ],
+        "cursorAim": "sniper",
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_127"
+        ]
       }
     },
     {
@@ -328,10 +657,20 @@
         "range": 1800,
         "rateOfFire": 80,
         "mass": 9500,
-        "modes": ["Single"],
-        "magazines": ["7Rnd_408_Mag"],
-        "magazineWells": ["CBA_408_CheyTac"],
-        "cursorAim": "sniper"
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "7Rnd_408_Mag"
+        ],
+        "magazineWells": [
+          "CBA_408_CheyTac"
+        ],
+        "cursorAim": "sniper",
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_408"
+        ]
       }
     },
     {
@@ -346,9 +685,24 @@
         "range": 500,
         "rateOfFire": 600,
         "mass": 3800,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["CUP_20Rnd_762x51_B_SCAR"],
-        "magazineWells": ["CBA_762x51_SCAR", "STANAG_762x51"]
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "CUP_20Rnd_762x51_B_SCAR",
+          "20Rnd_762x51_Mag",
+          "20Rnd_762x51_Mag_Tracer"
+        ],
+        "magazineWells": [
+          "CBA_762x51_SCAR",
+          "STANAG_762x51"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -363,9 +717,24 @@
         "range": 600,
         "rateOfFire": 600,
         "mass": 4000,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["CUP_20Rnd_762x51_B_SCAR"],
-        "magazineWells": ["CBA_762x51_SCAR", "STANAG_762x51"]
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "CUP_20Rnd_762x51_B_SCAR",
+          "20Rnd_762x51_Mag",
+          "20Rnd_762x51_Mag_Tracer"
+        ],
+        "magazineWells": [
+          "CBA_762x51_SCAR",
+          "STANAG_762x51"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -377,7 +746,22 @@
       "scope": 2,
       "properties": {
         "variant": "FG",
-        "texture": "cqc_fg"
+        "texture": "cqc_fg",
+        "caliber": "7.62×51 mm",
+        "magazineWells": [
+          "CBA_762x51_SCAR",
+          "STANAG_762x51"
+        ],
+        "magazines": [
+          "CUP_20Rnd_762x51_B_SCAR",
+          "20Rnd_762x51_Mag",
+          "20Rnd_762x51_Mag_Tracer"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -391,7 +775,22 @@
         "variant": "FG",
         "texture": "std_fg",
         "range": 600,
-        "mass": 4000
+        "mass": 4000,
+        "caliber": "7.62×51 mm",
+        "magazineWells": [
+          "CBA_762x51_SCAR",
+          "STANAG_762x51"
+        ],
+        "magazines": [
+          "CUP_20Rnd_762x51_B_SCAR",
+          "20Rnd_762x51_Mag",
+          "20Rnd_762x51_Mag_Tracer"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -406,10 +805,21 @@
         "range": 900,
         "rateOfFire": 450,
         "mass": 6800,
-        "modes": ["Single"],
-        "magazines": ["20Rnd_338_Mag"],
-        "magazineWells": ["CBA_338_LAPUA"],
-        "dlc": "Marksmen"
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "20Rnd_338_Mag"
+        ],
+        "magazineWells": [
+          "CBA_338_LAPUA"
+        ],
+        "dlc": "Marksmen",
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_338",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -421,7 +831,19 @@
       "scope": 2,
       "properties": {
         "variant": "Khaki",
-        "texture": "khaki"
+        "texture": "khaki",
+        "caliber": ".338 Lapua Magnum",
+        "magazineWells": [
+          "CBA_338_LAPUA"
+        ],
+        "magazines": [
+          "20Rnd_338_Mag"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_338",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -433,7 +855,19 @@
       "scope": 2,
       "properties": {
         "variant": "Multicam",
-        "texture": "multicam"
+        "texture": "multicam",
+        "caliber": ".338 Lapua Magnum",
+        "magazineWells": [
+          "CBA_338_LAPUA"
+        ],
+        "magazines": [
+          "20Rnd_338_Mag"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_338",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -445,7 +879,19 @@
       "scope": 2,
       "properties": {
         "variant": "Woodland",
-        "texture": "woodland"
+        "texture": "woodland",
+        "caliber": ".338 Lapua Magnum",
+        "magazineWells": [
+          "CBA_338_LAPUA"
+        ],
+        "magazines": [
+          "20Rnd_338_Mag"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_338",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -460,10 +906,22 @@
         "range": 750,
         "rateOfFire": 500,
         "mass": 5400,
-        "modes": ["Single"],
-        "magazines": ["20Rnd_762x51_Mag"],
-        "magazineWells": ["CBA_762x51_DMR", "STANAG_762x51"],
-        "dlc": "Marksmen"
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "20Rnd_762x51_Mag"
+        ],
+        "magazineWells": [
+          "CBA_762x51_DMR",
+          "STANAG_762x51"
+        ],
+        "dlc": "Marksmen",
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -475,7 +933,20 @@
       "scope": 2,
       "properties": {
         "variant": "Olive",
-        "texture": "olive"
+        "texture": "olive",
+        "caliber": "7.62×51 mm",
+        "magazineWells": [
+          "CBA_762x51_DMR",
+          "STANAG_762x51"
+        ],
+        "magazines": [
+          "20Rnd_762x51_Mag"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -490,10 +961,21 @@
         "range": 1200,
         "rateOfFire": 400,
         "mass": 8500,
-        "modes": ["Single"],
-        "magazines": ["10Rnd_127x54_Mag"],
-        "magazineWells": ["CBA_127x54_LINKS"],
-        "dlc": "Marksmen"
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "10Rnd_127x54_Mag"
+        ],
+        "magazineWells": [
+          "CBA_127x54_LINKS"
+        ],
+        "dlc": "Marksmen",
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -505,7 +987,19 @@
       "scope": 2,
       "properties": {
         "variant": "Tan",
-        "texture": "tan"
+        "texture": "tan",
+        "caliber": "12.7×54 mm",
+        "magazineWells": [
+          "CBA_127x54_LINKS"
+        ],
+        "magazines": [
+          "10Rnd_127x54_Mag"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -520,10 +1014,21 @@
         "range": 1100,
         "rateOfFire": 600,
         "mass": 10200,
-        "modes": ["FullAuto"],
-        "magazines": ["150Rnd_93x64_Mag"],
-        "magazineWells": ["CBA_93x64_LINKS"],
-        "dlc": "Marksmen"
+        "modes": [
+          "FullAuto"
+        ],
+        "magazines": [
+          "150Rnd_93x64_Mag"
+        ],
+        "magazineWells": [
+          "CBA_93x64_LINKS"
+        ],
+        "dlc": "Marksmen",
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -535,7 +1040,19 @@
       "scope": 2,
       "properties": {
         "variant": "Tan",
-        "texture": "tan"
+        "texture": "tan",
+        "caliber": "9.3×64 mm",
+        "magazineWells": [
+          "CBA_93x64_LINKS"
+        ],
+        "magazines": [
+          "150Rnd_93x64_Mag"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -550,9 +1067,23 @@
         "range": 180,
         "rateOfFire": 450,
         "mass": 900,
-        "modes": ["Single"],
-        "magazines": ["16Rnd_9x21_Mag"],
-        "faction": "NATO"
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "16Rnd_9x21_Mag",
+          "30Rnd_9x21_Mag",
+          "16Rnd_9x19_Mag",
+          "30Rnd_9x19_Mag"
+        ],
+        "faction": "NATO",
+        "magazineWells": [
+          "CBA_9x19_Pistol"
+        ],
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ]
       }
     },
     {
@@ -564,7 +1095,21 @@
       "scope": 2,
       "properties": {
         "variant": "Black",
-        "texture": "black"
+        "texture": "black",
+        "caliber": "9×19 mm",
+        "magazineWells": [
+          "CBA_9x19_Pistol"
+        ],
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ],
+        "magazines": [
+          "16Rnd_9x21_Mag",
+          "30Rnd_9x21_Mag",
+          "16Rnd_9x19_Mag",
+          "30Rnd_9x19_Mag"
+        ]
       }
     },
     {
@@ -576,7 +1121,21 @@
       "scope": 2,
       "properties": {
         "variant": "Khaki",
-        "texture": "khaki"
+        "texture": "khaki",
+        "caliber": "9×19 mm",
+        "magazineWells": [
+          "CBA_9x19_Pistol"
+        ],
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ],
+        "magazines": [
+          "16Rnd_9x21_Mag",
+          "30Rnd_9x21_Mag",
+          "16Rnd_9x19_Mag",
+          "30Rnd_9x19_Mag"
+        ]
       }
     },
     {
@@ -591,8 +1150,16 @@
         "range": 200,
         "rateOfFire": 350,
         "mass": 1200,
-        "modes": ["Single"],
-        "magazines": ["11Rnd_45ACP_Mag"]
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "11Rnd_45ACP_Mag"
+        ],
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ]
       }
     },
     {
@@ -607,9 +1174,23 @@
         "range": 160,
         "rateOfFire": 400,
         "mass": 850,
-        "modes": ["Single"],
-        "magazines": ["16Rnd_9x21_Mag"],
-        "faction": "CSAT"
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "16Rnd_9x21_Mag",
+          "30Rnd_9x21_Mag",
+          "16Rnd_9x19_Mag",
+          "30Rnd_9x19_Mag"
+        ],
+        "faction": "CSAT",
+        "magazineWells": [
+          "CBA_9x19_Pistol"
+        ],
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ]
       }
     },
     {
@@ -624,10 +1205,24 @@
         "range": 500,
         "rateOfFire": 650,
         "mass": 3400,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["rhs_30Rnd_545x39_7N10_AK"],
-        "magazineWells": ["CBA_545x39_AK", "AK_545x39"],
-        "weaponSlots": ["asdg_OpticRail_AK", "asdg_MuzzleSlot_762", "asdg_UnderBarrelSlot"],
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "rhs_30Rnd_545x39_7N10_AK",
+          "30Rnd_545x39_AK",
+          "30Rnd_545x39_AK_tracer"
+        ],
+        "magazineWells": [
+          "CBA_545x39_AK",
+          "AK_545x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail_AK",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ],
         "faction": "RUS"
       }
     },
@@ -640,7 +1235,22 @@
       "scope": 2,
       "properties": {
         "variant": "Desert",
-        "texture": "desert"
+        "texture": "desert",
+        "caliber": "5.45×39 mm",
+        "magazineWells": [
+          "CBA_545x39_AK",
+          "AK_545x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail_AK",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ],
+        "magazines": [
+          "rhs_30Rnd_545x39_7N10_AK",
+          "30Rnd_545x39_AK",
+          "30Rnd_545x39_AK_tracer"
+        ]
       }
     },
     {
@@ -652,7 +1262,22 @@
       "scope": 2,
       "properties": {
         "variant": "Plum",
-        "texture": "plum"
+        "texture": "plum",
+        "caliber": "5.45×39 mm",
+        "magazineWells": [
+          "CBA_545x39_AK",
+          "AK_545x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail_AK",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ],
+        "magazines": [
+          "rhs_30Rnd_545x39_7N10_AK",
+          "30Rnd_545x39_AK",
+          "30Rnd_545x39_AK_tracer"
+        ]
       }
     },
     {
@@ -664,7 +1289,22 @@
       "scope": 2,
       "properties": {
         "variant": "Zenitco",
-        "texture": "zenitco"
+        "texture": "zenitco",
+        "caliber": "5.45×39 mm",
+        "magazineWells": [
+          "CBA_545x39_AK",
+          "AK_545x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail_AK",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ],
+        "magazines": [
+          "rhs_30Rnd_545x39_7N10_AK",
+          "30Rnd_545x39_AK",
+          "30Rnd_545x39_AK_tracer"
+        ]
       }
     },
     {
@@ -679,8 +1319,24 @@
         "range": 400,
         "rateOfFire": 700,
         "mass": 3100,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["rhs_30Rnd_545x39_7N10_AK"]
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "rhs_30Rnd_545x39_7N10_AK",
+          "30Rnd_545x39_AK",
+          "30Rnd_545x39_AK_tracer"
+        ],
+        "magazineWells": [
+          "CBA_545x39_AK",
+          "AK_545x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail_AK",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -695,10 +1351,26 @@
         "range": 450,
         "rateOfFire": 600,
         "mass": 3800,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["rhs_30Rnd_762x39mm"],
-        "magazineWells": ["CBA_762x39_AK", "AK_762x39"],
-        "weaponSlots": ["asdg_OpticRail_AK", "asdg_MuzzleSlot_762", "asdg_UnderBarrelSlot"]
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "rhs_30Rnd_762x39mm",
+          "30Rnd_762x39_AK",
+          "30Rnd_762x39_AK_tracer",
+          "75Rnd_762x39_AK",
+          "75Rnd_762x39_AK_tracer"
+        ],
+        "magazineWells": [
+          "CBA_762x39_AK",
+          "AK_762x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail_AK",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -713,9 +1385,29 @@
         "range": 450,
         "rateOfFire": 600,
         "mass": 3900,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["rhs_30Rnd_762x39mm"],
-        "features": ["Night scope mount"]
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "rhs_30Rnd_762x39mm",
+          "30Rnd_762x39_AK",
+          "30Rnd_762x39_AK_tracer",
+          "75Rnd_762x39_AK",
+          "75Rnd_762x39_AK_tracer"
+        ],
+        "features": [
+          "Night scope mount"
+        ],
+        "magazineWells": [
+          "CBA_762x39_AK",
+          "AK_762x39"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail_AK",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -730,10 +1422,25 @@
         "range": 500,
         "rateOfFire": 700,
         "mass": 3200,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["rhs_mag_30Rnd_556x45_M855A1_Stanag"],
-        "magazineWells": ["CBA_556x45_STANAG", "STANAG_556x45"],
-        "weaponSlots": ["asdg_OpticRail", "asdg_MuzzleSlot_556", "asdg_UnderBarrelSlot"],
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ],
+        "magazineWells": [
+          "CBA_556x45_STANAG",
+          "STANAG_556x45"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ],
         "faction": "USA"
       }
     },
@@ -747,7 +1454,25 @@
       "properties": {
         "variant": "Block II",
         "texture": "block2",
-        "features": ["SOPMOD Block II"]
+        "features": [
+          "SOPMOD Block II"
+        ],
+        "caliber": "5.56×45 mm",
+        "magazineWells": [
+          "CBA_556x45_STANAG",
+          "STANAG_556x45"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ],
+        "magazines": [
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ]
       }
     },
     {
@@ -760,7 +1485,25 @@
       "properties": {
         "variant": "Carry Handle",
         "texture": "carryhandle",
-        "features": ["Carry handle"]
+        "features": [
+          "Carry handle"
+        ],
+        "caliber": "5.56×45 mm",
+        "magazineWells": [
+          "CBA_556x45_STANAG",
+          "STANAG_556x45"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ],
+        "magazines": [
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ]
       }
     },
     {
@@ -772,7 +1515,23 @@
       "scope": 2,
       "properties": {
         "variant": "Desert",
-        "texture": "desert"
+        "texture": "desert",
+        "caliber": "5.56×45 mm",
+        "magazineWells": [
+          "CBA_556x45_STANAG",
+          "STANAG_556x45"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ],
+        "magazines": [
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ]
       }
     },
     {
@@ -784,7 +1543,23 @@
       "scope": 2,
       "properties": {
         "variant": "Woodland",
-        "texture": "woodland"
+        "texture": "woodland",
+        "caliber": "5.56×45 mm",
+        "magazineWells": [
+          "CBA_556x45_STANAG",
+          "STANAG_556x45"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ],
+        "magazines": [
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ]
       }
     },
     {
@@ -799,8 +1574,25 @@
         "range": 550,
         "rateOfFire": 700,
         "mass": 3600,
-        "modes": ["Single", "Burst"],
-        "magazines": ["rhs_mag_30Rnd_556x45_M855A1_Stanag"]
+        "modes": [
+          "Single",
+          "Burst"
+        ],
+        "magazines": [
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ],
+        "magazineWells": [
+          "STANAG_556",
+          "CBA_556x45_STANAG"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -812,7 +1604,23 @@
       "scope": 2,
       "properties": {
         "variant": "Carry Handle",
-        "texture": "carryhandle"
+        "texture": "carryhandle",
+        "caliber": "5.56×45 mm",
+        "magazines": [
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ],
+        "magazineWells": [
+          "STANAG_556",
+          "CBA_556x45_STANAG"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -825,7 +1633,23 @@
       "properties": {
         "variant": "M203",
         "texture": "carryhandle_m203",
-        "underbarrel": "M203"
+        "underbarrel": "M203",
+        "caliber": "5.56×45 mm",
+        "magazines": [
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ],
+        "magazineWells": [
+          "STANAG_556",
+          "CBA_556x45_STANAG"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -840,8 +1664,25 @@
         "range": 500,
         "rateOfFire": 750,
         "mass": 3300,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["rhs_mag_30Rnd_556x45_M855A1_Stanag"]
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ],
+        "magazineWells": [
+          "STANAG_556",
+          "CBA_556x45_STANAG"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -853,7 +1694,23 @@
       "scope": 2,
       "properties": {
         "variant": "LMT",
-        "texture": "lmt"
+        "texture": "lmt",
+        "caliber": "5.56×45 mm",
+        "magazines": [
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ],
+        "magazineWells": [
+          "STANAG_556",
+          "CBA_556x45_STANAG"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -866,7 +1723,23 @@
       "properties": {
         "variant": "M320",
         "texture": "m320",
-        "underbarrel": "M320"
+        "underbarrel": "M320",
+        "caliber": "5.56×45 mm",
+        "magazines": [
+          "rhs_mag_30Rnd_556x45_M855A1_Stanag",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer"
+        ],
+        "magazineWells": [
+          "STANAG_556",
+          "CBA_556x45_STANAG"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -881,12 +1754,31 @@
         "range": 500,
         "rateOfFire": 750,
         "mass": 3600,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["CUP_30Rnd_556x45_G36"],
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "CUP_30Rnd_556x45_G36",
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer",
+          "30Rnd_556x45_G36",
+          "30Rnd_556x45_G36_tracer"
+        ],
         "faction": "GER",
         "model": "\\cup\\weapons\\cup_weapons_g36\\data\\g36a.p3d",
         "picture": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\gear_g36a_x_ca.paa",
-        "icon": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\icon_g36a_ca.paa"
+        "icon": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\icon_g36a_ca.paa",
+        "magazineWells": [
+          "CBA_556x45_G36",
+          "STANAG_556"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -903,7 +1795,24 @@
         "mass": 2800,
         "model": "\\cup\\weapons\\cup_weapons_g36\\data\\g36c.p3d",
         "picture": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\gear_g36c_x_ca.paa",
-        "icon": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\icon_g36c_ca.paa"
+        "icon": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\icon_g36c_ca.paa",
+        "magazineWells": [
+          "CBA_556x45_G36",
+          "STANAG_556"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ],
+        "caliber": "5.56×45 mm",
+        "magazines": [
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer",
+          "30Rnd_556x45_G36",
+          "30Rnd_556x45_G36_tracer"
+        ]
       }
     },
     {
@@ -920,7 +1829,24 @@
         "mass": 3200,
         "model": "\\cup\\weapons\\cup_weapons_g36\\data\\g36k.p3d",
         "picture": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\gear_g36k_x_ca.paa",
-        "icon": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\icon_g36k_ca.paa"
+        "icon": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\icon_g36k_ca.paa",
+        "magazineWells": [
+          "CBA_556x45_G36",
+          "STANAG_556"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ],
+        "caliber": "5.56×45 mm",
+        "magazines": [
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer",
+          "30Rnd_556x45_G36",
+          "30Rnd_556x45_G36_tracer"
+        ]
       }
     },
     {
@@ -935,7 +1861,24 @@
         "texture": "camo",
         "model": "\\cup\\weapons\\cup_weapons_g36\\data\\g36a.p3d",
         "picture": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\gear_g36a_camo_x_ca.paa",
-        "icon": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\icon_g36a_ca.paa"
+        "icon": "\\cup\\weapons\\cup_weapons_g36\\data\\ui\\icon_g36a_ca.paa",
+        "magazineWells": [
+          "CBA_556x45_G36",
+          "STANAG_556"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_556",
+          "asdg_UnderBarrelSlot"
+        ],
+        "caliber": "5.56×45 mm",
+        "magazines": [
+          "30Rnd_556x45_Stanag",
+          "30Rnd_556x45_Stanag_tracer",
+          "30Rnd_556x45_Stanag_green_tracer",
+          "30Rnd_556x45_G36",
+          "30Rnd_556x45_G36_tracer"
+        ]
       }
     },
     {
@@ -950,9 +1893,19 @@
         "range": 500,
         "rateOfFire": 680,
         "mass": 3600,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["CUP_30Rnd_556x45_AUG"],
-        "faction": "AUT"
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "CUP_30Rnd_556x45_AUG"
+        ],
+        "faction": "AUT",
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -964,7 +1917,16 @@
       "scope": 2,
       "properties": {
         "variant": "A3",
-        "texture": "a3"
+        "texture": "a3",
+        "caliber": "5.56×45 mm",
+        "magazines": [
+          "CUP_30Rnd_556x45_AUG"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -979,8 +1941,18 @@
         "range": 600,
         "rateOfFire": 650,
         "mass": 4300,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["CUP_20Rnd_762x51_FNFAL_M"]
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "CUP_20Rnd_762x51_FNFAL_M"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -992,7 +1964,16 @@
       "scope": 2,
       "properties": {
         "variant": "Railed",
-        "texture": "railed"
+        "texture": "railed",
+        "caliber": "7.62×51 mm",
+        "magazines": [
+          "CUP_20Rnd_762x51_FNFAL_M"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1007,9 +1988,19 @@
         "range": 500,
         "rateOfFire": 650,
         "mass": 3800,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["CUP_30Rnd_556x45_Stanag"],
-        "faction": "GBR"
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "CUP_30Rnd_556x45_Stanag"
+        ],
+        "faction": "GBR",
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1022,7 +2013,16 @@
       "properties": {
         "variant": "GL",
         "texture": "gl",
-        "underbarrel": "GL"
+        "underbarrel": "GL",
+        "caliber": "5.56×45 mm",
+        "magazines": [
+          "CUP_30Rnd_556x45_Stanag"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1037,8 +2037,17 @@
         "range": 700,
         "rateOfFire": 400,
         "mass": 5100,
-        "modes": ["Single"],
-        "magazines": ["CUP_20Rnd_762x51_DMR"]
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "CUP_20Rnd_762x51_DMR"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1053,8 +2062,18 @@
         "range": 450,
         "rateOfFire": 750,
         "mass": 3100,
-        "modes": ["Single", "FullAuto"],
-        "magazines": ["CUP_30Rnd_556x45_XM8"]
+        "modes": [
+          "Single",
+          "FullAuto"
+        ],
+        "magazines": [
+          "CUP_30Rnd_556x45_XM8"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1068,7 +2087,16 @@
         "variant": "Rifle",
         "texture": "rifle",
         "range": 500,
-        "mass": 3400
+        "mass": 3400,
+        "caliber": "5.56×45 mm",
+        "magazines": [
+          "CUP_30Rnd_556x45_XM8"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1083,8 +2111,17 @@
         "range": 800,
         "rateOfFire": 300,
         "mass": 4300,
-        "modes": ["Single"],
-        "magazines": ["rhs_10Rnd_762x54mmR_7N1"]
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "rhs_10Rnd_762x54mmR_7N1"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot_762",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1099,7 +2136,18 @@
         "texture": "svds",
         "range": 750,
         "mass": 4100,
-        "features": ["Folding stock"]
+        "features": [
+          "Folding stock"
+        ],
+        "caliber": "7.62×54R mm",
+        "magazines": [
+          "rhs_10Rnd_762x54mmR_7N1"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1114,8 +2162,17 @@
         "range": 1000,
         "rateOfFire": 700,
         "mass": 7500,
-        "modes": ["FullAuto"],
-        "magazines": ["rhs_100Rnd_762x54mmR"]
+        "modes": [
+          "FullAuto"
+        ],
+        "magazines": [
+          "rhs_100Rnd_762x54mmR"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1128,7 +2185,16 @@
       "properties": {
         "variant": "PKP",
         "texture": "pkp",
-        "mass": 8200
+        "mass": 8200,
+        "caliber": "7.62×54R mm",
+        "magazines": [
+          "rhs_100Rnd_762x54mmR"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1143,8 +2209,17 @@
         "range": 1100,
         "rateOfFire": 650,
         "mass": 12100,
-        "modes": ["FullAuto"],
-        "magazines": ["rhsusf_100Rnd_762x51"]
+        "modes": [
+          "FullAuto"
+        ],
+        "magazines": [
+          "rhsusf_100Rnd_762x51"
+        ],
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1158,8 +2233,15 @@
         "variant": "M249",
         "texture": "m249",
         "caliber": "5.56×45 mm",
-        "magazines": ["rhsusf_200Rnd_556x45_box"],
-        "mass": 7500
+        "magazines": [
+          "rhsusf_200Rnd_556x45_box"
+        ],
+        "mass": 7500,
+        "weaponSlots": [
+          "asdg_OpticRail",
+          "asdg_MuzzleSlot",
+          "asdg_UnderBarrelSlot"
+        ]
       }
     },
     {
@@ -1174,9 +2256,17 @@
         "range": 150,
         "rateOfFire": 300,
         "mass": 730,
-        "modes": ["Single"],
-        "magazines": ["rhs_mag_9x18_8_57N181S"],
-        "faction": "RUS"
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "rhs_mag_9x18_8_57N181S"
+        ],
+        "faction": "RUS",
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ]
       }
     },
     {
@@ -1191,9 +2281,17 @@
         "range": 180,
         "rateOfFire": 400,
         "mass": 950,
-        "modes": ["Single"],
-        "magazines": ["rhsusf_mag_15Rnd_9x19_JHP"],
-        "faction": "USA"
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "rhsusf_mag_15Rnd_9x19_JHP"
+        ],
+        "faction": "USA",
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ]
       }
     },
     {
@@ -1208,8 +2306,16 @@
         "range": 170,
         "rateOfFire": 350,
         "mass": 1100,
-        "modes": ["Single"],
-        "magazines": ["rhsusf_mag_7Rnd_45ACP_MHP"]
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "rhsusf_mag_7Rnd_45ACP_MHP"
+        ],
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ]
       }
     },
     {
@@ -1224,8 +2330,23 @@
         "range": 180,
         "rateOfFire": 450,
         "mass": 625,
-        "modes": ["Single"],
-        "magazines": ["CUP_17Rnd_9x19_glock17"]
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "CUP_17Rnd_9x19_glock17",
+          "16Rnd_9x21_Mag",
+          "30Rnd_9x21_Mag",
+          "16Rnd_9x19_Mag",
+          "30Rnd_9x19_Mag"
+        ],
+        "magazineWells": [
+          "CBA_9x19_Pistol"
+        ],
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ]
       }
     },
     {
@@ -1237,7 +2358,21 @@
       "scope": 2,
       "properties": {
         "variant": "Black",
-        "texture": "black"
+        "texture": "black",
+        "magazineWells": [
+          "CBA_9x19_Pistol"
+        ],
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ],
+        "caliber": "9×19 mm",
+        "magazines": [
+          "16Rnd_9x21_Mag",
+          "30Rnd_9x21_Mag",
+          "16Rnd_9x19_Mag",
+          "30Rnd_9x19_Mag"
+        ]
       }
     },
     {
@@ -1252,8 +2387,16 @@
         "range": 170,
         "rateOfFire": 350,
         "mass": 1100,
-        "modes": ["Single"],
-        "magazines": ["CUP_7Rnd_45ACP_1911"]
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "CUP_7Rnd_45ACP_1911"
+        ],
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ]
       }
     },
     {
@@ -1268,8 +2411,16 @@
         "range": 180,
         "rateOfFire": 400,
         "mass": 1000,
-        "modes": ["Single"],
-        "magazines": ["CUP_16Rnd_9x19_cz75"]
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "CUP_16Rnd_9x19_cz75"
+        ],
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ]
       }
     },
     {
@@ -1284,8 +2435,16 @@
         "range": 200,
         "rateOfFire": 280,
         "mass": 1900,
-        "modes": ["Single"],
-        "magazines": ["CUP_7Rnd_50AE_Deagle"]
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "CUP_7Rnd_50AE_Deagle"
+        ],
+        "weaponSlots": [
+          "asdg_PistolOptic",
+          "asdg_MuzzleSlot_9mm"
+        ]
       }
     },
     {
@@ -1300,8 +2459,12 @@
         "range": 600,
         "rateOfFire": 1,
         "mass": 12500,
-        "modes": ["Single"],
-        "magazines": ["NLAW_F"],
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "NLAW_F"
+        ],
         "type": "Anti-Tank"
       }
     },
@@ -1317,8 +2480,12 @@
         "range": 4000,
         "rateOfFire": 1,
         "mass": 22000,
-        "modes": ["Single"],
-        "magazines": ["Titan_AA"],
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "Titan_AA"
+        ],
         "type": "Anti-Aircraft"
       }
     },
@@ -1334,8 +2501,12 @@
         "range": 2000,
         "rateOfFire": 1,
         "mass": 18000,
-        "modes": ["Single"],
-        "magazines": ["Titan_AT"],
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "Titan_AT"
+        ],
         "type": "Anti-Tank"
       }
     },
@@ -1351,8 +2522,13 @@
         "range": 700,
         "rateOfFire": 1,
         "mass": 8200,
-        "modes": ["Single"],
-        "magazines": ["RPG32_F", "RPG32_HE_F"],
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "RPG32_F",
+          "RPG32_HE_F"
+        ],
         "type": "Multi-Purpose"
       }
     },
@@ -1368,8 +2544,12 @@
         "range": 500,
         "rateOfFire": 1,
         "mass": 6300,
-        "modes": ["Single"],
-        "magazines": ["rhs_rpg7_PG7VL_mag"],
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "rhs_rpg7_PG7VL_mag"
+        ],
         "type": "Anti-Tank"
       }
     },
@@ -1385,8 +2565,12 @@
         "range": 300,
         "rateOfFire": 1,
         "mass": 6700,
-        "modes": ["Single"],
-        "magazines": ["rhs_m136_mag"],
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "rhs_m136_mag"
+        ],
         "type": "Anti-Tank"
       }
     },
@@ -1402,8 +2586,12 @@
         "range": 4750,
         "rateOfFire": 1,
         "mass": 22300,
-        "modes": ["Single"],
-        "magazines": ["rhs_fgm148_magazine_AT"],
+        "modes": [
+          "Single"
+        ],
+        "magazines": [
+          "rhs_fgm148_magazine_AT"
+        ],
         "type": "Fire-and-Forget AT"
       }
     },
@@ -1844,7 +3032,10 @@
         "caliber": "6.5×39 mm",
         "capacity": 30,
         "mass": 100,
-        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
         "faction": "NATO"
       }
     },
@@ -1859,7 +3050,10 @@
         "caliber": "6.5×39 mm",
         "capacity": 30,
         "mass": 100,
-        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
         "faction": "NATO",
         "tracer": true,
         "variant": "Tracer"
@@ -1874,25 +3068,37 @@
       "scope": 2,
       "properties": {
         "mass": 300,
-        "weaponSlots": ["asdg_OpticRail"],
+        "weaponSlots": [
+          "asdg_OpticRail"
+        ],
         "faction": "NATO",
-        "features": ["thermal", "nightvision"],
-        "zoom": [4, 2],
+        "features": [
+          "thermal",
+          "nightvision"
+        ],
+        "zoom": [
+          4,
+          2
+        ],
         "magnification": "4x"
       }
     },
     {
       "className": "optic_Hamr",
-      "parentClass": "ItemCore", 
+      "parentClass": "ItemCore",
       "name": "RCO",
       "type": "attachment",
       "mod": "A3",
       "scope": 2,
       "properties": {
         "mass": 250,
-        "weaponSlots": ["asdg_OpticRail"],
+        "weaponSlots": [
+          "asdg_OpticRail"
+        ],
         "faction": "NATO",
-        "zoom": [4],
+        "zoom": [
+          4
+        ],
         "magnification": "4x"
       }
     },
@@ -1900,14 +3106,18 @@
       "className": "muzzle_snds_H",
       "parentClass": "ItemCore",
       "name": "Sound Suppressor (6.5 mm)",
-      "type": "attachment", 
+      "type": "attachment",
       "mod": "A3",
       "scope": 2,
       "properties": {
         "mass": 200,
-        "weaponSlots": ["asdg_MuzzleSlot"],
+        "weaponSlots": [
+          "asdg_MuzzleSlot"
+        ],
         "faction": "NATO",
-        "features": ["suppressor"],
+        "features": [
+          "suppressor"
+        ],
         "recoilModifier": -0.15
       }
     },
@@ -1916,13 +3126,17 @@
       "parentClass": "ItemCore",
       "name": "Bipod (Sand)",
       "type": "attachment",
-      "mod": "A3", 
+      "mod": "A3",
       "scope": 2,
       "properties": {
         "mass": 150,
-        "weaponSlots": ["asdg_UnderBarrelSlot"],
+        "weaponSlots": [
+          "asdg_UnderBarrelSlot"
+        ],
         "faction": "NATO",
-        "features": ["bipod"],
+        "features": [
+          "bipod"
+        ],
         "swayModifier": -0.3
       }
     },
@@ -1937,7 +3151,10 @@
         "caliber": "5.56×45 mm",
         "capacity": 30,
         "mass": 120,
-        "magazineWells": ["STANAG_556x45", "CBA_556x45_STANAG"],
+        "magazineWells": [
+          "STANAG_556x45",
+          "CBA_556x45_STANAG"
+        ],
         "faction": "USA"
       }
     },
@@ -1950,23 +3167,30 @@
       "scope": 2,
       "properties": {
         "mass": 320,
-        "weaponSlots": ["asdg_OpticRail"],
+        "weaponSlots": [
+          "asdg_OpticRail"
+        ],
         "faction": "USA",
-        "zoom": [4]
+        "zoom": [
+          4
+        ]
       }
     },
     {
       "className": "100Rnd_65x39_caseless_mag",
       "parentClass": "CA_Magazine",
       "name": "6.5 mm 100Rnd Belt",
-      "type": "magazine", 
+      "type": "magazine",
       "mod": "A3",
       "scope": 2,
       "properties": {
         "caliber": "6.5×39 mm",
         "capacity": 100,
         "mass": 350,
-        "magazineWells": ["CBA_65x39_MX", "STANAG_65x39"],
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
         "faction": "NATO"
       }
     },
@@ -1979,9 +3203,13 @@
       "scope": 2,
       "properties": {
         "mass": 150,
-        "weaponSlots": ["asdg_OpticRail"],
+        "weaponSlots": [
+          "asdg_OpticRail"
+        ],
         "faction": "NATO",
-        "zoom": [1]
+        "zoom": [
+          1
+        ]
       }
     },
     {
@@ -1993,14 +3221,18 @@
       "scope": 2,
       "properties": {
         "mass": 250,
-        "weaponSlots": ["asdg_MuzzleSlot_762"],
+        "weaponSlots": [
+          "asdg_MuzzleSlot_762"
+        ],
         "faction": "NATO",
-        "features": ["suppressor"],
-        "recoilModifier": -0.20
+        "features": [
+          "suppressor"
+        ],
+        "recoilModifier": -0.2
       }
     },
     {
-      "className": "optic_AMS", 
+      "className": "optic_AMS",
       "parentClass": "ItemCore",
       "name": "AMS",
       "type": "attachment",
@@ -2008,9 +3240,707 @@
       "scope": 2,
       "properties": {
         "mass": 400,
-        "weaponSlots": ["asdg_OpticRail_AK"],
+        "weaponSlots": [
+          "asdg_OpticRail_AK"
+        ],
         "faction": "CSAT",
-        "zoom": [8, 4, 2]
+        "zoom": [
+          8,
+          4,
+          2
+        ]
+      }
+    },
+    {
+      "className": "30Rnd_65x39_caseless_mag_tracer",
+      "parentClass": "30Rnd_65x39_caseless_mag",
+      "name": "6.5 mm 30Rnd STANAG Mag (Tracer)",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "6.5×39",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "tracer"
+      }
+    },
+    {
+      "className": "30Rnd_65x39_caseless_mag_green_tracer",
+      "parentClass": "30Rnd_65x39_caseless_mag",
+      "name": "6.5 mm 30Rnd STANAG Mag (Green_tracer)",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "6.5×39",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "CBA_65x39_MX",
+          "STANAG_65x39"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "green_tracer"
+      }
+    },
+    {
+      "className": "100Rnd_65x39_caseless_mag_tracer",
+      "parentClass": "100Rnd_65x39_caseless_mag",
+      "name": "6.5 mm 100Rnd Belt Mag (Tracer)",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "6.5×39",
+        "capacity": 100,
+        "mass": 250,
+        "magazineWells": [
+          "CBA_65x39_MX_Belt"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "tracer"
+      }
+    },
+    {
+      "className": "30Rnd_556x45_Stanag",
+      "parentClass": "CA_Magazine",
+      "name": "5.56 mm 30Rnd STANAG",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "5.56×45",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "STANAG_556",
+          "CBA_556x45_STANAG"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "30Rnd_556x45_Stanag_tracer",
+      "parentClass": "30Rnd_556x45_Stanag",
+      "name": "5.56 mm 30Rnd STANAG (Tracer)",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "5.56×45",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "STANAG_556",
+          "CBA_556x45_STANAG"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "tracer"
+      }
+    },
+    {
+      "className": "30Rnd_556x45_Stanag_green_tracer",
+      "parentClass": "30Rnd_556x45_Stanag",
+      "name": "5.56 mm 30Rnd STANAG (Green_tracer)",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "5.56×45",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "STANAG_556",
+          "CBA_556x45_STANAG"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "green_tracer"
+      }
+    },
+    {
+      "className": "30Rnd_556x45_G36",
+      "parentClass": "CA_Magazine",
+      "name": "5.56 mm 30Rnd G36",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "5.56×45",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "CBA_556x45_G36"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "30Rnd_556x45_G36_tracer",
+      "parentClass": "30Rnd_556x45_G36",
+      "name": "5.56 mm 30Rnd G36 (Tracer)",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "5.56×45",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "CBA_556x45_G36"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "tracer"
+      }
+    },
+    {
+      "className": "30Rnd_762x39_AK",
+      "parentClass": "CA_Magazine",
+      "name": "7.62 mm 30Rnd AK",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "7.62×39",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "CBA_762x39_AK"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "30Rnd_762x39_AK_tracer",
+      "parentClass": "30Rnd_762x39_AK",
+      "name": "7.62 mm 30Rnd AK (Tracer)",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "7.62×39",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "CBA_762x39_AK"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "tracer"
+      }
+    },
+    {
+      "className": "75Rnd_762x39_AK",
+      "parentClass": "CA_Magazine",
+      "name": "7.62 mm 75Rnd AK Drum",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "7.62×39",
+        "capacity": 75,
+        "mass": 188,
+        "magazineWells": [
+          "CBA_762x39_AK"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "75Rnd_762x39_AK_tracer",
+      "parentClass": "75Rnd_762x39_AK",
+      "name": "7.62 mm 75Rnd AK Drum (Tracer)",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "7.62×39",
+        "capacity": 75,
+        "mass": 188,
+        "magazineWells": [
+          "CBA_762x39_AK"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "tracer"
+      }
+    },
+    {
+      "className": "30Rnd_545x39_AK",
+      "parentClass": "CA_Magazine",
+      "name": "5.45 mm 30Rnd AK74",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "5.45×39",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "CBA_545x39_AK"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "30Rnd_545x39_AK_tracer",
+      "parentClass": "30Rnd_545x39_AK",
+      "name": "5.45 mm 30Rnd AK74 (Tracer)",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "5.45×39",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "CBA_545x39_AK"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "tracer"
+      }
+    },
+    {
+      "className": "16Rnd_9x21_Mag",
+      "parentClass": "CA_Magazine",
+      "name": "9 mm 16Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "9×19",
+        "capacity": 16,
+        "mass": 40,
+        "magazineWells": [
+          "CBA_9x19_Pistol"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "30Rnd_9x21_Mag",
+      "parentClass": "CA_Magazine",
+      "name": "9 mm 30Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "9×19",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "CBA_9x19_Pistol"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "9Rnd_45ACP_Mag",
+      "parentClass": "CA_Magazine",
+      "name": ".45 ACP 9Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "45ACP",
+        "capacity": 9,
+        "mass": 23,
+        "magazineWells": [
+          "CBA_45ACP_Pistol"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "optic_MRCO",
+      "parentClass": "ItemCore",
+      "name": "MRCO",
+      "type": "attachment",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "mass": 300,
+        "weaponSlots": [
+          "asdg_OpticRail"
+        ],
+        "faction": "NATO",
+        "features": [
+          "day_optic"
+        ],
+        "magnification": "4x",
+        "zoom": [
+          4
+        ]
+      }
+    },
+    {
+      "className": "optic_Aco",
+      "parentClass": "ItemCore",
+      "name": "ACO (Red)",
+      "type": "attachment",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "mass": 300,
+        "weaponSlots": [
+          "asdg_OpticRail"
+        ],
+        "faction": "NATO",
+        "features": [
+          "red_dot"
+        ],
+        "magnification": "1x",
+        "zoom": [
+          1
+        ]
+      }
+    },
+    {
+      "className": "muzzle_snds_M",
+      "parentClass": "ItemCore",
+      "name": "Sound Suppressor (5.56 mm)",
+      "type": "attachment",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "mass": 150,
+        "weaponSlots": [
+          "asdg_MuzzleSlot_556"
+        ],
+        "faction": "NATO",
+        "features": [
+          "suppressor",
+          "sound_reduction"
+        ],
+        "caliber": "5.56×45 mm"
+      }
+    },
+    {
+      "className": "bipod_01_F_blk",
+      "parentClass": "ItemCore",
+      "name": "Bipod (Black)",
+      "type": "attachment",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "mass": 200,
+        "weaponSlots": [
+          "asdg_UnderBarrelSlot"
+        ],
+        "faction": "NATO",
+        "features": [
+          "bipod",
+          "stability"
+        ]
+      }
+    },
+    {
+      "className": "20Rnd_762x51_Mag",
+      "parentClass": "CA_Magazine",
+      "name": "7.62 mm 20Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "7.62×51 mm",
+        "capacity": 20,
+        "mass": 50,
+        "magazineWells": [
+          "CBA_762x51_SCAR",
+          "CBA_762x51_M14"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "20Rnd_762x51_Mag_Tracer",
+      "parentClass": "CA_Magazine",
+      "name": "7.62 mm 20Rnd Tracer Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "7.62×51 mm",
+        "capacity": 20,
+        "mass": 50,
+        "magazineWells": [
+          "CBA_762x51_SCAR",
+          "CBA_762x51_M14"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "Tracer"
+      }
+    },
+    {
+      "className": "5Rnd_127x108_Mag",
+      "parentClass": "CA_Magazine",
+      "name": "12.7 mm 5Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "12.7×108 mm",
+        "capacity": 5,
+        "mass": 13,
+        "magazineWells": [
+          "CBA_127x108_GM6"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "5Rnd_127x108_APDS_Mag",
+      "parentClass": "CA_Magazine",
+      "name": "12.7 mm 5Rnd APDS Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "12.7×108 mm",
+        "capacity": 5,
+        "mass": 13,
+        "magazineWells": [
+          "CBA_127x108_GM6"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "7Rnd_408_Mag",
+      "parentClass": "CA_Magazine",
+      "name": ".408 7Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": ".408 CheyTac",
+        "capacity": 7,
+        "mass": 18,
+        "magazineWells": [
+          "CBA_408_CheyTac"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "10Rnd_338_Mag",
+      "parentClass": "CA_Magazine",
+      "name": ".338 LM 10Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": ".338 Lapua Magnum",
+        "capacity": 10,
+        "mass": 25,
+        "magazineWells": [
+          "CBA_338_Lapua"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "5Rnd_127x54_Mag",
+      "parentClass": "CA_Magazine",
+      "name": "12.7×54 mm 5Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "12.7×54 mm",
+        "capacity": 5,
+        "mass": 13,
+        "magazineWells": [
+          "CBA_127x54_VSS"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "5Rnd_93x64_Mag",
+      "parentClass": "CA_Magazine",
+      "name": "9.3×64 mm 5Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "9.3×64 mm",
+        "capacity": 5,
+        "mass": 13,
+        "magazineWells": [
+          "CBA_93x64_Hunting"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "150Rnd_762x54_Box",
+      "parentClass": "CA_Magazine",
+      "name": "7.62×54R 150Rnd Box",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "7.62×54R mm",
+        "capacity": 150,
+        "mass": 375,
+        "magazineWells": [
+          "CBA_762x54R_LINKS"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "150Rnd_762x54_Box_Tracer",
+      "parentClass": "CA_Magazine",
+      "name": "7.62×54R 150Rnd Box Tracer",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "7.62×54R mm",
+        "capacity": 150,
+        "mass": 375,
+        "magazineWells": [
+          "CBA_762x54R_LINKS"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "Tracer"
+      }
+    },
+    {
+      "className": "8Rnd_9x18_Mag",
+      "parentClass": "CA_Magazine",
+      "name": "9×18 mm 8Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "9×18 mm",
+        "capacity": 8,
+        "mass": 20,
+        "magazineWells": [
+          "CBA_9x18_Makarov"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "7Rnd_50AE_Mag",
+      "parentClass": "CA_Magazine",
+      "name": ".50 AE 7Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": ".50 AE",
+        "capacity": 7,
+        "mass": 18,
+        "magazineWells": [
+          "CBA_50AE_Eagle"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "200Rnd_65x39_cased_Box",
+      "parentClass": "CA_Magazine",
+      "name": "6.5 mm 200Rnd Box",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "6.5×39 mm",
+        "capacity": 200,
+        "mass": 500,
+        "magazineWells": [
+          "CBA_65x39_MX_Belt"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "200Rnd_65x39_cased_Box_Tracer",
+      "parentClass": "CA_Magazine",
+      "name": "6.5 mm 200Rnd Box Tracer",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "6.5×39 mm",
+        "capacity": 200,
+        "mass": 500,
+        "magazineWells": [
+          "CBA_65x39_MX_Belt"
+        ],
+        "faction": "NATO",
+        "tracer": true,
+        "variant": "Tracer"
+      }
+    },
+    {
+      "className": "16Rnd_9x19_Mag",
+      "parentClass": "CA_Magazine",
+      "name": "9×19 mm 16Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "9×19 mm",
+        "capacity": 16,
+        "mass": 40,
+        "magazineWells": [
+          "CBA_9x19_Pistol"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "30Rnd_9x19_Mag",
+      "parentClass": "CA_Magazine",
+      "name": "9×19 mm 30Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": "9×19 mm",
+        "capacity": 30,
+        "mass": 75,
+        "magazineWells": [
+          "CBA_9x19_Pistol"
+        ],
+        "faction": "NATO"
+      }
+    },
+    {
+      "className": "7Rnd_45ACP_Mag",
+      "parentClass": "CA_Magazine",
+      "name": ".45 ACP 7Rnd Mag",
+      "type": "magazine",
+      "mod": "A3",
+      "scope": 2,
+      "properties": {
+        "caliber": ".45 ACP",
+        "capacity": 7,
+        "mass": 18,
+        "magazineWells": [
+          "CBA_45ACP_Pistol"
+        ],
+        "faction": "NATO"
       }
     }
   ]
