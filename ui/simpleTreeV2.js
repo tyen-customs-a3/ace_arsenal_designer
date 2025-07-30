@@ -252,8 +252,10 @@ export class TreeManager {
         // Set tree in navigation state
         this.navigationState.setTree(rootNodes);
         
-        // Render using corrected renderer
-        const html = `<ul class="tree-view">${this.renderTreeData(treeData, options.viewMode)}</ul>`;
+        // Render using corrected renderer - always apply correct spacing
+        const spacing = window.displayOptions?.spacing || 'general';
+        const className = `tree-view spacing-${spacing}`;
+        const html = `<ul class="${className}">${this.renderTreeData(treeData, options.viewMode)}</ul>`;
         
         const endTime = performance.now();
         if (document.getElementById('timing')) {
@@ -263,7 +265,18 @@ export class TreeManager {
         // Update DOM
         const container = document.getElementById(this.panelId);
         if (container) {
+            // Store scroll position before updating
+            const scrollContainer = container.closest('.left-content') || container.parentElement;
+            const scrollPosition = scrollContainer ? scrollContainer.scrollTop : 0;
+            
             container.innerHTML = html;
+            
+            // Restore scroll position after DOM update
+            if (scrollContainer && scrollPosition > 0) {
+                setTimeout(() => {
+                    scrollContainer.scrollTop = scrollPosition;
+                }, 0);
+            }
             
             // Restore focus if needed
             setTimeout(() => {
@@ -364,13 +377,26 @@ export class TreeManager {
     
     // Apply view mode transformations
     applyViewModeTransform(items, viewMode) {
+        // Debug: Check if input items are unique
+        console.log('🐛 DEBUG: applyViewModeTransform input:', items.length, 'items');
+        if (items.length > 1) {
+            console.log('🐛 First item:', items[0].displayName, items[0].className);
+            console.log('🐛 Second item:', items[1].displayName, items[1].className);
+            console.log('🐛 Items are same reference?', items[0] === items[1]);
+        }
+        
         switch(viewMode) {
             case 'list':
-                return items.map(item => ({
+                const listResult = items.map(item => ({
                     name: item.displayName,
                     item: item,
                     children: null
                 }));
+                // Debug: Check if mapped nodes are unique
+                if (listResult.length > 1) {
+                    console.log('🐛 List result - same item refs?', listResult[0].item === listResult[1].item);
+                }
+                return listResult;
             case 'hierarchy':
                 return this.buildInheritanceHierarchy(items);
             case 'variants':
@@ -514,6 +540,12 @@ export class TreeManager {
     renderTreeNode(node, level, viewMode = 'variants', parentIsGroup = false) {
         const hasChildren = node.children && node.children.length > 0;
         
+        // Debug: Check if all nodes have the same item reference
+        if (node.item && level === 0) {
+            console.log('🐛 DEBUG: Rendering node:', node.name, 'className:', node.item.className, 'item ref:', node.item === window.debugFirstItem ? 'SAME AS FIRST!' : 'unique');
+            if (!window.debugFirstItem) window.debugFirstItem = node.item;
+        }
+        
         // Simplified indentation logic:
         // - Group headers (isPrimaryGroup) are never indented (level 0)
         // - First level children of groups are never indented (level 0) 
@@ -548,10 +580,10 @@ export class TreeManager {
             let clickHandler = '';
             if (hasChildren && !node.item) {
                 // This is a group node (has children but no item data) - make it toggle
-                clickHandler = `onclick="toggleTreeGroup('${nodeId}')" style="cursor: pointer;"`;
+                clickHandler = `onclick="window.toggleTreeGroup('${nodeId}')" style="cursor: pointer;"`;
             } else if (node.item) {
                 // This is an item node - make it selectable
-                clickHandler = `onclick="selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'`;
+                clickHandler = `onclick="window.selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'`;
             }
             
             const itemClass = node.item ? `tree-item tree-parent ${groupClass}` : `tree-item tree-base-class ${groupClass}`;
@@ -563,7 +595,7 @@ export class TreeManager {
             html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
             
             // Toggle button - clickable with stopPropagation to prevent row selection
-            html += `<span class="tree-toggle" data-node-id="${nodeId}" onclick="event.stopPropagation(); toggleTreeGroup('${nodeId}');">${TOGGLE_ICONS.EXPANDED}</span>`;
+            html += `<span class="tree-toggle" data-node-id="${nodeId}" onclick="event.stopPropagation(); window.toggleTreeGroup('${nodeId}');">${TOGGLE_ICONS.EXPANDED}</span>`;
             
             html += `<span class="group-name">${node.name}</span>`;
             
@@ -610,7 +642,7 @@ export class TreeManager {
             html += '</li>';
         } else {
             // Leaf item - no toggle needed, no count needed, simple left-aligned text
-            const clickHandler = node.item ? `onclick="selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'` : '';
+            const clickHandler = node.item ? `onclick="window.selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'` : '';
             
             const className = node.item ? `tree-item` : `tree-item tree-base-class`;
                 
@@ -666,55 +698,72 @@ export function getTreeManager(panelId) {
     return treeManagers.get(panelId);
 }
 
-// Legacy compatibility functions - removed as they're no longer needed
-
 // Enhanced selection and toggle functions
 export function selectTreeItem(element) {
-    const nodeId = element.dataset.nodeId;
+    // Extract item data directly from the clicked element
+    if (!element.dataset.item) {
+        console.warn('selectTreeItem: Element has no item data');
+        return;
+    }
+    
+    console.log('🐛 DEBUG: selectTreeItem called');
+    console.log('🐛 Clicked element text:', element.textContent.trim());
+    console.log('🐛 Raw data-item length:', element.dataset.item.length);
+    
+    let itemData;
+    try {
+        itemData = JSON.parse(element.dataset.item);
+        console.log('🐛 Parsed item:', itemData.displayName, 'className:', itemData.className);
+        console.log('🐛 Is this always the same item?', itemData.className === window.debugLastClickedClassName);
+        window.debugLastClickedClassName = itemData.className;
+    } catch (e) {
+        console.warn('selectTreeItem: Could not parse item data', e);
+        return;
+    }
+    
+    // Call selectItem directly with the item data, bypassing DOM element dependency
+    selectItemByData(itemData);
+    
+    // Also update the navigation system to sync focus/selection
     const panelId = findPanelId(element);
-    
-    if (!panelId) {
-        console.warn('selectTreeItem: Could not find panel for element');
-        return;
-    }
-    
-    const manager = getTreeManager(panelId);
-    if (!manager) {
-        console.warn('selectTreeItem: No tree manager found for panel:', panelId);
-        return;
-    }
-    
-    const navigationState = manager.getNavigationState();
-    
-    // Find the node
-    let targetNode = null;
-    if (nodeId) {
-        targetNode = TreeUtils.findNodeById(navigationState.rootNodes, nodeId);
-    }
-    
-    // Fallback: try to find by item data
-    if (!targetNode && element.dataset.item) {
-        try {
-            const itemData = JSON.parse(element.dataset.item);
-            const allNodes = TreeUtils.getAllNodes(navigationState.rootNodes);
-            targetNode = allNodes.find(node => 
-                node.data && node.data.className === itemData.className
-            );
-        } catch (e) {
-            console.warn('selectTreeItem: Could not parse item data');
-        }
-    }
-    
-    if (targetNode) {
-        navigationState.setFocus(targetNode);
-        if (targetNode.isSelectable) {
-            navigationState.setSelection(targetNode);
+    if (panelId) {
+        const manager = getTreeManager(panelId);
+        if (manager) {
+            const navigationState = manager.getNavigationState();
+            navigationState.setActive(true);
+            
+            // Find the corresponding navigation node by matching the clicked element
+            const allNodes = navigationState.getNavigableNodes();
+            console.log('🔍 Looking for navigation node with className:', itemData.className);
+            console.log('🔍 Available navigation nodes:', allNodes.map(n => ({
+                name: n.name, 
+                hasData: !!n.data, 
+                className: n.data?.className,
+                type: n.type
+            })));
+            
+            const matchingNode = allNodes.find(node => {
+                // Try to match by item data
+                if (node.data && node.data.className === itemData.className) {
+                    return true;
+                }
+                return false;
+            });
+            
+            if (matchingNode) {
+                console.log('🎯 Syncing navigation system to clicked item:', matchingNode.name);
+                navigationState.setFocus(matchingNode);
+                navigationState.setSelection(matchingNode);
+            } else {
+                console.warn('❌ Could not find matching navigation node for clicked item:', itemData.className);
+                console.log('Available node classNames:', allNodes.map(n => n.data?.className).filter(Boolean));
+            }
         }
     }
 }
 
 export function toggleTreeGroup(nodeId) {
-    // Direct DOM-based toggle for renderTreeData generated elements
+    // Toggle tree group expansion/collapse
     const childrenContainer = document.getElementById(nodeId);
     if (!childrenContainer) {
         console.warn('toggleTreeGroup: Could not find children container with ID:', nodeId);
@@ -740,17 +789,6 @@ export function toggleTreeGroup(nodeId) {
         // Expand
         childrenContainer.style.display = 'block';
         toggleButton.textContent = TOGGLE_ICONS.EXPANDED;
-    }
-    
-    // Also try the navigation system approach as fallback for newer elements
-    for (const [panelId, manager] of treeManagers) {
-        const navigationState = manager.getNavigationState();
-        const node = TreeUtils.findNodeById(navigationState.rootNodes, nodeId);
-        
-        if (node) {
-            navigationState.toggleNodeExpansion(node);
-            return;
-        }
     }
 }
 
@@ -784,10 +822,6 @@ export function restoreFocusAfterViewChange(panelId) {
     }
 }
 
-// Initialize keyboard navigation for backwards compatibility
-export function initializeKeyboardNavigation(panelId) {
-    initializeTreeManager(panelId);
-}
 
 // Utility function to find panel ID from element
 function findPanelId(element) {
@@ -798,25 +832,15 @@ function findPanelId(element) {
     return null;
 }
 
-// Global selection callback system
+// Simplified selection callback system
 window.onTreeSelectionChanged = function(itemData, panelId) {
-    if (itemData && window.selectItem) {
-        // Find the element to pass to legacy selectItem function
-        const panel = document.getElementById(panelId);
-        if (panel) {
-            const element = panel.querySelector(`[data-item*='${itemData.className}']`);
-            if (element) {
-                window.selectItem(element);
-                return;
-            }
-        }
-    }
-    
-    // Fallback: call legacy selection clearing
-    if (!itemData && window.clearSelection) {
+    if (itemData && window.selectItemByData) {
+        window.selectItemByData(itemData);
+    } else if (!itemData && window.clearSelection) {
         window.clearSelection();
     }
 };
+
 
 // Make functions globally available
 window.selectTreeItem = selectTreeItem;

@@ -150,37 +150,16 @@ export class VariantManager {
             if (!hasTextureVariants && baseWeapon) {
                 // Single weapon - add directly to top level
                 const itemKey = `single_${baseWeapon.className}`;
-                result[itemKey] = {
-                    _isSingleItem: true,
-                    _item: baseWeapon,
-                    _displayName: baseWeapon.displayName,
-                    _id: `single_${baseWeapon.className}`,
-                    // For compatibility with existing display code
-                    0: baseWeapon
-                };
+                result[itemKey] = [baseWeapon];
             } else {
-                // Base weapon with texture variants - create collapsible group
+                // Base weapon with texture variants - create group
                 const totalCount = (baseWeapon ? 1 : 0) + group.textureVariants.length;
                 const groupName = baseWeapon ? 
                     `${baseWeapon.displayName} (${totalCount})` : 
                     `${baseClassName} (${totalCount})`;
                 
                 const allItems = [baseWeapon, ...group.textureVariants].filter(Boolean);
-                
-                result[groupName] = {
-                    _isGroup: true,
-                    _baseWeapon: baseWeapon,
-                    _textureVariants: group.textureVariants,
-                    _totalCount: totalCount,
-                    _isExpanded: false,
-                    _id: `group_${baseClassName}`,
-                    _allItems: allItems,
-                    // Add items as indexed properties for compatibility
-                    ...allItems.reduce((acc, item, index) => {
-                        acc[index] = item;
-                        return acc;
-                    }, {})
-                };
+                result[groupName] = allItems;
             }
         }
 
