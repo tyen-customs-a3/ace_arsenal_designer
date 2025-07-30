@@ -240,9 +240,16 @@
         </div>
 
         <!-- Attachment Category Sidebar -->
-        <div class="attachment-sidebar">
-            <button class="attachment-tab active" data-attachment="attachments" data-tooltip="Attachments">⚙</button>
-            <button class="attachment-tab" data-attachment="magazines" data-tooltip="Magazines">◈</button>
+        <div class="attachment-sidebar" id="attachmentSidebar">
+            <!-- All possible tabs - we'll show/hide as needed -->
+            <button class="attachment-tab active" data-attachment="optics" data-tooltip="Optics" data-context="weapon">🔭</button>
+            <button class="attachment-tab" data-attachment="attachments" data-tooltip="Attachments" data-context="weapon">⚙</button>
+            <button class="attachment-tab" data-attachment="bipods" data-tooltip="Bipods" data-context="weapon">🔧</button>
+            <button class="attachment-tab" data-attachment="magazines" data-tooltip="Magazines" data-context="both">◈</button>
+            <button class="attachment-tab" data-attachment="medical" data-tooltip="Medical" data-context="storage" style="display: none;">🏥</button>
+            <button class="attachment-tab" data-attachment="food" data-tooltip="Food" data-context="storage" style="display: none;">🍽️</button>
+            <button class="attachment-tab" data-attachment="tools" data-tooltip="Tools" data-context="storage" style="display: none;">🔧</button>
+            <button class="attachment-tab" data-attachment="misc" data-tooltip="Miscellaneous" data-context="storage" style="display: none;">📦</button>
         </div>
 
 
@@ -325,7 +332,6 @@
             TreeManager,
             toggleTreeGroup,
             selectTreeItem,
-            initializeKeyboardNavigation,
             clearPanelFocus,
             focusFirstItem,
             restoreFocusAfterViewChange
@@ -335,7 +341,7 @@
         let currentItems = [];
         let filteredItems = [];
         let selectedCategory = 'weapons';
-        let selectedRightCategory = 'attachments';
+        let selectedRightCategory = 'optics';
         let selectedItem = null;
         let currentSortOrder = 'asc';
         let currentExpandState = false;
@@ -362,7 +368,18 @@
         // Category filtering
         function filterItemsByCategory(category) {
             const categoryItems = currentItems.filter(item => item.category === category);
-            return applyActiveFilters(categoryItems);
+            const filtered = applyActiveFilters(categoryItems);
+            
+            // Debug: Check if all items have the same reference
+            console.log('🐛 DEBUG: filterItemsByCategory for', category, '- found', filtered.length, 'items');
+            if (filtered.length > 1) {
+                console.log('🐛 First item:', filtered[0].displayName, filtered[0].className);
+                console.log('🐛 Second item:', filtered[1].displayName, filtered[1].className);
+                console.log('🐛 Same object reference?', filtered[0] === filtered[1]);
+                console.log('🐛 Same className?', filtered[0].className === filtered[1].className);
+            }
+            
+            return filtered;
         }
 
         // Apply all active filters to items
@@ -566,7 +583,7 @@
         }
 
         // Filter compatible accessories for selected weapon using weaponSlots
-        function getCompatibleAccessories(weapon) {
+        function getCompatibleAccessories(weapon, category = 'attachments') {
             if (!weapon) return [];
             
             const attachments = currentItems.filter(item => item.category === 'attachments');
@@ -574,7 +591,7 @@
             
             // Filter attachments by weapon slot compatibility
             if (weapon.weaponSlots && weapon.weaponSlots.length > 0) {
-                const compatible = attachments.filter(attachment => {
+                let compatible = attachments.filter(attachment => {
                     if (!attachment.weaponSlots || attachment.weaponSlots.length === 0) {
                         return false; // Attachment has no slot info, assume incompatible
                     }
@@ -586,7 +603,30 @@
                         )
                     );
                 });
-                console.log(`🔧 Found ${compatible.length} compatible attachments:`, compatible.map(a => a.displayName));
+                
+                // Filter by specific attachment category if specified
+                if (category === 'optics') {
+                    compatible = compatible.filter(attachment => 
+                        attachment.weaponSlots && attachment.weaponSlots.some(slot => 
+                            slot.includes('OpticRail') || slot.includes('Optic')
+                        )
+                    );
+                } else if (category === 'bipods') {
+                    compatible = compatible.filter(attachment => 
+                        attachment.weaponSlots && attachment.weaponSlots.some(slot => 
+                            slot.includes('UnderBarrel') || slot.includes('Bipod')
+                        )
+                    );
+                } else if (category === 'attachments') {
+                    compatible = compatible.filter(attachment => 
+                        attachment.weaponSlots && attachment.weaponSlots.some(slot => 
+                            slot.includes('MuzzleSlot') || slot.includes('Muzzle') || 
+                            (!slot.includes('OpticRail') && !slot.includes('UnderBarrel'))
+                        )
+                    );
+                }
+                
+                console.log(`🔧 Found ${compatible.length} compatible ${category}:`, compatible.map(a => a.displayName));
                 
                 // Apply right panel filters
                 return applyRightPanelFilters(compatible);
@@ -629,41 +669,172 @@
             return [];
         }
 
-        // Update right panel with compatible accessories
+        // Get storage items for backpacks/vests by category
+        function getStorageItems(category) {
+            console.log(`📦 Getting storage items for category: ${category}`);
+            
+            // For now, we'll use magazines as a base and create mock categories
+            // In a real implementation, these would be separate item categories
+            const allItems = currentItems.filter(item => item.category === 'magazines');
+            
+            switch (category) {
+                case 'magazines':
+                    return allItems;
+                case 'medical':
+                    // Mock medical items - in reality these would be separate items
+                    return allItems.slice(0, Math.ceil(allItems.length * 0.2)).map(item => ({
+                        ...item,
+                        displayName: `Medical: ${item.displayName.replace(/Magazine|Mag/g, 'Med Kit')}`,
+                        className: `medical_${item.className}`,
+                        category: 'medical'
+                    }));
+                case 'food':
+                    // Mock food items
+                    return allItems.slice(0, Math.ceil(allItems.length * 0.15)).map(item => ({
+                        ...item,
+                        displayName: `Food: ${item.displayName.replace(/Magazine|Mag/g, 'Ration')}`,
+                        className: `food_${item.className}`,
+                        category: 'food'
+                    }));
+                case 'tools':
+                    // Mock tool items
+                    return allItems.slice(0, Math.ceil(allItems.length * 0.1)).map(item => ({
+                        ...item,
+                        displayName: `Tool: ${item.displayName.replace(/Magazine|Mag/g, 'Kit')}`,
+                        className: `tool_${item.className}`,
+                        category: 'tools'
+                    }));
+                case 'misc':
+                    // Mock miscellaneous items
+                    return allItems.slice(0, Math.ceil(allItems.length * 0.1)).map(item => ({
+                        ...item,
+                        displayName: `Misc: ${item.displayName.replace(/Magazine|Mag/g, 'Item')}`,
+                        className: `misc_${item.className}`,
+                        category: 'misc'
+                    }));
+                default:
+                    return [];
+            }
+        }
+
+        // Update right panel based on selected item type
+        function updateRightPanel(selectedItem) {
+            console.log('🎯 Updating right panel for item:', selectedItem?.displayName, 'Category:', selectedItem?.category);
+            
+            // Show/hide tabs based on selected item type
+            const allTabs = document.querySelectorAll('.attachment-tab');
+            
+            if (selectedItem && (selectedItem.category === 'weapons' || selectedItem.category === 'handguns' || selectedItem.category === 'launchers')) {
+                // Show weapon and shared tabs
+                allTabs.forEach(tab => {
+                    const context = tab.dataset.context;
+                    if (context === 'weapon' || context === 'both') {
+                        tab.style.display = 'flex';
+                    } else {
+                        tab.style.display = 'none';
+                    }
+                });
+                
+                // Set default to optics if current category doesn't make sense for weapons
+                if (!['optics', 'attachments', 'bipods', 'magazines'].includes(selectedRightCategory)) {
+                    selectedRightCategory = 'optics';
+                }
+                updateRightCategoryTabs();
+                updateCompatibleAccessories(selectedItem);
+                
+            } else if (selectedItem && (selectedItem.category === 'backpacks' || selectedItem.category === 'vests')) {
+                // Show storage and shared tabs
+                allTabs.forEach(tab => {
+                    const context = tab.dataset.context;
+                    if (context === 'storage' || context === 'both') {
+                        tab.style.display = 'flex';
+                    } else {
+                        tab.style.display = 'none';
+                    }
+                });
+                
+                // Set default to magazines if current category doesn't make sense for storage
+                if (!['magazines', 'medical', 'food', 'tools', 'misc'].includes(selectedRightCategory)) {
+                    selectedRightCategory = 'magazines';
+                }
+                updateRightCategoryTabs();
+                updateStorageItems();
+                
+            } else {
+                // No item selected, show weapon tabs by default
+                allTabs.forEach(tab => {
+                    const context = tab.dataset.context;
+                    if (context === 'weapon' || context === 'both') {
+                        tab.style.display = 'flex';
+                    } else {
+                        tab.style.display = 'none';
+                    }
+                });
+                
+                clearRightPanelWithMessage('Select an item to view compatible accessories');
+            }
+        }
+
+        // Update right panel with compatible accessories for weapons
         function updateCompatibleAccessories(weapon) {
             console.log('🔫 Weapon selected:', weapon.displayName);
             console.log('📦 Magazine wells:', weapon.magazineWells);
             console.log('🔧 Weapon slots:', weapon.weaponSlots);
             console.log('🎯 Right panel category:', selectedRightCategory);
             
-            if (selectedRightCategory === 'attachments') {
-                const compatibleAttachments = getCompatibleAccessories(weapon);
-                console.log('✅ Compatible attachments found:', compatibleAttachments.length);
-                console.log('📋 Sample attachments:', compatibleAttachments.slice(0, 3).map(a => ({
-                    name: a.displayName,
-                    weaponSlots: a.weaponSlots,
-                    subcategory: a.subcategory
-                })));
-                
-                // Populate right panel filter options
-                populateRightPanelFilterOptions(compatibleAttachments);
-                
-                renderTreeView(compatibleAttachments, 'rightTreeView', false);
-            } else if (selectedRightCategory === 'magazines') {
-                const compatibleMagazines = getCompatibleMagazines(weapon);
-                console.log('✅ Compatible magazines found:', compatibleMagazines.length);
-                console.log('📋 Sample magazines:', compatibleMagazines.slice(0, 3).map(m => ({
-                    name: m.displayName,
-                    magazineWells: m.magazineWells,
-                    caliber: m.caliber
-                })));
-                
-                // Populate right panel filter options
-                populateRightPanelFilterOptions(compatibleMagazines);
-                
-                renderTreeView(compatibleMagazines, 'rightTreeView', false);
+            let items = [];
+            
+            if (selectedRightCategory === 'magazines') {
+                items = getCompatibleMagazines(weapon);
+                console.log('✅ Compatible magazines found:', items.length);
+            } else {
+                // For optics, attachments, bipods
+                items = getCompatibleAccessories(weapon, selectedRightCategory);
+                console.log(`✅ Compatible ${selectedRightCategory} found:`, items.length);
+            }
+            
+            // Populate right panel filter options
+            populateRightPanelFilterOptions(items);
+            
+            renderTreeView(items, 'rightTreeView', false);
+        }
+
+        // Update right panel with storage items for backpacks/vests
+        function updateStorageItems() {
+            console.log('🎒 Storage item selected, category:', selectedRightCategory);
+            
+            const items = getStorageItems(selectedRightCategory);
+            console.log(`✅ Storage items found for ${selectedRightCategory}:`, items.length);
+            
+            // Populate right panel filter options
+            populateRightPanelFilterOptions(items);
+            
+            renderTreeView(items, 'rightTreeView', false);
+        }
+
+        // Update right category tab appearance
+        function updateRightCategoryTabs() {
+            // Remove active from all tabs
+            document.querySelectorAll('.attachment-tab').forEach(tab => tab.classList.remove('active'));
+            
+            // Set active on the selected tab
+            const activeTab = document.querySelector(`[data-attachment="${selectedRightCategory}"]`);
+            if (activeTab && activeTab.style.display !== 'none') {
+                activeTab.classList.add('active');
             }
         }
+
+        // Helper function to clear right panel with message
+        function clearRightPanelWithMessage(message) {
+            const rightTreeView = document.getElementById('rightTreeView');
+            if (rightTreeView) {
+                // Apply consistent spacing via architecture
+                const spacing = displayOptions.spacing || 'general';
+                rightTreeView.className = `tree-view spacing-${spacing}`;
+                rightTreeView.innerHTML = `<div style="padding: 20px; text-align: center; color: #666;">${message}</div>`;
+            }
+        }
+
 
 
         // Enhanced tree view rendering with new architecture
@@ -725,25 +896,49 @@
             try {
                 selectedItem = JSON.parse(element.dataset.item);
                 console.log('✅ Item parsed:', selectedItem.displayName, 'Category:', selectedItem.category);
+                console.log('🔍 Raw parsed item:', selectedItem);
+                console.log('🔍 Properties check:', selectedItem.properties);
                 
                 updateStats(selectedItem);
                 
                 
-                // Update right panel with compatible accessories when weapon is selected
-                if (selectedItem.category === 'weapons') {
-                    console.log('🔫 Weapon detected, updating right panel...');
-                    console.log('🔍 Current items total:', currentItems.length);
-                    console.log('🔍 Items by category:', currentItems.reduce((acc, item) => {
-                        acc[item.category] = (acc[item.category] || 0) + 1;
-                        return acc;
-                    }, {}));
-                    updateCompatibleAccessories(selectedItem);
-                } else {
-                    console.log('🚫 Not a weapon, category:', selectedItem.category);
-                }
+                // Update right panel based on selected item type
+                updateRightPanel(selectedItem);
             } catch (e) {
                 console.warn('Could not parse item data:', e);
             }
+        }
+
+        // New function to select item by data without DOM dependency
+        function selectItemByData(itemData) {
+            console.log('🖱️ Item selected by data!', itemData);
+            
+            selectedItem = itemData;
+            console.log('✅ Item selected:', selectedItem.displayName, 'Category:', selectedItem.category);
+            
+            // Update visual selection after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                // Remove previous selection
+                document.querySelectorAll('.tree-item').forEach(item => item.classList.remove('selected'));
+                document.querySelectorAll('.tree-parent').forEach(item => item.classList.remove('selected'));
+                
+                // Find and select the correct element
+                const elements = document.querySelectorAll('[data-item]');
+                for (const el of elements) {
+                    try {
+                        const data = JSON.parse(el.dataset.item);
+                        if (data.className === itemData.className) {
+                            el.classList.add('selected');
+                            break;
+                        }
+                    } catch (e) {
+                        continue;
+                    }
+                }
+            }, 0);
+            
+            updateStats(selectedItem);
+            updateRightPanel(selectedItem);
         }
 
         function updateStats(item) {
@@ -935,23 +1130,14 @@
             selectedRightCategory = category;
             
             // Update tab appearance
-            document.querySelectorAll('.attachment-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelector(`[data-attachment="${category}"]`).classList.add('active');
+            updateRightCategoryTabs();
             
-            // Filter and display items based on selected weapon compatibility
-            if (selectedItem && selectedItem.category === 'weapons') {
-                console.log('🔫 Weapon is selected, filtering for compatibility...');
-                updateCompatibleAccessories(selectedItem);
+            // Update right panel based on current selection
+            if (selectedItem) {
+                updateRightPanel(selectedItem);
             } else {
-                console.log('🔍 No weapon selected, showing all', category);
-                // If no weapon selected, show all items of this category
-                const rightItems = filterItemsByCategory(category);
-                console.log('📦 Right items found:', rightItems.length);
-                
-                // Populate right panel filter options
-                populateRightPanelFilterOptions(rightItems);
-                
-                renderTreeView(rightItems, 'rightTreeView', false); // No grouping for right panel
+                // No item selected, show default message
+                clearRightPanelWithMessage('Select an item to view compatible accessories');
             }
         }
 
@@ -1226,9 +1412,12 @@
                         document.body.appendChild(hoverPreviewElement);
                     }
                     
-                    // Get category for icon styling
+                    // Get category for icon styling and dimensions
                     const category = itemData.category || 'unknown';
                     const categoryIcon = getCategoryIcon(category);
+                    
+                    // Set popup class with category for aspect ratio styling
+                    hoverPreviewElement.className = `item-hover-preview ${category}`;
                     
                     // Build preview content
                     hoverPreviewElement.innerHTML = `
@@ -1240,10 +1429,11 @@
                         </div>
                     `;
                     
-                    // Position preview near cursor
+                    // Position preview near cursor with category-specific dimensions
                     const rect = element.getBoundingClientRect();
-                    const previewWidth = 120;
-                    const previewHeight = 120;
+                    const previewDimensions = getPreviewDimensions(category);
+                    const previewWidth = previewDimensions.width;
+                    const previewHeight = previewDimensions.height;
                     
                     let left = rect.right + 10; // 10px offset from element
                     let top = rect.top;
@@ -1289,11 +1479,27 @@
             return icons[category] || icons['unknown'];
         }
 
+        function getPreviewDimensions(category) {
+            // Return width and height based on category aspect ratio
+            const dimensions = {
+                'weapons': { width: 180, height: 84 },      // 3x1 aspect ratio
+                'handguns': { width: 120, height: 120 },    // 1x1 aspect ratio
+                'launchers': { width: 120, height: 120 },   // 1x1 aspect ratio
+                'backpacks': { width: 120, height: 120 },   // 1x1 aspect ratio
+                'vests': { width: 120, height: 120 },       // 1x1 aspect ratio
+                'attachments': { width: 120, height: 120 }, // 1x1 aspect ratio
+                'magazines': { width: 120, height: 120 },   // 1x1 aspect ratio
+                'unknown': { width: 120, height: 120 }      // 1x1 aspect ratio (fallback)
+            };
+            return dimensions[category] || dimensions['unknown'];
+        }
+
         // Global functions for buttons and tree interaction
         window.regenerateData = regenerateData;
         window.runGrouping = runGrouping;
         window.clearSelection = clearSelection;
         window.selectItem = selectItem;
+        window.selectItemByData = selectItemByData;
         window.toggleTreeGroup = toggleTreeGroup;
         window.selectTreeItem = selectTreeItem;
         window.toggleInheritanceView = toggleInheritanceView;
@@ -1455,10 +1661,15 @@
             tab.addEventListener('click', () => switchCategory(tab.dataset.category));
         });
 
-        // Right panel tab listeners
-        document.querySelectorAll('.attachment-tab').forEach(tab => {
-            tab.addEventListener('click', () => switchRightCategory(tab.dataset.attachment));
-        });
+        // Right panel tab listeners - need to rebind since they're now individual buttons
+        function initializeRightTabListeners() {
+            document.querySelectorAll('.attachment-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchRightCategory(tab.dataset.attachment));
+            });
+        }
+        
+        // Initialize the listeners
+        initializeRightTabListeners();
 
         // Search functionality
         document.getElementById('leftSearch').addEventListener('input', (e) => {
@@ -1488,7 +1699,7 @@
                 
                 // Initialize UI state
                 switchCategory('weapons');
-                switchRightCategory('attachments');
+                switchRightCategory('optics');
                 
                 // Set initial expand state based on variant view default
                 // Since variant view creates groups, they should start expanded
@@ -1534,6 +1745,8 @@
                 const sampleAttachment = currentItems.find(i => i.category === 'attachments');
                 
                 console.log('🔫 Sample weapon:', sampleWeapon?.displayName, 'magazineWells:', sampleWeapon?.magazineWells, 'weaponSlots:', sampleWeapon?.weaponSlots);
+                console.log('🔫 Sample weapon properties:', sampleWeapon?.properties);
+                console.log('🔫 Full sample weapon:', sampleWeapon);
                 console.log('📦 Sample magazine:', sampleMagazine?.displayName, 'magazineWells:', sampleMagazine?.magazineWells);
                 console.log('🔧 Sample attachment:', sampleAttachment?.displayName, 'weaponSlots:', sampleAttachment?.weaponSlots);
                 
