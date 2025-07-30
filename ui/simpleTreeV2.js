@@ -781,6 +781,29 @@ export function toggleTreeGroup(nodeId) {
     const computedStyle = window.getComputedStyle(childrenContainer);
     const isCurrentlyExpanded = childrenContainer.style.display !== 'none' && computedStyle.display !== 'none';
     
+    // Find the corresponding TreeNode and update its expanded state
+    const panelId = findPanelIdFromContainer(childrenContainer);
+    if (panelId) {
+        const manager = getTreeManager(panelId);
+        if (manager) {
+            const navigationState = manager.getNavigationState();
+            const allNodes = TreeUtils.getAllNodes(navigationState.rootNodes);
+            
+            // Find the node that corresponds to this nodeId
+            // NodeId format is "tree_" + sanitized name, so we need to match it
+            const correspondingNode = allNodes.find(node => {
+                const expectedNodeId = `tree_${node.name.replace(/\s+/g, '_').replace(/[^\w]/g, '')}`;
+                return expectedNodeId === nodeId;
+            });
+            
+            if (correspondingNode) {
+                // Update the TreeNode's expanded state to match the UI
+                correspondingNode.expanded = !isCurrentlyExpanded;
+                console.log(`Updated TreeNode ${correspondingNode.name} expanded state to:`, correspondingNode.expanded);
+            }
+        }
+    }
+    
     if (isCurrentlyExpanded) {
         // Collapse
         childrenContainer.style.display = 'none';
@@ -826,6 +849,15 @@ export function restoreFocusAfterViewChange(panelId) {
 // Utility function to find panel ID from element
 function findPanelId(element) {
     const treeView = element.closest('.tree-view');
+    if (treeView) {
+        return treeView.id || treeView.parentElement?.id;
+    }
+    return null;
+}
+
+// Utility function to find panel ID from container
+function findPanelIdFromContainer(container) {
+    const treeView = container.closest('.tree-view');
     if (treeView) {
         return treeView.id || treeView.parentElement?.id;
     }

@@ -144,7 +144,16 @@ export class TreeNavigationState extends EventTarget {
     focusFirst() {
         const navigableNodes = this.getNavigableNodes();
         if (navigableNodes.length > 0) {
-            this.setFocus(navigableNodes[0]);
+            const firstNode = navigableNodes[0];
+            this.setFocus(firstNode);
+            
+            // Immediately select the item if it's selectable, or clear selection if it's a group
+            if (firstNode.isSelectable) {
+                this.setSelection(firstNode);
+            } else {
+                this.clearSelection();
+            }
+            
             return true;
         }
         return false;
@@ -154,7 +163,16 @@ export class TreeNavigationState extends EventTarget {
     focusLast() {
         const navigableNodes = this.getNavigableNodes();
         if (navigableNodes.length > 0) {
-            this.setFocus(navigableNodes[navigableNodes.length - 1]);
+            const lastNode = navigableNodes[navigableNodes.length - 1];
+            this.setFocus(lastNode);
+            
+            // Immediately select the item if it's selectable, or clear selection if it's a group
+            if (lastNode.isSelectable) {
+                this.setSelection(lastNode);
+            } else {
+                this.clearSelection();
+            }
+            
             return true;
         }
         return false;
@@ -167,9 +185,14 @@ export class TreeNavigationState extends EventTarget {
         const targetNode = TreeUtils.findNodeById(this.rootNodes, itemId);
         if (targetNode && targetNode.isNavigable) {
             this.setFocus(targetNode);
+            
+            // Immediately select the item if it's selectable, or clear selection if it's a group
             if (targetNode.isSelectable) {
                 this.setSelection(targetNode);
+            } else {
+                this.clearSelection();
             }
+            
             return true;
         }
         
@@ -214,7 +237,17 @@ export class NavigationHandlers {
         
         // Move to previous node (wrap to end if at beginning)
         const newIndex = currentIndex <= 0 ? navigableNodes.length - 1 : currentIndex - 1;
-        this.state.setFocus(navigableNodes[newIndex]);
+        const newNode = navigableNodes[newIndex];
+        
+        this.state.setFocus(newNode);
+        
+        // Immediately select the item if it's selectable, or clear selection if it's a group
+        if (newNode.isSelectable) {
+            this.state.setSelection(newNode);
+        } else {
+            this.state.clearSelection();
+        }
+        
         return true;
     }
     
@@ -228,7 +261,17 @@ export class NavigationHandlers {
         
         // Move to next node (wrap to beginning if at end)
         const newIndex = currentIndex >= navigableNodes.length - 1 ? 0 : currentIndex + 1;
-        this.state.setFocus(navigableNodes[newIndex]);
+        const newNode = navigableNodes[newIndex];
+        
+        this.state.setFocus(newNode);
+        
+        // Immediately select the item if it's selectable, or clear selection if it's a group
+        if (newNode.isSelectable) {
+            this.state.setSelection(newNode);
+        } else {
+            this.state.clearSelection();
+        }
+        
         return true;
     }
     
@@ -287,6 +330,14 @@ export class NavigationHandlers {
             const firstChild = focused.children.find(child => child.isNavigable);
             if (firstChild) {
                 this.state.setFocus(firstChild);
+                
+                // Immediately select the item if it's selectable, or clear selection if it's a group
+                if (firstChild.isSelectable) {
+                    this.state.setSelection(firstChild);
+                } else {
+                    this.state.clearSelection();
+                }
+                
                 return true;
             }
         }

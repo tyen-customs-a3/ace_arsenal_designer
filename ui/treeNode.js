@@ -110,6 +110,19 @@ export class TreeNode {
         return result;
     }
     
+    // Check if this node should be navigable based on ancestor expansion state
+    isNavigableInContext() {
+        // Check if any ancestor is collapsed
+        let currentParent = this.parent;
+        while (currentParent) {
+            if (currentParent.isExpandable && !currentParent.expanded) {
+                return false; // An ancestor is collapsed, so this node is not navigable
+            }
+            currentParent = currentParent.parent;
+        }
+        return this.isNavigable;
+    }
+    
     // Get next navigable sibling
     getNextSibling() {
         if (!this.parent) return null;
@@ -231,7 +244,7 @@ export class TreeUtils {
     
     // Get all navigable nodes (respecting expansion state)
     static getNavigableNodes(rootNodes) {
-        return this.getAllNodes(rootNodes).filter(node => node.isNavigable);
+        return this.getAllNodes(rootNodes).filter(node => node.isNavigableInContext());
     }
     
     // Get all selectable nodes
