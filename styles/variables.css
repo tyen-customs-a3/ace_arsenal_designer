@@ -8,8 +8,9 @@
     --surface-secondary: rgba(0, 0, 0, 0.2);            /* 20% opacity for tree backgrounds */
     --surface-elevated: rgba(26, 26, 26, 0.2);          /* 20% opacity for elevated elements */
     --surface-glass: rgba(0, 0, 0, 0.2);                /* 20% opacity to match tabs */
-    --surface-panel: rgba(26, 26, 26, 0.2);             /* 20% opacity for main panels */
+    --surface-panel: rgba(26, 26, 26, 0.85);            /* 85% opacity for main panels */
     --surface-title: rgba(0, 0, 0, 0.9);                /* 90% opacity black for headers */
+    --surface-group: rgba(64, 64, 64, 0.9);             /* 90% opacity dark grey for group rows */
     
     /* Button & Interactive Element Colors - 20% opacity for uniform styling */
     --button-background: rgba(0, 0, 0, 0.2);            /* 20% opacity to match panels */

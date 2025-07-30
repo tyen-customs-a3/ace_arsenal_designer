@@ -9,7 +9,7 @@
     height: 100%;
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
     font-weight: 600;
-    background: var(--surface-secondary);
+    background: transparent;
 }
 
 .tree-view ul {
@@ -28,7 +28,8 @@
     padding: 4px 8px;
     cursor: pointer;
     border-radius: 0;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     font-size: 11px;
     color: var(--content-secondary);
     display: flex;
@@ -36,6 +37,7 @@
     width: 100%;
     min-height: 22px;
     line-height: 1.3;
+    box-sizing: border-box;
 }
 
 .tree-item:hover {
@@ -47,13 +49,13 @@
     background-color: var(--selection-background);
     color: var(--content-primary);
     font-weight: 500;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .tree-group-header {
     font-weight: 600 !important;
     color: var(--content-primary) !important;
-    background-color: var(--surface-title) !important;
+    background-color: var(--surface-group) !important;
     border-radius: 0;
     margin: 2px 0;
     padding: 6px 8px !important;
@@ -120,6 +122,38 @@
     min-height: 36px;
     padding: 8px 13px;
     font-size: 16px;
+}
+
+/* Group Header Spacing Options */
+.tree-view.spacing-compact .tree-group-header {
+    min-height: 20px;
+    padding: 3px 6px !important;
+    font-size: 10px !important;
+}
+
+.tree-view.spacing-general .tree-group-header {
+    min-height: 24px;
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+}
+
+.tree-view.spacing-spacious .tree-group-header {
+    min-height: 40px;
+    padding: 10px 13px !important;
+    font-size: 16px !important;
+}
+
+/* Group Header Item Count Scaling */
+.tree-view.spacing-compact .tree-group-header .item-count-inline {
+    font-size: 8px !important;
+}
+
+.tree-view.spacing-general .tree-group-header .item-count-inline {
+    font-size: 9px !important;
+}
+
+.tree-view.spacing-spacious .tree-group-header .item-count-inline {
+    font-size: 14px !important;
 }
 
 /* Icon Support - Fixed width container to prevent layout shifts */
@@ -199,8 +233,6 @@
     opacity: 0;
     transform: scale(0.8);
     transition: opacity 0.15s ease, transform 0.15s ease;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     display: flex;
     flex-direction: column;
     padding: 0;

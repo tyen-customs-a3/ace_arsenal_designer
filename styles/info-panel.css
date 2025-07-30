@@ -14,8 +14,6 @@
     z-index: 50;
     overflow: hidden;
     display: block;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 }
 
 .info-panel-header {

@@ -258,15 +258,26 @@ export function renderSimpleTree(treeData, viewMode = 'variants') {
 function renderTreeNode(node, level, viewMode = 'variants', parentIsGroup = false) {
     const hasChildren = node.children && node.children.length > 0;
     
-    // For user-selected grouping, immediate children of groups should not be indented
-    // But hierarchy and variants views should maintain full indentation for their structures
+    // Simplified indentation logic:
+    // - Group headers (isPrimaryGroup) are never indented (level 0)
+    // - First level children of groups are never indented (level 0) 
+    // - All other items follow normal hierarchical indentation
     let effectiveLevel = level;
-    if (parentIsGroup && viewMode !== 'hierarchy' && viewMode !== 'variants') {
-        effectiveLevel = 0; // No indentation for items within user-selected groups (except hierarchy and variants views)
-        console.log(`[INDENT] Removing indentation: "${node.name}" level=${level}→${effectiveLevel}, parentIsGroup=${parentIsGroup}, viewMode=${viewMode}`);
+    
+    // If this is a primary group header, don't indent it
+    if (node.isPrimaryGroup && !node.item && hasChildren) {
+        effectiveLevel = 0;
+    }
+    // If parent is a group and this is the first level of children, don't indent
+    else if (parentIsGroup && level === 1) {
+        effectiveLevel = 0;
+    }
+    // Otherwise use normal hierarchical indentation
+    else if (level > 1) {
+        effectiveLevel = level - 1; // Adjust to account for group level
     }
     
-    const indent = effectiveLevel * 20; // 20px indent per level - icons flow naturally
+    const indent = effectiveLevel * 20; // 20px indent per level
     
     let html = '';
     
