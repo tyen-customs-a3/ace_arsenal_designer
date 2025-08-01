@@ -1,0 +1,305 @@
+class CfgPatches
+{
+	class CUP_Weapons_NLAW
+	{
+		units[]={};
+		weapons[]=
+		{
+			"CUP_launch_NLAW_Loaded",
+			"CUP_launch_NLAW",
+			"CUP_launch_NLAW_Used"
+		};
+		requiredVersion=2.1400001;
+		requiredAddons[]=
+		{
+			"CUP_Weapons_WeaponsCore",
+			"CUP_Weapons_Ammunition",
+			"CUP_Weapons_Sounds"
+		};
+		version=1.1799999;
+		versionStr="1.18.1.0";
+		versionAr[]={1,18,1,0};
+	};
+};
+class CBA_DisposableLaunchers
+{
+	CUP_launch_NLAW_Loaded[]=
+	{
+		"CUP_launch_NLAW",
+		"CUP_launch_NLAW_Used"
+	};
+};
+class Mode_SemiAuto;
+class CfgWeapons
+{
+	class Launcher;
+	class Launcher_Base_F: Launcher
+	{
+		class WeaponSlotsInfo;
+	};
+	class CUP_launch_NLAW_Loaded: Launcher_Base_F
+	{
+		author="$STR_CUP_AUTHOR_STRING";
+		dlc="CUP_Weapons";
+		htMin=1;
+		htMax=460;
+		afMax=0;
+		mfMax=0;
+		mFact=1;
+		tBody=100;
+		scope=1;
+		scopeArsenal=1;
+		baseWeapon="CUP_launch_NLAW";
+		displayName="$STR_CUP_dn_nlaw";
+		model="\A3\weapons_F\launchers\nlaw\nlaw_F.p3d";
+		picture="\A3\weapons_f\launchers\nlaw\data\UI\gear_nlaw_ca.paa";
+		UiPicture="\A3\Weapons_F\Data\UI\icon_at_CA.paa";
+		modelOptics="\A3\Weapons_F\acc\reticle_NLAW";
+		opticsPPEffects[]=
+		{
+			"OpticsCHAbera1",
+			"OpticsBlur1"
+		};
+		cursorAim="\a3\weapons_f\data\clear_empty";
+		cursor="missile";
+		cursorSize=1;
+		reloadAction="ReloadRPG";
+		recoil="recoil_nlaw";
+		magazineReloadTime=0.1;
+		class EventHandlers
+		{
+			fired="_this call CBA_fnc_firedDisposable";
+		};
+		handAnim[]=
+		{
+			"OFP2_ManSkeleton",
+			"\A3\Weapons_F\Launchers\NLAW\Data\Anim\NLAW.rtm"
+		};
+		cameraDir="look";
+		opticsZoomMin=0.0623;
+		opticsZoomMax=0.0623;
+		opticsZoomInit=0.0623;
+		magazines[]=
+		{
+			"CUP_NLAW_M"
+		};
+		magazineWell[]=
+		{
+			"NLAW"
+		};
+		maxZeroing=800;
+		shotPos="muzzlePos2";
+		shotEnd="muzzleEnd2";
+		jsrs_soundeffect="JSRS2_Distance_Effects_nlaw";
+		AGM_Backblast_Angle=30;
+		AGM_Backblast_Range=2;
+		AGM_Backblast_Damage=0.5;
+		AGM_UsedTube="AGM_launch_NLAW_Used_F_CUP";
+		class GunParticles
+		{
+			class effect1
+			{
+				positionName="muzzleEnd2";
+				directionName="muzzlePos2";
+				effectName="RocketBackEffectsNLAWNT";
+			};
+		};
+		modes[]=
+		{
+			"Single",
+			"Overfly"
+		};
+		class Single: Mode_SemiAuto
+		{
+			sounds[]=
+			{
+				"StandardSound"
+			};
+			class BaseSoundModeType
+			{
+				weaponSoundEffect="DefaultRifle";
+			};
+			class StandardSound: BaseSoundModeType
+			{
+				begin1[]=
+				{
+					"CUP\Weapons\CUP_Weapons_NLAW\data\sfx\NLAW_s1",
+					10,
+					1,
+					1400
+				};
+				begin2[]=
+				{
+					"CUP\Weapons\CUP_Weapons_NLAW\data\sfx\NLAW_s2",
+					10,
+					1,
+					1400
+				};
+				begin3[]=
+				{
+					"CUP\Weapons\CUP_Weapons_NLAW\data\sfx\NLAW_s3",
+					10,
+					1,
+					1400
+				};
+				begin4[]=
+				{
+					"CUP\Weapons\CUP_Weapons_NLAW\data\sfx\NLAW_s4",
+					10,
+					1,
+					1400
+				};
+				soundBegin[]=
+				{
+					"begin1",
+					0.25,
+					"begin2",
+					0.25,
+					"begin3",
+					0.25,
+					"begin4",
+					0.25
+				};
+			};
+			recoil="recoil_single_nlaw";
+			aiRateOfFire=7;
+			aiRateOfFireDistance=500;
+			minRange=25;
+			minRangeProbab=0.80000001;
+			midRange=50;
+			midRangeProbab=0.80000001;
+			maxRange=790;
+			maxRangeProbab=0.80000001;
+			ace_missileGuidance_attackProfile="ace_nlaw_directAttack";
+		};
+		class Overfly: Single
+		{
+			textureType="overfly";
+			displayName="Overfly Top Attack";
+			aiRateOfFire=7;
+			aiRateOfFireDistance=500;
+			minRange=50;
+			minRangeProbab=0.69999999;
+			midRange=100;
+			midRangeProbab=0.94999999;
+			maxRange=790;
+			maxRangeProbab=0.94999999;
+			ace_missileGuidance_attackProfile="ace_nlaw_overflyTopAttack";
+		};
+		reloadMagazineSound[]=
+		{
+			"CUP\Weapons\CUP_Weapons_NLAW\data\sfx\Reload",
+			1,
+			1,
+			35
+		};
+		drySound[]=
+		{
+			"CUP\Weapons\CUP_Weapons_NLAW\data\sfx\Dry",
+			1,
+			1,
+			35
+		};
+		soundFly[]=
+		{
+			"CUP\Weapons\CUP_Weapons_NLAW\data\sfx\Fly",
+			0.56234133,
+			1.5,
+			700
+		};
+		lockingTargetSound[]=
+		{
+			"A3\Sounds_F\arsenal\weapons\Launchers\NLAW\locking_NLAW",
+			0.31622776,
+			1
+		};
+		lockedTargetSound[]=
+		{
+			"A3\Sounds_F\arsenal\weapons\Launchers\NLAW\locked_NLAW",
+			0.316228,
+			2.5
+		};
+		value=20;
+		class Library
+		{
+			libTextDesc="$STR_CUP_lib_nlaw";
+		};
+		descriptionShort="$STR_CUP_dss_nlaw";
+		class WeaponSlotsInfo: WeaponSlotsInfo
+		{
+			mass=105;
+		};
+		inertia=1.2;
+		aimTransitionSpeed=0.5;
+		dexterity=1;
+		class ItemInfo
+		{
+			priority=3;
+		};
+		class OpticsModes
+		{
+			class StepScope
+			{
+				opticsID=1;
+				useModelOptics=1;
+				opticsPPEffects[]=
+				{
+					"OpticsCHAbera1",
+					"OpticsBlur1"
+				};
+				opticsFlare=1;
+				opticsZoomMin=0.0623;
+				opticsZoomMax=0.0623;
+				opticsZoomInit=0.0623;
+				distanceZoomMin=300;
+				distanceZoomMax=300;
+				memoryPointCamera="eye";
+				visionMode[]=
+				{
+					"Normal",
+					"NVG"
+				};
+				opticsDisablePeripherialVision=1;
+			};
+		};
+		weaponInfoType="RscOpticsRangeFinderNLAW";
+		canLock=2;
+		weaponLockDelay=3;
+		lockAcquire=0;
+		weaponLockSystem=1;
+		cmImmunity=0.1;
+	};
+	class CUP_launch_NLAW: CUP_launch_NLAW_Loaded
+	{
+		author="$STR_CUP_AUTHOR_STRING";
+		scope=2;
+		scopeArsenal=2;
+		baseWeapon="CUP_launch_NLAW";
+		magazines[]=
+		{
+			"CBA_FakeLauncherMagazine"
+		};
+		magazineWell[]={};
+		class WeaponSlotsInfo: WeaponSlotsInfo
+		{
+			mass=185;
+		};
+	};
+	class CUP_launch_NLAW_Used: CUP_launch_NLAW_Loaded
+	{
+		author="$STR_CUP_AUTHOR_STRING";
+		scope=1;
+		scopeArsenal=1;
+		baseWeapon="CUP_launch_NLAW_Used";
+		displayName="$STR_CUP_dn_nlaw_used";
+		magazines[]=
+		{
+			"CBA_FakeLauncherMagazine"
+		};
+		magazineWell[]={};
+		class WeaponSlotsInfo: WeaponSlotsInfo
+		{
+			mass=105;
+		};
+	};
+};

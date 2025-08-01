@@ -1,0 +1,1 @@
+#define paramsCheck(input,method,template) if !(input method template) exitWith {[input, #method, template] call (missionNamespace getVariable "BIS_fnc_errorParamsType")};

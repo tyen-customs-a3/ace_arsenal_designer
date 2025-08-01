@@ -1,0 +1,242 @@
+class CfgPatches
+{
+	class CUP_Weapons_M136
+	{
+		units[]={};
+		weapons[]=
+		{
+			"CUP_launch_M136",
+			"CUP_launch_M136_Loaded",
+			"CUP_launch_M136_Used"
+		};
+		requiredVersion=2.1400001;
+		requiredAddons[]=
+		{
+			"CUP_Weapons_WeaponsCore",
+			"CUP_Weapons_Ammunition"
+		};
+		version=1.1799999;
+		versionStr="1.18.1.0";
+		versionAr[]={1,18,1,0};
+	};
+};
+class CBA_DisposableLaunchers
+{
+	CUP_launch_M136_Loaded[]=
+	{
+		"CUP_launch_M136",
+		"CUP_launch_M136_Used"
+	};
+};
+class CfgWeapons
+{
+	class Launcher;
+	class Launcher_Base_F: Launcher
+	{
+		class WeaponSlotsInfo;
+	};
+	class CUP_launch_M136_Loaded: Launcher_Base_F
+	{
+		author="$STR_CUP_AUTHOR_STRING";
+		dlc="CUP_Weapons";
+		scope=1;
+		scopeArsenal=1;
+		displayName="$STR_CUP_dn_m136";
+		baseWeapon="CUP_launch_M136";
+		model="\CUP\Weapons\CUP_Weapons_M136\CUP_at4.p3d";
+		picture="\CUP\Weapons\CUP_Weapons_M136\data\ui\gear_at4_x_ca.paa";
+		UiPicture="\a3\weapons_f\data\ui\icon_at_ca.paa";
+		modelOptics="-";
+		opticsPPEffects[]=
+		{
+			"OpticsCHAbera1",
+			"OpticsBlur1"
+		};
+		cursorAim="\a3\weapons_f\data\clear_empty";
+		cursor="missile";
+		cursorSize=1;
+		reloadAction="ReloadRPG";
+		magazineReloadTime=0.1;
+		handAnim[]=
+		{
+			"OFP2_ManSkeleton",
+			"\CUP\Weapons\CUP_Weapons_M136\Data\Anim\handanim_at4.rtm"
+		};
+		maxZeroing=400;
+		weaponInfoType="RscWeaponZeroing";
+		distanceZoomMin=50;
+		distanceZoomMax=400;
+		discreteDistance[]={50,100,150,200,250,300,350,400};
+		discreteDistanceCameraPoint[]=
+		{
+			"eye_1",
+			"eye_2",
+			"eye_3",
+			"eye_4",
+			"eye_5",
+			"eye_6",
+			"eye_7",
+			"eye_8"
+		};
+		discreteDistanceInitIndex=0;
+		memorypointcamera="eye";
+		cameraDir="look";
+		magazines[]=
+		{
+			"CUP_M136_M"
+		};
+		jsrs_soundeffect="JSRS2_Distance_Effects_Launcher";
+		AGM_Backblast_Angle=45;
+		AGM_Backblast_Range=100;
+		AGM_Backblast_Damage=0.69999999;
+		AGM_UsedTube="AGM_launch_M136_Used_F";
+		ace_overpressure_angle=45;
+		ace_overpressure_damage=0.5;
+		ace_overpressure_range=10;
+		class GunParticles
+		{
+			class effect1
+			{
+				positionName="BackBlast2";
+				directionName="BackBlast1";
+				effectName="CUP_at4_backblast";
+			};
+		};
+		sounds[]=
+		{
+			"StandardSound"
+		};
+		class BaseSoundModeType
+		{
+			weaponSoundEffect="DefaultRifle";
+		};
+		class StandardSound: BaseSoundModeType
+		{
+			begin1[]=
+			{
+				"CUP\Weapons\CUP_Weapons_M136\data\sound\M136_s1.wss",
+				"db18",
+				1,
+				900
+			};
+			begin2[]=
+			{
+				"CUP\Weapons\CUP_Weapons_M136\data\sound\M136_s2.wss",
+				"db18",
+				1,
+				900
+			};
+			begin3[]=
+			{
+				"CUP\Weapons\CUP_Weapons_M136\data\sound\M136_s3.wss",
+				"db18",
+				1,
+				900
+			};
+			begin4[]=
+			{
+				"CUP\Weapons\CUP_Weapons_M136\data\sound\M136_s4.wss",
+				"db18",
+				1,
+				900
+			};
+			soundBegin[]=
+			{
+				"begin1",
+				1,
+				"begin2",
+				1,
+				"begin3",
+				1,
+				"begin4",
+				1
+			};
+		};
+		reloadMagazineSound[]=
+		{
+			"CUP\Weapons\CUP_Weapons_M136\data\sfx\Reload",
+			1,
+			1,
+			35
+		};
+		drySound[]=
+		{
+			"CUP\Weapons\CUP_Weapons_M136\data\sfx\Dry",
+			1,
+			1,
+			35
+		};
+		soundFly[]=
+		{
+			"CUP\Weapons\CUP_Weapons_M136\data\sfx\Fly",
+			0.31622776,
+			1.5,
+			900
+		};
+		recoil="recoil_single_law";
+		value=20;
+		canLock=0;
+		aiRateOfFire=5;
+		aiRateOfFireDistance=2500;
+		minRange=10;
+		midRange=200;
+		maxRange=300;
+		class Library
+		{
+			libTextDesc="$STR_CUP_lib_m136";
+		};
+		descriptionShort="$STR_CUP_dss_m136";
+		class WeaponSlotsInfo: WeaponSlotsInfo
+		{
+			allowedSlots[]={901};
+			mass=107.4;
+		};
+		inertia=0.89999998;
+		aimTransitionSpeed=0.5;
+		class ItemInfo
+		{
+			priority=3;
+		};
+		htMin=1;
+		htMax=460;
+		afMax=0;
+		mfMax=0;
+		mFact=1;
+		tBody=100;
+		class EventHandlers
+		{
+			fired="_this call CBA_fnc_firedDisposable";
+		};
+	};
+	class CUP_launch_M136: CUP_launch_M136_Loaded
+	{
+		author="$STR_CUP_AUTHOR_STRING";
+		baseWeapon="CUP_launch_M136";
+		scope=2;
+		scopeArsenal=2;
+		magazines[]=
+		{
+			"CBA_FakeLauncherMagazine"
+		};
+		class WeaponSlotsInfo: WeaponSlotsInfo
+		{
+			mass=147.39999;
+		};
+	};
+	class CUP_launch_M136_Used: CUP_launch_M136_Loaded
+	{
+		author="$STR_CUP_AUTHOR_STRING";
+		baseWeapon="CUP_launch_M136_Used";
+		scope=1;
+		displayName="$STR_CUP_dn_m136_used";
+		model="\CUP\Weapons\CUP_Weapons_M136\CUP_AT4_used.p3d";
+		magazines[]=
+		{
+			"CBA_FakeLauncherMagazine"
+		};
+		class WeaponSlotsInfo: WeaponSlotsInfo
+		{
+			mass=107.4;
+		};
+	};
+};
