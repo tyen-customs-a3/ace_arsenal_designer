@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataExtractor Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background-color: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .stat-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DataExtractor Test Suite</h1>
+        <p>Testing the Phase 3 data enrichment system that orchestrates definition modules.</p>
+
+        <div class="test-section">
+            <h3>Test Controls</h3>
+            <button id="runBasicTest">Run Basic Test</button>
+            <button id="runFullTest">Run Full Test</button>
+            <button id="runPerformanceTest">Run Performance Test</button>
+            <button id="clearResults">Clear Results</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Test Results</h3>
+            <div id="testResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Enrichment Statistics</h3>
+            <div id="enrichmentStats"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Sample Enriched Data</h3>
+            <div id="sampleData"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { enrich, DataExtractor } from './extractor/dataExtractor.js';
+
+        const testResults = document.getElementById('testResults');
+        const enrichmentStats = document.getElementById('enrichmentStats');
+        const sampleData = document.getElementById('sampleData');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            testResults.appendChild(div);
+        }
+
+        function displayStats(report) {
+            const statsHtml = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${report.summary.totalClasses}</div>
+                        <div class="stat-label">Total Classes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${report.summary.enrichedClasses}</div>
+                        <div class="stat-label">Enriched Classes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${report.summary.enrichmentRate}</div>
+                        <div class="stat-label">Enrichment Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${report.summary.definitionsLoaded}</div>
+                        <div class="stat-label">Definitions Loaded</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${report.summary.processingTimeMs.toFixed(2)}ms</div>
+                        <div class="stat-label">Processing Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${report.errors.length}</div>
+                        <div class="stat-label">Errors</div>
+                    </div>
+                </div>
+                <h4>Definition Statistics:</h4>
+                <pre>${JSON.stringify(report.definitionStats, null, 2)}</pre>
+                ${report.errors.length > 0 ? `<h4>Errors:</h4><pre>${JSON.stringify(report.errors, null, 2)}</pre>` : ''}
+                ${report.warnings.length > 0 ? `<h4>Warnings:</h4><pre>${JSON.stringify(report.warnings, null, 2)}</pre>` : ''}
+            `;
+            enrichmentStats.innerHTML = statsHtml;
+        }
+
+        function displaySampleData(enrichedDb) {
+            const samples = [];
+            let count = 0;
+            for (const [className, classData] of enrichedDb) {
+                if (count >= 3) break;
+                samples.push({ className, classData });
+                count++;
+            }
+
+            const sampleHtml = samples.map(sample => `
+                <h4>${sample.className}</h4>
+                <pre>${JSON.stringify(sample.classData, null, 2)}</pre>
+            `).join('');
+
+            sampleData.innerHTML = sampleHtml;
+        }
+
+        // Create mock resolved database for testing
+        function createMockResolvedDatabase() {
+            const mockDb = new Map();
+
+            // Mock weapon data
+            mockDb.set('arifle_MX_F', {
+                className: 'arifle_MX_F',
+                baseClass: 'arifle_MX_Base_F',
+                displayName: 'MX 6.5 mm',
+                WeaponSlotsInfo: {
+                    CowsSlot: true,
+                    PointerSlot: true,
+                    MuzzleSlot: true
+                },
+                magazines: ['30Rnd_65x39_caseless_mag', '30Rnd_65x39_caseless_mag_Tracer'],
+                modes: ['Single', 'FullAuto'],
+                initSpeed: 900,
+                damage: 11,
+                mass: 35,
+                Single: {
+                    reloadTime: 0.1,
+                    maxRange: 500
+                },
+                FullAuto: {
+                    reloadTime: 0.08,
+                    maxRange: 300
+                }
+            });
+
+            // Mock vest data
+            mockDb.set('V_PlateCarrier1_rgr', {
+                className: 'V_PlateCarrier1_rgr',
+                baseClass: 'Vest_Base_F',
+                displayName: 'Carrier Rig (Green)',
+                ItemInfo: {
+                    containerClass: 'Supply140',
+                    armor: 16,
+                    passThrough: 0.5,
+                    mass: 80
+                },
+                armor: 16
+            });
+
+            // Mock backpack data
+            mockDb.set('B_AssaultPack_rgr', {
+                className: 'B_AssaultPack_rgr',
+                baseClass: 'Bag_Base',
+                displayName: 'Assault Pack (Green)',
+                maximumLoad: 160,
+                mass: 20
+            });
+
+            // Mock attachment data
+            mockDb.set('optic_Aco', {
+                className: 'optic_Aco',
+                baseClass: 'ItemCore',
+                displayName: 'ACO (Red)',
+                ItemInfo: {
+                    type: 201,
+                    mass: 2
+                },
+                optics: 2
+            });
+
+            // Mock magazine data
+            mockDb.set('30Rnd_65x39_caseless_mag', {
+                className: '30Rnd_65x39_caseless_mag',
+                baseClass: 'CA_Magazine',
+                displayName: '6.5 mm 30Rnd Mag',
+                count: 30,
+                ammo: 'B_65x39_Caseless',
+                mass: 8
+            });
+
+            // Mock item that doesn't match any definition
+            mockDb.set('Land_InfoStand_V1_F', {
+                className: 'Land_InfoStand_V1_F',
+                baseClass: 'House_F',
+                displayName: 'Information Stand',
+                scope: 1
+            });
+
+            return mockDb;
+        }
+
+        // Test functions
+        async function runBasicTest() {
+            addResult('Starting basic DataExtractor test...', 'info');
+            
+            try {
+                const mockDb = createMockResolvedDatabase();
+                addResult(`Created mock database with ${mockDb.size} classes`, 'success');
+
+                const result = await enrich(mockDb);
+                addResult('Enrichment completed successfully!', 'success');
+
+                displayStats(result.report);
+                displaySampleData(result.enrichedDb);
+
+                addResult(`Enriched ${result.enrichedDb.size} classes`, 'success');
+                
+            } catch (error) {
+                addResult(`Basic test failed: ${error.message}`, 'error');
+                console.error('Basic test error:', error);
+            }
+        }
+
+        async function runFullTest() {
+            addResult('Starting full DataExtractor test with custom configuration...', 'info');
+            
+            try {
+                const mockDb = createMockResolvedDatabase();
+                
+                const config = {
+                    enableLogging: true,
+                    continueOnError: true,
+                    maxRetries: 2,
+                    trackPerformance: true
+                };
+
+                const extractor = new DataExtractor(config);
+                const result = await extractor.enrich(mockDb);
+
+                addResult('Full test completed successfully!', 'success');
+                displayStats(result.report);
+                displaySampleData(result.enrichedDb);
+
+                // Test additional methods
+                const stats = extractor.getStats();
+                const definitions = extractor.getDefinitions();
+                
+                addResult(`DataExtractor has ${definitions.size} loaded definitions`, 'success');
+                addResult(`Statistics tracking: ${stats.totalClasses} total classes processed`, 'success');
+                
+            } catch (error) {
+                addResult(`Full test failed: ${error.message}`, 'error');
+                console.error('Full test error:', error);
+            }
+        }
+
+        async function runPerformanceTest() {
+            addResult('Starting performance test with larger dataset...', 'info');
+            
+            try {
+                // Create larger mock database
+                const mockDb = createMockResolvedDatabase();
+                
+                // Add more test data
+                for (let i = 0; i < 100; i++) {
+                    mockDb.set(`test_weapon_${i}`, {
+                        className: `test_weapon_${i}`,
+                        baseClass: 'Rifle_Base_F',
+                        displayName: `Test Weapon ${i}`,
+                        WeaponSlotsInfo: { CowsSlot: true },
+                        magazines: ['30Rnd_556x45_Stanag'],
+                        modes: ['Single'],
+                        damage: 10 + (i % 5)
+                    });
+                }
+
+                addResult(`Created performance test database with ${mockDb.size} classes`, 'info');
+
+                const startTime = performance.now();
+                const result = await enrich(mockDb);
+                const endTime = performance.now();
+
+                addResult(`Performance test completed in ${(endTime - startTime).toFixed(2)}ms`, 'success');
+                displayStats(result.report);
+
+                const throughput = Math.round(result.report.summary.totalClasses / (result.report.summary.processingTimeMs / 1000));
+                addResult(`Throughput: ${throughput} classes/second`, 'info');
+                
+            } catch (error) {
+                addResult(`Performance test failed: ${error.message}`, 'error');
+                console.error('Performance test error:', error);
+            }
+        }
+
+        function clearResults() {
+            testResults.innerHTML = '';
+            enrichmentStats.innerHTML = '';
+            sampleData.innerHTML = '';
+        }
+
+        // Event listeners
+        document.getElementById('runBasicTest').addEventListener('click', runBasicTest);
+        document.getElementById('runFullTest').addEventListener('click', runFullTest);
+        document.getElementById('runPerformanceTest').addEventListener('click', runPerformanceTest);
+        document.getElementById('clearResults').addEventListener('click', clearResults);
+
+        // Auto-run basic test on page load
+        setTimeout(runBasicTest, 1000);
+    </script>
+</body>
+</html>

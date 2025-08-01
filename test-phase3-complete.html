@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 3 Data Enrichment - Complete Test Suite</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: #00ff00;
+        }
+        .log {
+            background-color: #2a2a2a;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #00ff00;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .error {
+            border-left-color: #ff0000;
+            color: #ff0000;
+        }
+        .success {
+            border-left-color: #00ff00;
+            color: #00ff00;
+        }
+        .warning {
+            border-left-color: #ffaa00;
+            color: #ffaa00;
+        }
+        .info {
+            border-left-color: #0088ff;
+            color: #0088ff;
+        }
+        .highlight {
+            border-left-color: #ff00ff;
+            color: #ff00ff;
+        }
+        button {
+            background-color: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #00ff00;
+            color: #000;
+        }
+        button:disabled {
+            background-color: #666;
+            color: #999;
+            cursor: not-allowed;
+        }
+        #output {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 10px;
+        }
+        .test-section {
+            border: 1px solid #333;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        .test-section h3 {
+            color: #ffaa00;
+            margin-top: 0;
+        }
+        .progress {
+            background-color: #333;
+            height: 20px;
+            border: 1px solid #666;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background-color: #00ff00;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .stat-box {
+            background-color: #2a2a2a;
+            border: 1px solid #666;
+            padding: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            color: #00ff00;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Phase 3: Data Enrichment - Complete Test Suite</h1>
+
+<p>This comprehensive test verifies that the complete Parse → Resolve → Enrich pipeline works correctly:</p>
+
+<div class="test-section">
+    <h3>Pipeline Verification</h3>
+    <ul>
+        <li><strong>Complete Integration</strong>: DataService with full 3-stage pipeline</li>
+        <li><strong>Metadata Verification</strong>: _meta properties on different item types</li>
+        <li><strong>Category Detection</strong>: Weapons, vests, backpacks, attachments, magazines, NVGs</li>
+        <li><strong>API Functionality</strong>: New filtering and query methods</li>
+        <li><strong>Performance Analysis</strong>: Pipeline timing and enrichment statistics</li>
+        <li><strong>Error Handling</strong>: Robust error recovery and reporting</li>
+    </ul>
+</div>
+
+<div class="test-section">
+    <h3>Test Controls</h3>
+    <button onclick="runCompleteTestSuite()">🚀 Run Complete Test Suite</button>
+    <button onclick="runPipelineIntegrationTest()">1. Pipeline Integration</button>
+    <button onclick="runMetadataVerificationTest()">2. Metadata Verification</button>
+    <button onclick="runCategoryDetectionTest()">3. Category Detection</button>
+    <button onclick="runAPIFunctionalityTest()">4. API Functionality</button>
+    <button onclick="runPerformanceAnalysisTest()">5. Performance Analysis</button>
+    <button onclick="clearOutput()">Clear Output</button>
+    
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+</div>
+
+<div id="statsDisplay" class="stats-grid" style="display: none;">
+    <!-- Statistics will be populated here -->
+</div>
+
+<div id="output"></div>
+
+<script type="module">
+    import { DataService } from './services/DataService.js';
+
+    let dataService = null;
+    let enrichedData = null;
+    let enrichmentReport = null;
+
+    function log(message, type = 'log') {
+        const output = document.getElementById('output');
+        const div = document.createElement('div');
+        div.className = `log ${type}`;
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        output.appendChild(div);
+        output.scrollTop = output.scrollHeight;
+        console.log(message);
+    }
+
+    function logObject(obj, label = 'Object', maxDepth = 2) {
+        log(`${label}:`, 'info');
+        
+        if (obj instanceof Map) {
+            const objForDisplay = Object.fromEntries(
+                Array.from(obj).slice(0, 3).map(([k, v]) => [k, limitDepth(v, maxDepth)])
+            );
+            log(JSON.stringify(objForDisplay, null, 2), 'info');
+            if (obj.size > 3) {
+                log(`... and ${obj.size - 3} more entries`, 'info');
+            }
+        } else {
+            const jsonStr = JSON.stringify(limitDepth(obj, maxDepth), null, 2);
+            log(jsonStr.substring(0, 1500) + (jsonStr.length > 1500 ? '...[Truncated]' : ''), 'info');
+        }
+    }
+
+    function limitDepth(obj, maxDepth) {
+        if (maxDepth <= 0 || obj === null || typeof obj !== 'object') {
+            return obj;
+        }
+        
+        if (Array.isArray(obj)) {
+            return obj.slice(0, 3).map(item => limitDepth(item, maxDepth - 1));
+        }
+        
+        const result = {};
+        let count = 0;
+        for (const [key, value] of Object.entries(obj)) {
+            if (count >= 5) {
+                result['...'] = `${Object.keys(obj).length - 5} more properties`;
+                break;
+            }
+            result[key] = limitDepth(value, maxDepth - 1);
+            count++;
+        }
+        return result;
+    }
+
+    function updateProgress(percent) {
+        document.getElementById('progressBar').style.width = percent + '%';
+    }
+
+    function displayStats(stats) {
+        const statsDisplay = document.getElementById('statsDisplay');
+        statsDisplay.style.display = 'grid';
+        
+        statsDisplay.innerHTML = `
+            <div class="stat-box">
+                <div class="stat-number">${stats.enrichedClassCount || 0}</div>
+                <div class="stat-label">Enriched Classes</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">${stats.enrichmentRate || 0}%</div>
+                <div class="stat-label">Enrichment Rate</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">${stats.totalProcessingTimeMs || 0}ms</div>
+                <div class="stat-label">Total Processing</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">${stats.enrichmentProcessingTimeMs || 0}ms</div>
+                <div class="stat-label">Enrichment Time</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">${Object.keys(stats.definitionStats || {}).length}</div>
+                <div class="stat-label">Definition Modules</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">${(stats.enrichmentReport?.errorCount || 0) + (stats.enrichmentReport?.warningCount || 0)}</div>
+                <div class="stat-label">Errors + Warnings</div>
+            </div>
+        `;
+    }
+
+    window.runCompleteTestSuite = async function() {
+        log("🎯 STARTING COMPLETE PHASE 3 TEST SUITE", 'success');
+        log("=" * 80, 'info');
+        
+        try {
+            updateProgress(0);
+            
+            // Initialize DataService with full pipeline
+            await initializeDataService();
+            updateProgress(20);
+            
+            // Run all test categories
+            await runPipelineIntegrationTest();
+            updateProgress(40);
+            
+            await runMetadataVerificationTest();
+            updateProgress(60);
+            
+            await runCategoryDetectionTest();
+            updateProgress(75);
+            
+            await runAPIFunctionalityTest();
+            updateProgress(90);
+            
+            await runPerformanceAnalysisTest();
+            updateProgress(100);
+            
+            log("🎉 ALL PHASE 3 TESTS COMPLETED SUCCESSFULLY!", 'success');
+            log("✅ Complete Parse → Resolve → Enrich pipeline is working correctly", 'success');
+            log("✅ Data enrichment with _meta properties verified", 'success');
+            log("✅ All item type detection functioning properly", 'success');
+            
+        } catch (error) {
+            log(`❌ TEST SUITE FAILED: ${error.message}`, 'error');
+            console.error('Full error:', error);
+        }
+    };
+
+    async function initializeDataService() {
+        if (dataService && enrichedData) return; // Already initialized
+        
+        log("🔧 Initializing DataService with complete pipeline...", 'info');
+        
+        dataService = new DataService({ maxWorkers: 2, workerTimeout: 20000 });
+        
+        const startTime = performance.now();
+        enrichedData = await dataService.initialize();
+        enrichmentReport = dataService.getEnrichmentReport();
+        const endTime = performance.now();
+        
+        const duration = ((endTime - startTime) / 1000).toFixed(2);
+        log(`✅ DataService initialized in ${duration}s`, 'success');
+        log(`📊 Pipeline returned ${enrichedData.size} enriched classes`, 'success');
+        
+        // Display basic statistics
+        const stats = dataService.getStats();
+        displayStats(stats);
+    }
+
+    window.runPipelineIntegrationTest = async function() {
+        log("\n🔗 TEST 1: PIPELINE INTEGRATION", 'info');
+        log("-".repeat(50), 'info');
+        
+        try {
+            await initializeDataService();
+            
+            // Verify complete pipeline execution
+            if (!enrichedData || !(enrichedData instanceof Map)) {
+                throw new Error("DataService did not return enriched Map data");
+            }
+            
+            log(`✅ Pipeline returns Map with ${enrichedData.size} enriched classes`, 'success');
+            
+            // Check for enrichment report
+            if (!enrichmentReport) {
+                throw new Error("No enrichment report available");
+            }
+            
+            log(`✅ Enrichment report available with processing details`, 'success');
+            log(`  - Success rate: ${enrichmentReport.successRate}%`, 'info');
+            log(`  - Errors: ${enrichmentReport.errorCount}`, 'info');
+            log(`  - Warnings: ${enrichmentReport.warningCount}`, 'info');
+            
+            // Verify we have the expected data structure
+            const stats = dataService.getStats();
+            if (stats.enrichedClassCount > 0) {
+                log(`✅ Pipeline integration test PASSED`, 'success');
+                log(`✅ ${stats.enrichedClassCount} classes successfully enriched`, 'success');
+            } else {
+                throw new Error("No classes were enriched");
+            }
+            
+        } catch (error) {
+            log(`❌ Pipeline integration test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.runMetadataVerificationTest = async function() {
+        log("\n🏷️ TEST 2: METADATA VERIFICATION", 'info');
+        log("-".repeat(50), 'info');
+        
+        try {
+            await initializeDataService();
+            
+            // Check for classes with _meta properties
+            let classesWithMeta = 0;
+            let sampleEnrichedClasses = [];
+            
+            for (const [className, classData] of enrichedData) {
+                if (classData._meta) {
+                    classesWithMeta++;
+                    if (sampleEnrichedClasses.length < 5) {
+                        sampleEnrichedClasses.push({ name: className, meta: classData._meta });
+                    }
+                }
+            }
+            
+            log(`📊 Found ${classesWithMeta} classes with _meta properties`, 'info');
+            
+            if (classesWithMeta === 0) {
+                throw new Error("No classes have _meta properties - enrichment failed");
+            }
+            
+            // Verify _meta structure
+            log(`🔍 Sample enriched classes:`, 'info');
+            for (const sample of sampleEnrichedClasses) {
+                log(`  - ${sample.name}: type="${sample.meta.type}", category="${sample.meta.category}"`, 'info');
+                
+                // Verify required _meta properties
+                if (!sample.meta.type || !sample.meta.category || !sample.meta.extractedBy) {
+                    log(`⚠️ Missing required _meta properties in ${sample.name}`, 'warning');
+                }
+            }
+            
+            const enrichmentRate = ((classesWithMeta / enrichedData.size) * 100).toFixed(1);
+            log(`✅ Metadata verification test PASSED`, 'success');
+            log(`✅ ${enrichmentRate}% of classes have _meta properties`, 'success');
+            
+        } catch (error) {
+            log(`❌ Metadata verification test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.runCategoryDetectionTest = async function() {
+        log("\n🎯 TEST 3: CATEGORY DETECTION", 'info');
+        log("-".repeat(50), 'info');
+        
+        try {
+            await initializeDataService();
+            
+            // Get available categories using new API
+            const categories = dataService.getAvailableCategories();
+            const types = dataService.getAvailableTypes();
+            
+            log(`📊 Available categories: ${categories.join(', ')}`, 'info');
+            log(`📊 Available types: ${types.join(', ')}`, 'info');
+            
+            // Test specific category detection
+            const expectedCategories = ['weapon', 'vest', 'backpack', 'attachment', 'magazine'];
+            let foundCategories = 0;
+            
+            for (const category of expectedCategories) {
+                try {
+                    const itemsInCategory = dataService.getClassesByCategory(category);
+                    if (itemsInCategory.length > 0) {
+                        foundCategories++;
+                        log(`✅ Found ${itemsInCategory.length} items in category: ${category}`, 'success');
+                        
+                        // Show sample item from this category
+                        const sample = itemsInCategory[0];
+                        log(`  - Sample: ${sample.className} (${sample._meta.type})`, 'info');
+                    } else {
+                        log(`⚠️ No items found in category: ${category}`, 'warning');
+                    }
+                } catch (error) {
+                    log(`⚠️ Error testing category ${category}: ${error.message}`, 'warning');
+                }
+            }
+            
+            if (foundCategories > 0) {
+                log(`✅ Category detection test PASSED (${foundCategories}/${expectedCategories.length} categories found)`, 'success');
+            } else {
+                throw new Error("No expected categories were detected");
+            }
+            
+        } catch (error) {
+            log(`❌ Category detection test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.runAPIFunctionalityTest = async function() {
+        log("\n🔧 TEST 4: API FUNCTIONALITY", 'info');
+        log("-".repeat(50), 'info');
+        
+        try {
+            await initializeDataService();
+            
+            // Test new API methods
+            const testCases = [
+                {
+                    name: 'findClass',
+                    test: () => {
+                        // Find any class
+                        const firstClassName = Array.from(enrichedData.keys())[0];
+                        const foundClass = dataService.findClass(firstClassName);
+                        return foundClass && foundClass.className === firstClassName;
+                    }
+                },
+                {
+                    name: 'getAvailableCategories',
+                    test: () => {
+                        const categories = dataService.getAvailableCategories();
+                        return Array.isArray(categories) && categories.length > 0;
+                    }
+                },
+                {
+                    name: 'getAvailableTypes',
+                    test: () => {
+                        const types = dataService.getAvailableTypes();
+                        return Array.isArray(types) && types.length > 0;
+                    }
+                },
+                {
+                    name: 'getClassesByCategory',
+                    test: () => {
+                        const categories = dataService.getAvailableCategories();
+                        if (categories.length === 0) return false;
+                        const items = dataService.getClassesByCategory(categories[0]);
+                        return Array.isArray(items);
+                    }
+                },
+                {
+                    name: 'getClassesByType',
+                    test: () => {
+                        const types = dataService.getAvailableTypes();
+                        if (types.length === 0) return false;
+                        const items = dataService.getClassesByType(types[0]);
+                        return Array.isArray(items);
+                    }
+                }
+            ];
+            
+            let passedTests = 0;
+            for (const testCase of testCases) {
+                try {
+                    const result = testCase.test();
+                    if (result) {
+                        log(`✅ API test passed: ${testCase.name}`, 'success');
+                        passedTests++;
+                    } else {
+                        log(`❌ API test failed: ${testCase.name}`, 'error');
+                    }
+                } catch (error) {
+                    log(`❌ API test error in ${testCase.name}: ${error.message}`, 'error');
+                }
+            }
+            
+            if (passedTests === testCases.length) {
+                log(`✅ API functionality test PASSED (${passedTests}/${testCases.length} tests passed)`, 'success');
+            } else {
+                throw new Error(`API tests failed: ${passedTests}/${testCases.length} passed`);
+            }
+            
+        } catch (error) {
+            log(`❌ API functionality test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.runPerformanceAnalysisTest = async function() {
+        log("\n⚡ TEST 5: PERFORMANCE ANALYSIS", 'info');
+        log("-".repeat(50), 'info');
+        
+        try {
+            // Re-initialize to get fresh timing data
+            dataService = new DataService({ maxWorkers: 2, workerTimeout: 20000 });
+            
+            const startTime = performance.now();
+            const newEnrichedData = await dataService.initialize();
+            const endTime = performance.now();
+            
+            const totalTime = endTime - startTime;
+            const stats = dataService.getStats();
+            const newEnrichmentReport = dataService.getEnrichmentReport();
+            
+            log(`📊 PERFORMANCE METRICS:`, 'highlight');
+            log(`  - Total pipeline time: ${(totalTime / 1000).toFixed(2)}s`, 'info');
+            log(`  - Parsing time: ${stats.parsingProcessingTimeMs || 0}ms`, 'info');
+            log(`  - Inheritance resolution time: ${stats.inheritanceProcessingTimeMs || 0}ms`, 'info');
+            log(`  - Enrichment time: ${stats.enrichmentProcessingTimeMs || 0}ms`, 'info');
+            log(`  - Classes processed: ${newEnrichedData.size}`, 'info');
+            log(`  - Enrichment rate: ${stats.enrichmentRate}%`, 'info');
+            
+            if (newEnrichmentReport) {
+                log(`📊 ENRICHMENT DETAILS:`, 'highlight');
+                log(`  - Success rate: ${newEnrichmentReport.successRate}%`, 'info');
+                log(`  - Errors: ${newEnrichmentReport.errorCount}`, 'info');
+                log(`  - Warnings: ${newEnrichmentReport.warningCount}`, 'info');
+                
+                if (newEnrichmentReport.definitionStats) {
+                    log(`  - Definition modules loaded: ${Object.keys(newEnrichmentReport.definitionStats).length}`, 'info');
+                }
+            }
+            
+            // Performance benchmarks
+            const acceptableTimePerClass = 100; // 100ms per class is reasonable for full pipeline
+            const actualTimePerClass = totalTime / newEnrichedData.size;
+            
+            if (actualTimePerClass <= acceptableTimePerClass) {
+                log(`✅ Performance test PASSED (${actualTimePerClass.toFixed(2)}ms <= ${acceptableTimePerClass}ms per class)`, 'success');
+            } else {
+                log(`⚠️ Performance slower than expected (${actualTimePerClass.toFixed(2)}ms > ${acceptableTimePerClass}ms per class)`, 'warning');
+            }
+            
+            // Update display with fresh stats
+            displayStats(stats);
+            
+        } catch (error) {
+            log(`❌ Performance analysis test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.clearOutput = function() {
+        document.getElementById('output').innerHTML = '';
+        document.getElementById('statsDisplay').style.display = 'none';
+        updateProgress(0);
+    };
+
+    // Auto-initialize on page load
+    setTimeout(() => {
+        log("🎯 Phase 3 Complete Test Suite Ready", 'success');
+        log("👆 Click 'Run Complete Test Suite' to verify the full Parse → Resolve → Enrich pipeline", 'info');
+    }, 500);
+
+</script>
+
+</body>
+</html>

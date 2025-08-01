@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 1 Complete Pipeline Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: #00ff00;
+        }
+        .log {
+            background-color: #2a2a2a;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #00ff00;
+            white-space: pre-wrap;
+        }
+        .error {
+            border-left-color: #ff0000;
+            color: #ff0000;
+        }
+        .success {
+            border-left-color: #00ff00;
+            color: #00ff00;
+        }
+        .warning {
+            border-left-color: #ffaa00;
+            color: #ffaa00;
+        }
+        button {
+            background-color: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #00ff00;
+            color: #000;
+        }
+        #output {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>ACE3 Arsenal Testbed - Phase 1 Complete Pipeline Test</h1>
+
+<p>This page tests the complete Phase 1 implementation:</p>
+<ul>
+    <li>Web Worker import path resolution</li>
+    <li>ConfigParser integration in workers</li>
+    <li>DataService parallel parsing pipeline</li>
+    <li>Aggregated AST output format</li>
+</ul>
+
+<button onclick="testWorkerImport()">1. Test Worker Import Path</button>
+<button onclick="testSingleWorkerParsing()">2. Test Single Worker Parsing</button>
+<button onclick="testDataServicePipeline()">3. Test Complete DataService Pipeline</button>
+<button onclick="clearOutput()">Clear Output</button>
+
+<div id="output"></div>
+
+<script type="module">
+    import { DataService } from './services/DataService.js';
+
+    window.dataService = new DataService({ maxWorkers: 2, workerTimeout: 10000 });
+
+    function log(message, type = 'log') {
+        const output = document.getElementById('output');
+        const div = document.createElement('div');
+        div.className = `log ${type}`;
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        output.appendChild(div);
+        output.scrollTop = output.scrollHeight;
+        console.log(message);
+    }
+
+    function logObject(obj, label = 'Object') {
+        log(`${label}:`, 'log');
+        log(JSON.stringify(obj, null, 2), 'log');
+    }
+
+    window.testWorkerImport = async function() {
+        log("=== Testing Web Worker Import Path Resolution ===", 'log');
+        
+        try {
+            const worker = new Worker('./workers/parser.worker.js', { type: 'module' });
+            
+            let messageReceived = false;
+            let errorOccurred = false;
+
+            worker.onmessage = function(event) {
+                messageReceived = true;
+                const { success, error, filePath } = event.data;
+                
+                if (success) {
+                    log("✅ Worker responded successfully - import path works!", 'success');
+                    log(`📁 Parsed file: ${filePath}`, 'success');
+                } else {
+                    log(`❌ Worker parsing failed: ${error}`, 'error');
+                }
+                
+                worker.terminate();
+            };
+
+            worker.onerror = function(error) {
+                errorOccurred = true;
+                log(`❌ Worker error: ${error.message}`, 'error');
+                log("This likely indicates import path resolution failed", 'error');
+                worker.terminate();
+            };
+
+            // Test with a known config file
+            log("📤 Sending test file to worker...", 'log');
+            worker.postMessage({ filePath: './data/addons/sfp/ak5/config.cpp' });
+
+            // Timeout check
+            setTimeout(() => {
+                if (!messageReceived && !errorOccurred) {
+                    log("⏰ Worker test timed out - possible import or network issue", 'warning');
+                    worker.terminate();
+                }
+            }, 5000);
+
+        } catch (error) {
+            log(`❌ Failed to create worker: ${error.message}`, 'error');
+        }
+    };
+
+    window.testSingleWorkerParsing = async function() {
+        log("=== Testing Single Worker Config Parsing ===", 'log');
+        
+        try {
+            const worker = new Worker('./workers/parser.worker.js', { type: 'module' });
+            
+            worker.onmessage = function(event) {
+                const { success, ast, error, filePath } = event.data;
+                
+                if (success) {
+                    log("✅ Single worker parsing successful!", 'success');
+                    log(`📁 File: ${filePath}`, 'success');
+                    
+                    if (ast && typeof ast === 'object') {
+                        const classCount = Object.keys(ast).length;
+                        log(`📊 Parsed ${classCount} top-level classes`, 'success');
+                        
+                        // Show first few class names
+                        const classNames = Object.keys(ast).slice(0, 3);
+                        log(`🔍 Sample classes: ${classNames.join(', ')}`, 'success');
+                        
+                        logObject(ast, 'Complete AST Structure');
+                    } else {
+                        log("⚠️ AST structure appears invalid", 'warning');
+                    }
+                } else {
+                    log(`❌ Worker parsing failed: ${error}`, 'error');
+                }
+                
+                worker.terminate();
+            };
+
+            worker.onerror = function(error) {
+                log(`❌ Worker error: ${error.message}`, 'error');
+                worker.terminate();
+            };
+
+            log("📤 Testing single worker with SFP AK5 config...", 'log');
+            worker.postMessage({ filePath: './data/addons/sfp/ak5/config.cpp' });
+
+        } catch (error) {
+            log(`❌ Failed to test single worker: ${error.message}`, 'error');
+        }
+    };
+
+    window.testDataServicePipeline = async function() {
+        log("=== Testing Complete DataService Pipeline ===", 'log');
+        
+        try {
+            log("🚀 Initializing DataService...", 'log');
+            const startTime = performance.now();
+            
+            const result = await window.dataService.initialize();
+            
+            const endTime = performance.now();
+            const duration = ((endTime - startTime) / 1000).toFixed(2);
+            
+            log(`✅ DataService initialization completed in ${duration}s`, 'success');
+            
+            if (result && typeof result === 'object') {
+                const topLevelClasses = Object.keys(result);
+                log(`📊 Found ${topLevelClasses.length} top-level config sections`, 'success');
+                log(`🔍 Sections: ${topLevelClasses.join(', ')}`, 'success');
+                
+                // Check for aggregated structure
+                let totalSubClasses = 0;
+                let sectionsWithMetadata = 0;
+                
+                for (const [sectionName, section] of Object.entries(result)) {
+                    if (section.subClasses) {
+                        totalSubClasses += Object.keys(section.subClasses).length;
+                    }
+                    if (section._sourceMod) {
+                        sectionsWithMetadata++;
+                    }
+                }
+                
+                log(`📈 Total aggregated classes: ${totalSubClasses}`, 'success');
+                log(`🏷️ Sections with metadata: ${sectionsWithMetadata}/${topLevelClasses.length}`, 'success');
+                
+                // Verify aggregated format
+                if (topLevelClasses.some(name => name.startsWith('./data/'))) {
+                    log("❌ Output still has file paths as keys - aggregation failed!", 'error');
+                } else {
+                    log("✅ Output format is properly aggregated (no file paths as keys)", 'success');
+                }
+                
+                // Show sample of the structure
+                const firstSection = Object.values(result)[0];
+                if (firstSection && firstSection.subClasses && Object.keys(firstSection.subClasses).length > 0) {
+                    const firstClass = Object.values(firstSection.subClasses)[0];
+                    log("📝 Sample aggregated class:", 'success');
+                    logObject(firstClass, 'Sample Class with Metadata');
+                }
+                
+                logObject(result, 'Complete Aggregated Result');
+                
+            } else {
+                log("❌ DataService returned invalid result", 'error');
+            }
+            
+        } catch (error) {
+            log(`❌ DataService pipeline failed: ${error.message}`, 'error');
+            console.error('Full error:', error);
+        }
+    };
+
+    window.clearOutput = function() {
+        document.getElementById('output').innerHTML = '';
+    };
+
+    // Auto-run basic test on page load
+    setTimeout(() => {
+        log("🎯 Phase 1 Complete Pipeline Test Ready", 'success');
+        log("👆 Click buttons above to test different components", 'log');
+    }, 500);
+
+</script>
+
+</body>
+</html>

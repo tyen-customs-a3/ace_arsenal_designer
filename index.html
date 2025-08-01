@@ -319,7 +319,7 @@
 
     <script type="module">
         // Import data and algorithms
-        import { getMockItems } from './data.js';
+        import { DataService } from './services/DataService.js';
         import * as algorithms from './algorithms.js';
         import * as groupingAlgorithms from './algorithms/grouping.js';
         import * as hierarchyAlgorithms from './algorithms/hierarchy.js';
@@ -336,6 +336,9 @@
             focusFirstItem,
             restoreFocusAfterViewChange
         } from './ui/simpleTreeV2.js';
+        
+        // Initialize DataService
+        const dataService = new DataService({ maxWorkers: 2, workerTimeout: 30000 });
         
         // Global state - simplified
         let currentItems = [];
@@ -364,6 +367,44 @@
             tracers: new Set(),
             ballistics: new Set(),
         };
+
+        // Transform DataService enriched classes to UI-compatible format
+        function transformDataServiceItems(enrichedClasses) {
+            return enrichedClasses.map(classObj => {
+                const meta = classObj._meta || {};
+                
+                // Create UI-compatible item object
+                const item = {
+                    className: classObj.className,
+                    displayName: meta.displayName || classObj.className,
+                    category: meta.category || 'unknown',
+                    mod: classObj._sourceMod || 'Unknown',
+                    baseClass: classObj.baseClass || '',
+                    
+                    // Extract common properties from meta or resolved properties
+                    range: meta.range || classObj.properties?.range || 0,
+                    mass: meta.mass || classObj.properties?.mass || 0,
+                    damage: meta.damage || classObj.properties?.damage || 0,
+                    caliber: meta.caliber || classObj.properties?.caliber || '',
+                    
+                    // Preserve original data for advanced features
+                    _originalData: classObj,
+                    _meta: meta,
+                    
+                    // Legacy properties object for backward compatibility
+                    properties: {
+                        ...classObj.properties,
+                        displayName: meta.displayName || classObj.className,
+                        range: meta.range || classObj.properties?.range || 0,
+                        mass: meta.mass || classObj.properties?.mass || 0,
+                        damage: meta.damage || classObj.properties?.damage || 0,
+                        caliber: meta.caliber || classObj.properties?.caliber || ''
+                    }
+                };
+                
+                return item;
+            });
+        }
 
         // Category filtering
         function filterItemsByCategory(category) {
@@ -1109,21 +1150,7 @@
         }
 
 
-        // Category tab handling
-        function switchCategory(category) {
-            selectedCategory = category;
-            
-            // Update tab appearance
-            document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelector(`[data-category="${category}"]`).classList.add('active');
-            
-            // Populate filter options for new category
-            populateFilterOptions(category);
-            
-            // Filter and display items
-            filteredItems = filterItemsByCategory(category);
-            renderTreeView(filteredItems, 'leftTreeView');
-        }
+        // Category tab handling - now handled above in the main switchCategory function
 
         function switchRightCategory(category) {
             console.log('🔄 Switching right category to:', category);
@@ -1704,18 +1731,179 @@
             renderTreeView(items, 'rightTreeView', false);
         });
 
+        // Transform DataService data to UI format
+        function transformDataServiceItems(enrichedDataMap) {
+            const items = [];
+            
+            for (const [className, classObj] of enrichedDataMap) {
+                // Extract enriched metadata
+                const meta = classObj._meta || {};
+                
+                // Create UI-compatible item
+                const item = {
+                    className: className,
+                    displayName: meta.displayName || classObj.displayName || className,
+                    category: meta.category || 'unknown',
+                    mod: classObj._sourceMod || 'Unknown',
+                    baseClass: classObj.baseClass || '',
+                    
+                    // Map common properties from both resolved data and metadata
+                    range: meta.range || classObj.range,
+                    mass: meta.mass || classObj.mass,
+                    caliber: meta.caliber || classObj.caliber,
+                    capacity: meta.capacity || classObj.capacity,
+                    damage: meta.damage || classObj.damage,
+                    armor: meta.armor || classObj.armor,
+                    maximumLoad: meta.maximumLoad || classObj.maximumLoad,
+                    rateOfFire: meta.rateOfFire || classObj.rateOfFire,
+                    zoom: meta.zoom || classObj.zoom,
+                    recoilModifier: meta.recoilModifier || classObj.recoilModifier,
+                    
+                    // Compatibility properties
+                    magazineWells: meta.magazineWells || classObj.magazineWells,
+                    weaponSlots: meta.weaponSlots || classObj.weaponSlots,
+                    compatibleSlots: meta.compatibleSlots || classObj.compatibleSlots,
+                    compatibleWells: meta.compatibleWells || classObj.compatibleWells,
+                    
+                    // Additional properties
+                    cursorAim: meta.cursorAim || classObj.cursorAim,
+                    variant: meta.variant || classObj.variant,
+                    tracer: meta.tracer || classObj.tracer,
+                    magnification: meta.magnification || classObj.magnification,
+                    
+                    // Store original data for advanced access
+                    _originalData: classObj,
+                    _meta: meta,
+                    
+                    // Legacy properties object for backward compatibility
+                    properties: {
+                        range: meta.range || classObj.range,
+                        mass: meta.mass || classObj.mass,
+                        caliber: meta.caliber || classObj.caliber,
+                        capacity: meta.capacity || classObj.capacity,
+                        damage: meta.damage || classObj.damage,
+                        armor: meta.armor || classObj.armor,
+                        maximumLoad: meta.maximumLoad || classObj.maximumLoad,
+                        rateOfFire: meta.rateOfFire || classObj.rateOfFire,
+                        zoom: meta.zoom || classObj.zoom,
+                        recoilModifier: meta.recoilModifier || classObj.recoilModifier,
+                        cursorAim: meta.cursorAim || classObj.cursorAim,
+                        variant: meta.variant || classObj.variant,
+                        tracer: meta.tracer || classObj.tracer,
+                        magnification: meta.magnification || classObj.magnification
+                    }
+                };
+                
+                items.push(item);
+            }
+            
+            return items;
+        }
+        
+        // Category mapping for DataService integration
+        function switchCategory(category) {
+            selectedCategory = category;
+            
+            // Update tab appearance
+            document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            
+            // Map UI categories to DataService categories if needed
+            let dataServiceCategory = category;
+            if (category === 'weapons') dataServiceCategory = 'weapon';
+            else if (category === 'handguns') dataServiceCategory = 'handgun';
+            else if (category === 'launchers') dataServiceCategory = 'launcher';
+            else if (category === 'backpacks') dataServiceCategory = 'backpack';
+            else if (category === 'vests') dataServiceCategory = 'vest';
+            else if (category === 'attachments') dataServiceCategory = 'attachment';
+            else if (category === 'magazines') dataServiceCategory = 'magazine';
+            
+            // Get items from DataService
+            const dataServiceItems = dataService.getClassesByCategory(dataServiceCategory);
+            const transformedItems = dataServiceItems.map(item => {
+                // DataService already returns objects with className property, just need to transform
+                const { className, ...classData } = item;
+                const meta = classData._meta || {};
+                
+                return {
+                    className: className,
+                    displayName: meta.displayName || classData.displayName || className,
+                    category: category, // Use UI category
+                    mod: classData._sourceMod || 'Unknown',
+                    baseClass: classData.baseClass || '',
+                    
+                    // Map properties
+                    range: meta.range || classData.range,
+                    mass: meta.mass || classData.mass,
+                    caliber: meta.caliber || classData.caliber,
+                    capacity: meta.capacity || classData.capacity,
+                    damage: meta.damage || classData.damage,
+                    armor: meta.armor || classData.armor,
+                    maximumLoad: meta.maximumLoad || classData.maximumLoad,
+                    rateOfFire: meta.rateOfFire || classData.rateOfFire,
+                    zoom: meta.zoom || classData.zoom,
+                    recoilModifier: meta.recoilModifier || classData.recoilModifier,
+                    
+                    // Compatibility properties
+                    magazineWells: meta.magazineWells || classData.magazineWells,
+                    weaponSlots: meta.weaponSlots || classData.weaponSlots,
+                    compatibleSlots: meta.compatibleSlots || classData.compatibleSlots,
+                    compatibleWells: meta.compatibleWells || classData.compatibleWells,
+                    
+                    // Additional properties
+                    cursorAim: meta.cursorAim || classData.cursorAim,
+                    variant: meta.variant || classData.variant,
+                    tracer: meta.tracer || classData.tracer,
+                    magnification: meta.magnification || classData.magnification,
+                    
+                    // Store original data
+                    _originalData: classData,
+                    _meta: meta,
+                    
+                    // Legacy properties object
+                    properties: {
+                        range: meta.range || classData.range,
+                        mass: meta.mass || classData.mass,
+                        caliber: meta.caliber || classData.caliber,
+                        capacity: meta.capacity || classData.capacity,
+                        damage: meta.damage || classData.damage,
+                        armor: meta.armor || classData.armor,
+                        maximumLoad: meta.maximumLoad || classData.maximumLoad,
+                        rateOfFire: meta.rateOfFire || classData.rateOfFire,
+                        zoom: meta.zoom || classData.zoom,
+                        recoilModifier: meta.recoilModifier || classData.recoilModifier,
+                        cursorAim: meta.cursorAim || classData.cursorAim,
+                        variant: meta.variant || classData.variant,
+                        tracer: meta.tracer || classData.tracer,
+                        magnification: meta.magnification || classData.magnification
+                    }
+                };
+            });
+            
+            // Update current items for this category
+            currentItems = transformedItems;
+            
+            // Populate filter options for new category
+            populateFilterOptions(category);
+            
+            // Filter and display items
+            filteredItems = filterItemsByCategory(category);
+            renderTreeView(filteredItems, 'leftTreeView');
+        }
+        
         // Async initialization function
         async function initializeArsenal() {
             // Show loading message
-            document.getElementById('timing').textContent = 'Loading data...';
+            document.getElementById('timing').textContent = 'Initializing DataService...';
             
             try {
-                // Load data asynchronously
-                const items = await getMockItems();
-                currentItems = [...items];
-                filteredItems = [...items];
+                // Initialize DataService
+                const enrichedData = await dataService.initialize();
                 
-                // Initialize UI state
+                console.log('✅ DataService initialized successfully');
+                console.log('📊 Enriched classes loaded:', enrichedData.size);
+                
+                // Initialize UI state (switchCategory will set currentItems for the category)
                 switchCategory('weapons');
                 switchRightCategory('optics');
                 
@@ -1744,39 +1932,39 @@
                 document.getElementById('showModIcon').checked = displayOptions.showModIcon;
                 document.querySelector(`input[name="spacingOption"][value="${displayOptions.spacing}"]`).checked = true;
 
-
-                console.log('🎯 ACE3 Arsenal Simulation Ready!');
+                // Show final statistics
+                const stats = dataService.getStats();
+                console.log('✅ ACE3 Arsenal Simulation Ready!');
                 console.log('💡 Select a weapon to see compatible attachments and magazines.');
-                console.log('📊 Items loaded:', {
-                    weapons: currentItems.filter(i => i.category === 'weapons').length,
-                    handguns: currentItems.filter(i => i.category === 'handguns').length,
-                    launchers: currentItems.filter(i => i.category === 'launchers').length,
-                    attachments: currentItems.filter(i => i.category === 'attachments').length,
-                    magazines: currentItems.filter(i => i.category === 'magazines').length,
-                    backpacks: currentItems.filter(i => i.category === 'backpacks').length,
-                    vests: currentItems.filter(i => i.category === 'vests').length
+                console.log('📊 DataService Statistics:', {
+                    enrichedClasses: stats.enrichedClassCount,
+                    enrichmentRate: stats.enrichment?.enrichmentRate || 'N/A',
+                    processingTime: stats.enrichment?.processingTimeMs || 'N/A'
                 });
+                
+                // Show category distribution from available categories
+                const availableCategories = dataService.getAvailableCategories();
+                const categoryStats = {};
+                for (const category of availableCategories) {
+                    const items = dataService.getClassesByCategory(category);
+                    categoryStats[category] = items.length;
+                }
+                console.log('📂 Category Distribution:', categoryStats);
                 
                 // Debug: Check some sample items have the right data
                 const sampleWeapon = currentItems.find(i => i.category === 'weapons');
                 const sampleMagazine = currentItems.find(i => i.category === 'magazines');
                 const sampleAttachment = currentItems.find(i => i.category === 'attachments');
                 
-                console.log('🔫 Sample weapon:', sampleWeapon?.displayName, 'magazineWells:', sampleWeapon?.magazineWells, 'weaponSlots:', sampleWeapon?.weaponSlots);
-                console.log('🔫 Sample weapon properties:', sampleWeapon?.properties);
-                console.log('🔫 Full sample weapon:', sampleWeapon);
-                console.log('📦 Sample magazine:', sampleMagazine?.displayName, 'magazineWells:', sampleMagazine?.magazineWells);
-                console.log('🔧 Sample attachment:', sampleAttachment?.displayName, 'weaponSlots:', sampleAttachment?.weaponSlots);
-                
-                // Debug: Check all magazines for magazineWells data
-                const allMagazines = currentItems.filter(i => i.category === 'magazines');
-                console.log('📦 Total magazines:', allMagazines.length);
-                console.log('📦 Magazines with magazineWells:', allMagazines.filter(m => m.magazineWells && m.magazineWells.length > 0).length);
-                console.log('📦 Sample magazine data:', allMagazines.slice(0, 3).map(m => ({
-                    name: m.displayName,
-                    magazineWells: m.magazineWells,
-                    caliber: m.caliber
-                })));
+                if (sampleWeapon) {
+                    console.log('🔫 Sample weapon:', sampleWeapon.displayName, 'magazineWells:', sampleWeapon.magazineWells, 'weaponSlots:', sampleWeapon.weaponSlots);
+                }
+                if (sampleMagazine) {
+                    console.log('📦 Sample magazine:', sampleMagazine.displayName, 'magazineWells:', sampleMagazine.magazineWells);
+                }
+                if (sampleAttachment) {
+                    console.log('🔧 Sample attachment:', sampleAttachment.displayName, 'weaponSlots:', sampleAttachment.weaponSlots);
+                }
                 
                 document.getElementById('timing').textContent = 'Ready';
                 

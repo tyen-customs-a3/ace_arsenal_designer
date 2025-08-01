@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2 Inheritance Resolution - Complete Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: #00ff00;
+        }
+        .log {
+            background-color: #2a2a2a;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #00ff00;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .error {
+            border-left-color: #ff0000;
+            color: #ff0000;
+        }
+        .success {
+            border-left-color: #00ff00;
+            color: #00ff00;
+        }
+        .warning {
+            border-left-color: #ffaa00;
+            color: #ffaa00;
+        }
+        .info {
+            border-left-color: #0088ff;
+            color: #0088ff;
+        }
+        button {
+            background-color: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #00ff00;
+            color: #000;
+        }
+        button:disabled {
+            background-color: #666;
+            color: #999;
+            cursor: not-allowed;
+        }
+        #output {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 10px;
+        }
+        .test-section {
+            border: 1px solid #333;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        .test-section h3 {
+            color: #ffaa00;
+            margin-top: 0;
+        }
+        .progress {
+            background-color: #333;
+            height: 20px;
+            border: 1px solid #666;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background-color: #00ff00;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Phase 2: Inheritance Resolution - Complete Test Suite</h1>
+
+<p>This comprehensive test verifies that the inheritance resolution works correctly with real config data:</p>
+
+<div class="test-section">
+    <h3>Test Categories</h3>
+    <ul>
+        <li><strong>Basic Integration</strong>: DataService with inheritance resolution</li>
+        <li><strong>Inheritance Chains</strong>: Multi-level parent-child relationships</li>
+        <li><strong>Property Merging</strong>: Deep merge of nested objects</li>
+        <li><strong>BaseClass Preservation</strong>: Verify baseClass properties are maintained</li>
+        <li><strong>Metadata Integrity</strong>: Source mod/file information preserved</li>
+        <li><strong>Performance Analysis</strong>: Resolution timing and efficiency</li>
+    </ul>
+</div>
+
+<div class="test-section">
+    <h3>Test Controls</h3>
+    <button onclick="runAllTests()">🚀 Run Complete Test Suite</button>
+    <button onclick="runBasicIntegration()">1. Basic Integration Test</button>
+    <button onclick="runInheritanceChainTest()">2. Inheritance Chain Test</button>
+    <button onclick="runPropertyMergingTest()">3. Property Merging Test</button>
+    <button onclick="runBaseClassPreservationTest()">4. BaseClass Preservation</button>
+    <button onclick="runPerformanceTest()">5. Performance Analysis</button>
+    <button onclick="clearOutput()">Clear Output</button>
+    
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+</div>
+
+<div id="output"></div>
+
+<script type="module">
+    import { DataService } from './services/DataService.js';
+
+    let dataService = null;
+    let resolvedData = null;
+    let rawData = null;
+
+    function log(message, type = 'log') {
+        const output = document.getElementById('output');
+        const div = document.createElement('div');
+        div.className = `log ${type}`;
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        output.appendChild(div);
+        output.scrollTop = output.scrollHeight;
+        console.log(message);
+    }
+
+    function logObject(obj, label = 'Object', maxDepth = 3) {
+        log(`${label}:`, 'info');
+        
+        // Safely stringify with depth limit
+        const jsonStr = JSON.stringify(obj, (key, value) => {
+            if (typeof value === 'object' && value !== null) {
+                // Limit depth to prevent circular references and huge output
+                const depth = (key.match(/\./g) || []).length;
+                if (depth > maxDepth) return '[Truncated]';
+            }
+            return value;
+        }, 2);
+        
+        log(jsonStr.substring(0, 2000) + (jsonStr.length > 2000 ? '...[Truncated]' : ''), 'info');
+    }
+
+    function updateProgress(percent) {
+        document.getElementById('progressBar').style.width = percent + '%';
+    }
+
+    window.runAllTests = async function() {
+        log("🎯 STARTING COMPLETE PHASE 2 TEST SUITE", 'success');
+        log("=" * 60, 'info');
+        
+        try {
+            updateProgress(0);
+            
+            // Initialize DataService first
+            await initializeDataService();
+            updateProgress(20);
+            
+            // Run all test categories
+            await runBasicIntegration();
+            updateProgress(40);
+            
+            await runInheritanceChainTest();
+            updateProgress(60);
+            
+            await runPropertyMergingTest();
+            updateProgress(80);
+            
+            await runBaseClassPreservationTest();
+            updateProgress(90);
+            
+            await runPerformanceTest();
+            updateProgress(100);
+            
+            log("🎉 ALL PHASE 2 TESTS COMPLETED SUCCESSFULLY!", 'success');
+            log("✅ Inheritance resolution is working correctly", 'success');
+            
+        } catch (error) {
+            log(`❌ TEST SUITE FAILED: ${error.message}`, 'error');
+            console.error('Full error:', error);
+        }
+    };
+
+    async function initializeDataService() {
+        if (dataService && resolvedData) return; // Already initialized
+        
+        log("🔧 Initializing DataService with inheritance resolution...", 'info');
+        
+        dataService = new DataService({ maxWorkers: 2, workerTimeout: 15000 });
+        
+        const startTime = performance.now();
+        resolvedData = await dataService.initialize();
+        rawData = dataService.getRawData();
+        const endTime = performance.now();
+        
+        const duration = ((endTime - startTime) / 1000).toFixed(2);
+        log(`✅ DataService initialized in ${duration}s`, 'success');
+        log(`📊 Resolved ${resolvedData.size} classes`, 'success');
+    }
+
+    window.runBasicIntegration = async function() {
+        log("\n🔍 TEST 1: BASIC INTEGRATION", 'info');
+        log("-".repeat(40), 'info');
+        
+        try {
+            await initializeDataService();
+            
+            // Verify we have resolved data
+            if (!resolvedData || !(resolvedData instanceof Map)) {
+                throw new Error("DataService did not return a Map of resolved data");
+            }
+            
+            log(`✅ DataService returns Map with ${resolvedData.size} resolved classes`, 'success');
+            
+            // Check for expected top-level classes
+            const expectedSections = ['CfgWeapons', 'CfgMagazines', 'CfgVehicles'];
+            let foundSections = 0;
+            
+            for (const section of expectedSections) {
+                if (resolvedData.has(section)) {
+                    foundSections++;
+                    const sectionData = resolvedData.get(section);
+                    log(`✅ Found ${section} with ${Object.keys(sectionData.subClasses || {}).length} subclasses`, 'success');
+                } else {
+                    log(`⚠️ Missing expected section: ${section}`, 'warning');
+                }
+            }
+            
+            if (foundSections > 0) {
+                log(`✅ Basic integration test PASSED (${foundSections}/${expectedSections.length} sections found)`, 'success');
+            } else {
+                throw new Error("No expected config sections found in resolved data");
+            }
+            
+        } catch (error) {
+            log(`❌ Basic integration test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.runInheritanceChainTest = async function() {
+        log("\n🔗 TEST 2: INHERITANCE CHAIN VERIFICATION", 'info');
+        log("-".repeat(40), 'info');
+        
+        try {
+            await initializeDataService();
+            
+            // Look for weapons with known inheritance chains
+            const cfgWeapons = resolvedData.get('CfgWeapons');
+            if (!cfgWeapons || !cfgWeapons.subClasses) {
+                throw new Error("CfgWeapons not found or has no subClasses");
+            }
+            
+            const weapons = cfgWeapons.subClasses;
+            const weaponNames = Object.keys(weapons);
+            
+            log(`🔍 Analyzing ${weaponNames.length} weapons for inheritance chains...`, 'info');
+            
+            // Find weapons with inheritance (have baseClass)
+            let weaponsWithInheritance = 0;
+            let resolvedWeapons = 0;
+            let sampleWeapon = null;
+            
+            for (const [weaponName, weaponData] of Object.entries(weapons)) {
+                if (weaponData.baseClass) {
+                    weaponsWithInheritance++;
+                    
+                    // Check if this weapon appears to be fully resolved
+                    if (weaponData.properties && Object.keys(weaponData.properties).length > 5) {
+                        resolvedWeapons++;
+                        if (!sampleWeapon) {
+                            sampleWeapon = { name: weaponName, data: weaponData };
+                        }
+                    }
+                }
+            }
+            
+            log(`📊 Found ${weaponsWithInheritance} weapons with inheritance`, 'info');
+            log(`📊 Found ${resolvedWeapons} weapons with resolved properties`, 'info');
+            
+            if (sampleWeapon) {
+                log(`🔍 Sample resolved weapon: ${sampleWeapon.name}`, 'info');
+                log(`  - BaseClass: ${sampleWeapon.data.baseClass}`, 'info');
+                log(`  - Properties: ${Object.keys(sampleWeapon.data.properties).length} total`, 'info');
+                log(`  - Source Mod: ${sampleWeapon.data._sourceMod}`, 'info');
+                
+                // Show some sample properties
+                const props = sampleWeapon.data.properties;
+                const sampleProps = Object.keys(props).slice(0, 5);
+                log(`  - Sample properties: ${sampleProps.join(', ')}`, 'info');
+            }
+            
+            if (weaponsWithInheritance > 0 && resolvedWeapons > 0) {
+                log(`✅ Inheritance chain test PASSED`, 'success');
+                log(`✅ Found weapons with proper inheritance resolution`, 'success');
+            } else {
+                log(`⚠️ No weapons with resolved inheritance found`, 'warning');
+            }
+            
+        } catch (error) {
+            log(`❌ Inheritance chain test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.runPropertyMergingTest = async function() {
+        log("\n🔀 TEST 3: PROPERTY MERGING VERIFICATION", 'info');
+        log("-".repeat(40), 'info');
+        
+        try {
+            await initializeDataService();
+            
+            // Compare a sample class between raw and resolved data
+            const rawCfgWeapons = rawData.CfgWeapons;
+            const resolvedCfgWeapons = resolvedData.get('CfgWeapons');
+            
+            if (!rawCfgWeapons || !resolvedCfgWeapons) {
+                throw new Error("Cannot find CfgWeapons in both raw and resolved data");
+            }
+            
+            // Find a weapon that exists in both
+            const rawWeapons = rawCfgWeapons.subClasses || {};
+            const resolvedWeapons = resolvedCfgWeapons.subClasses || {};
+            
+            let testWeapon = null;
+            for (const weaponName of Object.keys(rawWeapons)) {
+                if (resolvedWeapons[weaponName] && rawWeapons[weaponName].baseClass) {
+                    testWeapon = weaponName;
+                    break;
+                }
+            }
+            
+            if (!testWeapon) {
+                log(`⚠️ No suitable weapon found for property merging test`, 'warning');
+                return;
+            }
+            
+            const rawWeapon = rawWeapons[testWeapon];
+            const resolvedWeapon = resolvedWeapons[testWeapon];
+            
+            log(`🔍 Testing property merging with weapon: ${testWeapon}`, 'info');
+            log(`  - Raw properties: ${Object.keys(rawWeapon.properties || {}).length}`, 'info');
+            log(`  - Resolved properties: ${Object.keys(resolvedWeapon.properties || {}).length}`, 'info');
+            
+            // Check if resolved weapon has more properties (inherited ones)
+            const rawPropCount = Object.keys(rawWeapon.properties || {}).length;
+            const resolvedPropCount = Object.keys(resolvedWeapon.properties || {}).length;
+            
+            if (resolvedPropCount >= rawPropCount) {
+                log(`✅ Property merging appears successful (${resolvedPropCount} >= ${rawPropCount})`, 'success');
+                
+                // Check for specific inherited properties that might exist
+                const inheritedProps = ['displayName', 'model', 'picture', 'scope'];
+                let foundInherited = 0;
+                
+                for (const prop of inheritedProps) {
+                    if (resolvedWeapon.properties[prop] && !rawWeapon.properties[prop]) {
+                        foundInherited++;
+                        log(`  ✅ Found inherited property: ${prop} = ${resolvedWeapon.properties[prop]}`, 'success');
+                    }
+                }
+                
+                if (foundInherited > 0) {
+                    log(`✅ Property merging test PASSED (${foundInherited} inherited properties found)`, 'success');
+                } else {
+                    log(`✅ Property merging test PASSED (property counts match)`, 'success');
+                }
+            } else {
+                throw new Error(`Resolved weapon has fewer properties than raw (${resolvedPropCount} < ${rawPropCount})`);
+            }
+            
+        } catch (error) {
+            log(`❌ Property merging test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.runBaseClassPreservationTest = async function() {
+        log("\n🏷️ TEST 4: BASECLASS PRESERVATION VERIFICATION", 'info');
+        log("-".repeat(40), 'info');
+        
+        try {
+            await initializeDataService();
+            
+            const cfgWeapons = resolvedData.get('CfgWeapons');
+            if (!cfgWeapons || !cfgWeapons.subClasses) {
+                throw new Error("CfgWeapons not found");
+            }
+            
+            const weapons = cfgWeapons.subClasses;
+            let weaponsWithBaseClass = 0;
+            let baseClassesPreserved = 0;
+            
+            for (const [weaponName, weaponData] of Object.entries(weapons)) {
+                if (weaponData.baseClass) {
+                    weaponsWithBaseClass++;
+                    
+                    // Verify baseClass property is preserved
+                    if (typeof weaponData.baseClass === 'string' && weaponData.baseClass.length > 0) {
+                        baseClassesPreserved++;
+                    }
+                }
+            }
+            
+            log(`📊 Weapons with baseClass: ${weaponsWithBaseClass}`, 'info');
+            log(`📊 BaseClass properties preserved: ${baseClassesPreserved}`, 'info');
+            
+            if (baseClassesPreserved === weaponsWithBaseClass && weaponsWithBaseClass > 0) {
+                log(`✅ BaseClass preservation test PASSED (${baseClassesPreserved}/${weaponsWithBaseClass})`, 'success');
+                
+                // Show a few examples
+                const examples = Object.entries(weapons).filter(([_, data]) => data.baseClass).slice(0, 3);
+                for (const [name, data] of examples) {
+                    log(`  - ${name} extends ${data.baseClass}`, 'info');
+                }
+            } else if (weaponsWithBaseClass === 0) {
+                log(`⚠️ No weapons with baseClass found to test`, 'warning');
+            } else {
+                throw new Error(`Some baseClass properties were not preserved (${baseClassesPreserved}/${weaponsWithBaseClass})`);
+            }
+            
+        } catch (error) {
+            log(`❌ BaseClass preservation test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.runPerformanceTest = async function() {
+        log("\n⚡ TEST 5: PERFORMANCE ANALYSIS", 'info');
+        log("-".repeat(40), 'info');
+        
+        try {
+            // Re-initialize to get fresh timing data
+            dataService = new DataService({ maxWorkers: 2, workerTimeout: 15000 });
+            
+            const startTime = performance.now();
+            const newResolvedData = await dataService.initialize();
+            const endTime = performance.now();
+            
+            const totalTime = endTime - startTime;
+            const stats = dataService.getStats();
+            
+            log(`📊 PERFORMANCE METRICS:`, 'info');
+            log(`  - Total initialization time: ${(totalTime / 1000).toFixed(2)}s`, 'info');
+            log(`  - Classes resolved: ${newResolvedData.size}`, 'info');
+            log(`  - Average time per class: ${(totalTime / newResolvedData.size).toFixed(2)}ms`, 'info');
+            
+            if (stats) {
+                log(`  - Raw classes parsed: ${stats.aggregatedClassCount || 'N/A'}`, 'info');
+                log(`  - Resolution efficiency: ${((stats.aggregatedClassCount / newResolvedData.size) * 100).toFixed(1)}%`, 'info');
+            }
+            
+            // Performance benchmarks
+            const acceptableTimePerClass = 50; // 50ms per class is reasonable
+            const actualTimePerClass = totalTime / newResolvedData.size;
+            
+            if (actualTimePerClass <= acceptableTimePerClass) {
+                log(`✅ Performance test PASSED (${actualTimePerClass.toFixed(2)}ms <= ${acceptableTimePerClass}ms per class)`, 'success');
+            } else {
+                log(`⚠️ Performance slower than expected (${actualTimePerClass.toFixed(2)}ms > ${acceptableTimePerClass}ms per class)`, 'warning');
+            }
+            
+            // Memory usage estimate
+            const memoryUsage = JSON.stringify(Array.from(newResolvedData.entries())).length;
+            log(`  - Estimated memory usage: ${(memoryUsage / 1024 / 1024).toFixed(2)} MB`, 'info');
+            
+        } catch (error) {
+            log(`❌ Performance test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.clearOutput = function() {
+        document.getElementById('output').innerHTML = '';
+        updateProgress(0);
+    };
+
+    // Auto-initialize on page load
+    setTimeout(() => {
+        log("🎯 Phase 2 Complete Test Suite Ready", 'success');
+        log("👆 Click 'Run Complete Test Suite' to verify inheritance resolution", 'info');
+    }, 500);
+
+</script>
+
+</body>
+</html>

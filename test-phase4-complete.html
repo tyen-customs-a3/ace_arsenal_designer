@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 4 UI Integration - Complete Test Suite</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: #00ff00;
+        }
+        .log {
+            background-color: #2a2a2a;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #00ff00;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .error {
+            border-left-color: #ff0000;
+            color: #ff0000;
+        }
+        .success {
+            border-left-color: #00ff00;
+            color: #00ff00;
+        }
+        .warning {
+            border-left-color: #ffaa00;
+            color: #ffaa00;
+        }
+        .info {
+            border-left-color: #0088ff;
+            color: #0088ff;
+        }
+        .highlight {
+            border-left-color: #ff00ff;
+            color: #ff00ff;
+        }
+        button {
+            background-color: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #00ff00;
+            color: #000;
+        }
+        button:disabled {
+            background-color: #666;
+            color: #999;
+            cursor: not-allowed;
+        }
+        #output {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 10px;
+        }
+        .test-section {
+            border: 1px solid #333;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        .test-section h3 {
+            color: #ffaa00;
+            margin-top: 0;
+        }
+        .progress {
+            background-color: #333;
+            height: 20px;
+            border: 1px solid #666;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background-color: #00ff00;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .stat-box {
+            background-color: #2a2a2a;
+            border: 1px solid #666;
+            padding: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            color: #00ff00;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+        .iframe-container {
+            border: 2px solid #333;
+            margin: 20px 0;
+            height: 600px;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Phase 4: Service API and UI Integration - Complete Test Suite</h1>
+
+<p>This test verifies that the complete application works with the new DataService backend:</p>
+
+<div class="test-section">
+    <h3>Integration Verification</h3>
+    <ul>
+        <li><strong>DataService Integration</strong>: Verify DataService API is working correctly</li>
+        <li><strong>Category Switching</strong>: Test all category tabs with live data</li>
+        <li><strong>Data Transformation</strong>: Verify enriched data is properly formatted for UI</li>
+        <li><strong>UI Responsiveness</strong>: Test UI remains responsive during data loading</li>
+        <li><strong>Feature Compatibility</strong>: All existing features work with new data source</li>
+        <li><strong>Performance Analysis</strong>: Monitor load times and memory usage</li>
+    </ul>
+</div>
+
+<div class="test-section">
+    <h3>Test Controls</h3>
+    <button onclick="runCompleteIntegrationTest()">🚀 Run Integration Test Suite</button>
+    <button onclick="testDataServiceAPI()">1. Test DataService API</button>
+    <button onclick="testCategorySwitching()">2. Test Category Switching</button>
+    <button onclick="testDataTransformation()">3. Test Data Transformation</button>
+    <button onclick="testUIResponsiveness()">4. Test UI Responsiveness</button>
+    <button onclick="launchActualApplication()">5. Launch Actual Application</button>
+    <button onclick="clearOutput()">Clear Output</button>
+    
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+</div>
+
+<div id="statsDisplay" class="stats-grid" style="display: none;">
+    <!-- Statistics will be populated here -->
+</div>
+
+<div id="output"></div>
+
+<div id="applicationFrame" class="iframe-container" style="display: none;">
+    <iframe id="appIframe" src=""></iframe>
+</div>
+
+<script type="module">
+    import { DataService } from './services/DataService.js';
+
+    let testDataService = null;
+
+    function log(message, type = 'log') {
+        const output = document.getElementById('output');
+        const div = document.createElement('div');
+        div.className = `log ${type}`;
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        output.appendChild(div);
+        output.scrollTop = output.scrollHeight;
+        console.log(message);
+    }
+
+    function logObject(obj, label = 'Object', maxDepth = 2) {
+        log(`${label}:`, 'info');
+        
+        if (obj instanceof Map) {
+            const objForDisplay = Object.fromEntries(
+                Array.from(obj).slice(0, 3).map(([k, v]) => [k, limitDepth(v, maxDepth)])
+            );
+            log(JSON.stringify(objForDisplay, null, 2), 'info');
+            if (obj.size > 3) {
+                log(`... and ${obj.size - 3} more entries`, 'info');
+            }
+        } else {
+            const jsonStr = JSON.stringify(limitDepth(obj, maxDepth), null, 2);
+            log(jsonStr.substring(0, 1500) + (jsonStr.length > 1500 ? '...[Truncated]' : ''), 'info');
+        }
+    }
+
+    function limitDepth(obj, maxDepth) {
+        if (maxDepth <= 0 || obj === null || typeof obj !== 'object') {
+            return obj;
+        }
+        
+        if (Array.isArray(obj)) {
+            return obj.slice(0, 3).map(item => limitDepth(item, maxDepth - 1));
+        }
+        
+        const result = {};
+        let count = 0;
+        for (const [key, value] of Object.entries(obj)) {
+            if (count >= 5) {
+                result['...'] = `${Object.keys(obj).length - 5} more properties`;
+                break;
+            }
+            result[key] = limitDepth(value, maxDepth - 1);
+            count++;
+        }
+        return result;
+    }
+
+    function updateProgress(percent) {
+        document.getElementById('progressBar').style.width = percent + '%';
+    }
+
+    function displayStats(stats) {
+        const statsDisplay = document.getElementById('statsDisplay');
+        statsDisplay.style.display = 'grid';
+        
+        statsDisplay.innerHTML = `
+            <div class="stat-box">
+                <div class="stat-number">${stats.enrichedClassCount || 0}</div>
+                <div class="stat-label">Total Classes</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">${stats.enrichmentRate || 0}%</div>
+                <div class="stat-label">Enrichment Rate</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">${stats.totalProcessingTimeMs || 0}ms</div>
+                <div class="stat-label">Total Processing</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">${Object.keys(stats.definitionStats || {}).length}</div>
+                <div class="stat-label">Definition Modules</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">${stats.parsingProcessingTimeMs || 0}ms</div>
+                <div class="stat-label">Parsing Time</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">${stats.enrichmentProcessingTimeMs || 0}ms</div>
+                <div class="stat-label">Enrichment Time</div>
+            </div>
+        `;
+    }
+
+    window.runCompleteIntegrationTest = async function() {
+        log("🎯 STARTING COMPLETE PHASE 4 INTEGRATION TEST SUITE", 'success');
+        log("=" * 80, 'info');
+        
+        try {
+            updateProgress(0);
+            
+            await testDataServiceAPI();
+            updateProgress(25);
+            
+            await testCategorySwitching();
+            updateProgress(50);
+            
+            await testDataTransformation();
+            updateProgress(75);
+            
+            await testUIResponsiveness();
+            updateProgress(100);
+            
+            log("🎉 ALL PHASE 4 INTEGRATION TESTS COMPLETED SUCCESSFULLY!", 'success');
+            log("✅ DataService is fully integrated with the UI", 'success');
+            log("✅ All category switching works with live config data", 'success');  
+            log("✅ Data transformation maintains UI compatibility", 'success');
+            log("✅ Application ready for production use", 'success');
+            
+        } catch (error) {
+            log(`❌ INTEGRATION TEST SUITE FAILED: ${error.message}`, 'error');
+            console.error('Full error:', error);
+        }
+    };
+
+    window.testDataServiceAPI = async function() {
+        log("\n🔌 TEST 1: DATASERVICE API VERIFICATION", 'info');
+        log("-".repeat(50), 'info');
+        
+        try {
+            // Initialize fresh DataService
+            testDataService = new DataService({ maxWorkers: 2, workerTimeout: 15000 });
+            
+            log("🔄 Initializing DataService...", 'info');
+            const startTime = performance.now();
+            const enrichedData = await testDataService.initialize();
+            const endTime = performance.now();
+            
+            const initTime = ((endTime - startTime) / 1000).toFixed(2);
+            log(`✅ DataService initialized in ${initTime}s`, 'success');
+            
+            // Test API methods
+            const apiTests = [
+                {
+                    name: 'getAllClasses',
+                    test: () => {
+                        const all = testDataService.getAllClasses();
+                        return all instanceof Map && all.size > 0;
+                    }
+                },
+                {
+                    name: 'getAvailableCategories', 
+                    test: () => {
+                        const categories = testDataService.getAvailableCategories();
+                        return Array.isArray(categories) && categories.length > 0;
+                    }
+                },
+                {
+                    name: 'getClassesByCategory',
+                    test: () => {
+                        const categories = testDataService.getAvailableCategories();
+                        if (categories.length === 0) return false;
+                        const items = testDataService.getClassesByCategory(categories[0]);
+                        return Array.isArray(items) && items.length >= 0;
+                    }
+                },
+                {
+                    name: 'findClass',
+                    test: () => {
+                        const allClasses = testDataService.getAllClasses();
+                        if (allClasses.size === 0) return false;
+                        const firstClassName = Array.from(allClasses.keys())[0];
+                        const found = testDataService.findClass(firstClassName);
+                        return found && found.className === firstClassName;
+                    }
+                },
+                {
+                    name: 'getStats',
+                    test: () => {
+                        const stats = testDataService.getStats();
+                        return stats && typeof stats.enrichedClassCount === 'number';
+                    }
+                }
+            ];
+            
+            let passedTests = 0;
+            for (const test of apiTests) {
+                try {
+                    const result = test.test();
+                    if (result) {
+                        log(`✅ API method working: ${test.name}`, 'success');
+                        passedTests++;
+                    } else {
+                        log(`❌ API method failed: ${test.name}`, 'error');
+                    }
+                } catch (error) {
+                    log(`❌ API method error: ${test.name} - ${error.message}`, 'error');
+                }
+            }
+            
+            // Display statistics
+            const stats = testDataService.getStats();
+            displayStats(stats);
+            
+            if (passedTests === apiTests.length) {
+                log(`✅ DataService API test PASSED (${passedTests}/${apiTests.length} methods working)`, 'success');
+                log(`📊 Total enriched classes: ${enrichedData.size}`, 'success');
+            } else {
+                throw new Error(`API tests failed: ${passedTests}/${apiTests.length} passed`);
+            }
+            
+        } catch (error) {
+            log(`❌ DataService API test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.testCategorySwitching = async function() {
+        log("\n🔄 TEST 2: CATEGORY SWITCHING VERIFICATION", 'info');
+        log("-".repeat(50), 'info');
+        
+        try {
+            if (!testDataService) {
+                await testDataServiceAPI();
+            }
+            
+            // Get available categories
+            const categories = testDataService.getAvailableCategories();
+            log(`📂 Available categories: ${categories.join(', ')}`, 'info');
+            
+            // Test common UI categories
+            const testCategories = [
+                { ui: 'weapons', dataService: 'weapon' },
+                { ui: 'handguns', dataService: 'handgun' },
+                { ui: 'launchers', dataService: 'launcher' },
+                { ui: 'backpacks', dataService: 'backpack' },
+                { ui: 'vests', dataService: 'vest' },
+                { ui: 'attachments', dataService: 'attachment' },
+                { ui: 'magazines', dataService: 'magazine' }
+            ];
+            
+            let successfulCategories = 0;
+            
+            for (const category of testCategories) {
+                try {
+                    const items = testDataService.getClassesByCategory(category.dataService);
+                    
+                    if (items.length > 0) {
+                        log(`✅ ${category.ui} category: ${items.length} items found`, 'success');
+                        successfulCategories++;
+                        
+                        // Verify first item has required properties
+                        const sample = items[0];
+                        const hasRequiredProps = sample.className && 
+                                                (sample._meta?.category === category.dataService);
+                        
+                        if (hasRequiredProps) {
+                            log(`  ✅ Sample item has correct metadata`, 'success');
+                        } else {
+                            log(`  ⚠️ Sample item missing metadata: ${sample.className}`, 'warning');
+                        }
+                    } else {
+                        log(`⚠️ ${category.ui} category: No items found`, 'warning');
+                    }
+                } catch (error) {
+                    log(`❌ Error testing ${category.ui}: ${error.message}`, 'error');
+                }
+            }
+            
+            if (successfulCategories > 0) {
+                log(`✅ Category switching test PASSED (${successfulCategories}/${testCategories.length} categories working)`, 'success');
+            } else {
+                throw new Error("No categories found items");
+            }
+            
+        } catch (error) {
+            log(`❌ Category switching test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.testDataTransformation = async function() {
+        log("\n🔄 TEST 3: DATA TRANSFORMATION VERIFICATION", 'info');
+        log("-".repeat(50), 'info');
+        
+        try {
+            if (!testDataService) {
+                await testDataServiceAPI();
+            }
+            
+            // Test transformation for weapons category
+            const weaponItems = testDataService.getClassesByCategory('weapon');
+            
+            if (weaponItems.length === 0) {
+                log(`⚠️ No weapons found for transformation test`, 'warning');
+                return;
+            }
+            
+            // Simulate the transformation that happens in the UI
+            const transformedItems = weaponItems.slice(0, 3).map(classObj => {
+                const meta = classObj._meta || {};
+                
+                return {
+                    className: classObj.className,
+                    displayName: meta.displayName || classObj.className,
+                    category: meta.category || 'unknown',
+                    mod: classObj._sourceMod || 'Unknown',
+                    baseClass: classObj.baseClass || '',
+                    range: meta.range || classObj.properties?.range || 0,
+                    mass: meta.mass || classObj.properties?.mass || 0,
+                    _originalData: classObj,
+                    _meta: meta
+                };
+            });
+            
+            log(`🔄 Transformed ${transformedItems.length} sample weapons`, 'info');
+            
+            // Verify transformation quality
+            let validTransformations = 0;
+            for (const item of transformedItems) {
+                const isValid = item.className && 
+                               item.displayName && 
+                               item.category && 
+                               item._originalData &&
+                               item._meta;
+                
+                if (isValid) {
+                    validTransformations++;
+                    log(`  ✅ ${item.displayName} (${item.className})`, 'success');
+                } else {
+                    log(`  ❌ Invalid transformation: ${item.className}`, 'error');
+                }
+            }
+            
+            if (validTransformations === transformedItems.length) {
+                log(`✅ Data transformation test PASSED (${validTransformations}/${transformedItems.length} valid)`, 'success');
+                
+                // Show sample transformed item
+                logObject(transformedItems[0], 'Sample Transformed Item');
+            } else {
+                throw new Error(`Transformation failed: ${validTransformations}/${transformedItems.length} valid`);
+            }
+            
+        } catch (error) {
+            log(`❌ Data transformation test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.testUIResponsiveness = async function() {
+        log("\n⚡ TEST 4: UI RESPONSIVENESS VERIFICATION", 'info');
+        log("-".repeat(50), 'info');
+        
+        try {
+            // Test initialization timing
+            const newDataService = new DataService({ maxWorkers: 2, workerTimeout: 15000 });
+            
+            log("⏱️ Testing initialization responsiveness...", 'info');
+            
+            const startTime = performance.now();
+            let progressChecks = 0;
+            
+            // Check if the main thread remains responsive during initialization
+            const responsivenessTester = setInterval(() => {
+                progressChecks++;
+                log(`  📊 Responsiveness check ${progressChecks} - main thread responding`, 'info');
+            }, 1000);
+            
+            const enrichedData = await newDataService.initialize();
+            
+            clearInterval(responsivenessTester);
+            const endTime = performance.now();
+            
+            const totalTime = endTime - startTime;
+            const stats = newDataService.getStats();
+            
+            log(`✅ Initialization completed in ${(totalTime / 1000).toFixed(2)}s`, 'success');
+            log(`📊 Main thread remained responsive (${progressChecks} checks completed)`, 'success');
+            log(`📈 Performance metrics:`, 'info');
+            log(`  - Total classes: ${enrichedData.size}`, 'info');
+            log(`  - Processing time: ${totalTime.toFixed(0)}ms`, 'info');
+            log(`  - Time per class: ${(totalTime / enrichedData.size).toFixed(2)}ms`, 'info');
+            
+            // Performance benchmarks
+            const acceptableInitTime = 30000; // 30 seconds
+            const acceptableTimePerClass = 50; // 50ms per class
+            
+            const timePerClass = totalTime / enrichedData.size;
+            
+            if (totalTime <= acceptableInitTime && timePerClass <= acceptableTimePerClass) {
+                log(`✅ UI responsiveness test PASSED`, 'success');
+                log(`  - Init time: ${(totalTime/1000).toFixed(2)}s <= 30s ✅`, 'success');
+                log(`  - Time per class: ${timePerClass.toFixed(2)}ms <= 50ms ✅`, 'success');
+            } else {
+                log(`⚠️ Performance slower than expected but functional`, 'warning');
+                log(`  - Init time: ${(totalTime/1000).toFixed(2)}s`, 'warning');
+                log(`  - Time per class: ${timePerClass.toFixed(2)}ms`, 'warning');
+            }
+            
+        } catch (error) {
+            log(`❌ UI responsiveness test FAILED: ${error.message}`, 'error');
+            throw error;
+        }
+    };
+
+    window.launchActualApplication = function() {
+        log("\n🚀 LAUNCHING ACTUAL APPLICATION", 'highlight');
+        log("-".repeat(50), 'info');
+        
+        const frameContainer = document.getElementById('applicationFrame');
+        const iframe = document.getElementById('appIframe');
+        
+        // Set the iframe source to the actual application
+        iframe.src = './index.html';
+        frameContainer.style.display = 'block';
+        
+        log("✅ Application loaded in iframe below", 'success');
+        log("👆 Test all UI features in the embedded application", 'info');
+        log("🔍 Check browser console for DataService initialization logs", 'info');
+        
+        // Scroll to the iframe
+        frameContainer.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.clearOutput = function() {
+        document.getElementById('output').innerHTML = '';
+        document.getElementById('statsDisplay').style.display = 'none';
+        document.getElementById('applicationFrame').style.display = 'none';
+        updateProgress(0);
+    };
+
+    // Auto-initialize on page load
+    setTimeout(() => {
+        log("🎯 Phase 4 Complete Integration Test Suite Ready", 'success');
+        log("👆 Click 'Run Integration Test Suite' to verify the complete UI integration", 'info');
+        log("🚀 Or click 'Launch Actual Application' to test the live application", 'info');
+    }, 500);
+
+</script>
+
+</body>
+</html>

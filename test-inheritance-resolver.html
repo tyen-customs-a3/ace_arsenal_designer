@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inheritance Resolver Test - Phase 2</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: #00ff00;
+        }
+        .log {
+            background-color: #2a2a2a;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #00ff00;
+            white-space: pre-wrap;
+        }
+        .error {
+            border-left-color: #ff0000;
+            color: #ff0000;
+        }
+        .success {
+            border-left-color: #00ff00;
+            color: #00ff00;
+        }
+        .warning {
+            border-left-color: #ffaa00;
+            color: #ffaa00;
+        }
+        .info {
+            border-left-color: #0099ff;
+            color: #0099ff;
+        }
+        button {
+            background-color: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #00ff00;
+            color: #000;
+        }
+        button:disabled {
+            background-color: #666;
+            color: #999;
+            cursor: not-allowed;
+        }
+        #output {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 10px;
+        }
+        .stats-box {
+            background-color: #2a2a2a;
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .inheritance-chain {
+            background-color: #1a2a1a;
+            border-left: 4px solid #00aa00;
+            padding: 10px;
+            margin: 5px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+<h1>ACE3 Arsenal Testbed - Inheritance Resolver Test (Phase 2)</h1>
+
+<p>This page tests the Phase 2 inheritance resolver that processes Phase 1 AST data:</p>
+<ul>
+    <li>Load Phase 1 aggregated AST data via DataService</li>
+    <li>Build global class map for efficient lookups</li>
+    <li>Resolve inheritance chains with deep merging</li>
+    <li>Handle circular inheritance and missing base classes</li>
+    <li>Validate resolved class database</li>
+</ul>
+
+<div class="stats-box" id="phase1Stats" style="display: none;">
+    <h3>Phase 1 Data Statistics</h3>
+    <div id="phase1StatsContent"></div>
+</div>
+
+<button onclick="loadPhase1Data()" id="loadPhase1Btn">1. Load Phase 1 Data</button>
+<button onclick="testInheritanceResolver()" id="resolveBtn" disabled>2. Test Inheritance Resolver</button>
+<button onclick="analyzeInheritanceChains()" id="analyzeBtn" disabled>3. Analyze Inheritance Chains</button>
+<button onclick="validateDatabase()" id="validateBtn" disabled>4. Validate Resolved Database</button>
+<button onclick="clearOutput()">Clear Output</button>
+
+<div id="output"></div>
+
+<script type="module">
+    import { DataService } from './services/DataService.js';
+    import { resolve, getInheritanceChain, validateResolvedDatabase } from './parser/inheritanceResolver.js';
+
+    window.dataService = new DataService({ maxWorkers: 2, workerTimeout: 10000 });
+    window.phase1Data = null;
+    window.resolvedData = null;
+    window.globalClassMap = null;
+
+    function log(message, type = 'log') {
+        const output = document.getElementById('output');
+        const div = document.createElement('div');
+        div.className = `log ${type}`;
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        output.appendChild(div);
+        output.scrollTop = output.scrollHeight;
+        console.log(message);
+    }
+
+    function logObject(obj, label = 'Object', maxDepth = 3) {
+        log(`${label}:`, 'info');
+        
+        try {
+            // Create a truncated version for display
+            const truncated = truncateObject(obj, maxDepth);
+            log(JSON.stringify(truncated, null, 2), 'log');
+        } catch (error) {
+            log(`Error displaying object: ${error.message}`, 'error');
+        }
+    }
+
+    function truncateObject(obj, maxDepth, currentDepth = 0) {
+        if (currentDepth >= maxDepth) {
+            if (typeof obj === 'object' && obj !== null) {
+                if (Array.isArray(obj)) {
+                    return `[Array with ${obj.length} items]`;
+                } else {
+                    return `{Object with ${Object.keys(obj).length} keys}`;
+                }
+            }
+            return obj;
+        }
+
+        if (typeof obj !== 'object' || obj === null) {
+            return obj;
+        }
+
+        if (Array.isArray(obj)) {
+            return obj.slice(0, 5).map(item => truncateObject(item, maxDepth, currentDepth + 1));
+        }
+
+        const truncated = {};
+        let count = 0;
+        for (const [key, value] of Object.entries(obj)) {
+            if (count >= 10) {
+                truncated[`... ${Object.keys(obj).length - count} more keys`] = '...';
+                break;
+            }
+            truncated[key] = truncateObject(value, maxDepth, currentDepth + 1);
+            count++;
+        }
+
+        return truncated;
+    }
+
+    window.loadPhase1Data = async function() {
+        log("=== Loading Phase 1 Data via DataService ===", 'info');
+        
+        try {
+            document.getElementById('loadPhase1Btn').disabled = true;
+            log("🚀 Initializing DataService (Phase 1)...", 'log');
+            
+            const startTime = performance.now();
+            window.phase1Data = await window.dataService.initialize();
+            const endTime = performance.now();
+            
+            const duration = ((endTime - startTime) / 1000).toFixed(2);
+            log(`✅ Phase 1 data loaded successfully in ${duration}s`, 'success');
+            
+            // Display Phase 1 statistics
+            const topLevelClasses = Object.keys(window.phase1Data);
+            log(`📊 Found ${topLevelClasses.length} top-level config sections`, 'success');
+            log(`🔍 Sections: ${topLevelClasses.join(', ')}`, 'success');
+            
+            // Count total classes
+            let totalSubClasses = 0;
+            const modCounts = {};
+            
+            function countClasses(classesObj) {
+                let count = 0;
+                if (classesObj && typeof classesObj === 'object') {
+                    for (const [className, classData] of Object.entries(classesObj)) {
+                        count++;
+                        if (classData._sourceMod) {
+                            modCounts[classData._sourceMod] = (modCounts[classData._sourceMod] || 0) + 1;
+                        }
+                        if (classData.subClasses) {
+                            count += countClasses(classData.subClasses);
+                        }
+                    }
+                }
+                return count;
+            }
+            
+            totalSubClasses = countClasses(window.phase1Data);
+            
+            log(`📈 Total classes (including nested): ${totalSubClasses}`, 'success');
+            log(`🏷️ Classes by mod: ${JSON.stringify(modCounts, null, 2)}`, 'info');
+            
+            // Update stats display
+            const statsDiv = document.getElementById('phase1StatsContent');
+            statsDiv.innerHTML = `
+                <strong>Top-level sections:</strong> ${topLevelClasses.length}<br>
+                <strong>Total classes:</strong> ${totalSubClasses}<br>
+                <strong>Mods represented:</strong> ${Object.keys(modCounts).length}<br>
+                <strong>Loading time:</strong> ${duration}s
+            `;
+            document.getElementById('phase1Stats').style.display = 'block';
+            
+            // Enable next step
+            document.getElementById('resolveBtn').disabled = false;
+            
+        } catch (error) {
+            log(`❌ Failed to load Phase 1 data: ${error.message}`, 'error');
+            console.error('Full error:', error);
+        } finally {
+            document.getElementById('loadPhase1Btn').disabled = false;
+        }
+    };
+
+    window.testInheritanceResolver = async function() {
+        log("=== Testing Inheritance Resolver (Phase 2) ===", 'info');
+        
+        if (!window.phase1Data) {
+            log("❌ Phase 1 data not loaded. Please load Phase 1 data first.", 'error');
+            return;
+        }
+        
+        try {
+            document.getElementById('resolveBtn').disabled = true;
+            log("🔄 Starting inheritance resolution...", 'log');
+            
+            const startTime = performance.now();
+            window.resolvedData = resolve(window.phase1Data);
+            const endTime = performance.now();
+            
+            const duration = ((endTime - startTime) / 1000).toFixed(2);
+            log(`✅ Inheritance resolution completed in ${duration}s`, 'success');
+            
+            // Display resolution statistics
+            log(`📊 Resolved ${window.resolvedData.size} classes`, 'success');
+            
+            // Analyze the resolved data
+            let classesWithProperties = 0;
+            let classesWithMetadata = 0;
+            let classesWithInheritance = 0;
+            const modCounts = {};
+            
+            for (const [className, classData] of window.resolvedData) {
+                if (classData.properties && Object.keys(classData.properties).length > 0) {
+                    classesWithProperties++;
+                }
+                if (classData._sourceMod) {
+                    classesWithMetadata++;
+                    modCounts[classData._sourceMod] = (modCounts[classData._sourceMod] || 0) + 1;
+                }
+                if (classData.baseClass) {
+                    classesWithInheritance++;
+                }
+            }
+            
+            log(`📈 Classes with properties: ${classesWithProperties}`, 'success');
+            log(`🏷️ Classes with metadata: ${classesWithMetadata}`, 'success');
+            log(`🔗 Classes with inheritance: ${classesWithInheritance}`, 'success');
+            log(`📊 Resolved classes by mod: ${JSON.stringify(modCounts, null, 2)}`, 'info');
+            
+            // Show a sample resolved class
+            const sampleClass = Array.from(window.resolvedData.entries())[0];
+            if (sampleClass) {
+                log("📝 Sample resolved class:", 'info');
+                logObject(sampleClass[1], `Sample: ${sampleClass[0]}`, 2);
+            }
+            
+            // Enable next steps
+            document.getElementById('analyzeBtn').disabled = false;
+            document.getElementById('validateBtn').disabled = false;
+            
+        } catch (error) {
+            log(`❌ Inheritance resolution failed: ${error.message}`, 'error');
+            console.error('Full error:', error);
+        } finally {
+            document.getElementById('resolveBtn').disabled = false;
+        }
+    };
+
+    window.analyzeInheritanceChains = function() {
+        log("=== Analyzing Inheritance Chains ===", 'info');
+        
+        if (!window.resolvedData) {
+            log("❌ Resolved data not available. Please run inheritance resolver first.", 'error');
+            return;
+        }
+        
+        try {
+            // Build global class map for inheritance chain analysis
+            const globalMap = new Map();
+            
+            function addToGlobalMap(classesObj) {
+                for (const [className, classData] of Object.entries(classesObj)) {
+                    globalMap.set(className, classData);
+                    if (classData.subClasses) {
+                        addToGlobalMap(classData.subClasses);
+                    }
+                }
+            }
+            
+            addToGlobalMap(window.phase1Data);
+            window.globalClassMap = globalMap;
+            
+            log(`🔍 Built global class map with ${globalMap.size} classes for analysis`, 'success');
+            
+            // Analyze inheritance chains for interesting classes
+            const interestingClasses = Array.from(window.resolvedData.keys())
+                .filter(name => name.includes('arifle_') || name.includes('hgun_') || name.includes('Rifle_'))
+                .slice(0, 10); // Limit to first 10 for readability
+            
+            log(`🔗 Analyzing inheritance chains for ${interestingClasses.length} sample classes:`, 'info');
+            
+            for (const className of interestingClasses) {
+                try {
+                    const chain = getInheritanceChain(className, globalMap);
+                    if (chain.length > 1) {
+                        const chainStr = chain.join(' → ');
+                        log(`${className}: ${chainStr}`, 'log');
+                        
+                        // Add to DOM with special styling
+                        const output = document.getElementById('output');
+                        const div = document.createElement('div');
+                        div.className = 'inheritance-chain';
+                        div.innerHTML = `<strong>${className}:</strong><br>${chainStr}`;
+                        output.appendChild(div);
+                        output.scrollTop = output.scrollHeight;
+                    } else {
+                        log(`${className}: No inheritance (base class)`, 'log');
+                    }
+                } catch (error) {
+                    log(`${className}: Error analyzing chain - ${error.message}`, 'warning');
+                }
+            }
+            
+        } catch (error) {
+            log(`❌ Failed to analyze inheritance chains: ${error.message}`, 'error');
+            console.error('Full error:', error);
+        }
+    };
+
+    window.validateDatabase = function() {
+        log("=== Validating Resolved Database ===", 'info');
+        
+        if (!window.resolvedData) {
+            log("❌ Resolved data not available. Please run inheritance resolver first.", 'error');
+            return;
+        }
+        
+        try {
+            log("🔍 Running database validation...", 'log');
+            
+            const report = validateResolvedDatabase(window.resolvedData);
+            
+            log("✅ Database validation completed", 'success');
+            log(`📊 Validation Report:`, 'info');
+            log(`  - Total classes: ${report.totalClasses}`, 'info');
+            log(`  - Classes with metadata: ${report.classesWithMetadata}`, 'info');
+            log(`  - Classes with properties: ${report.classesWithProperties}`, 'info');
+            log(`  - Classes with subClasses: ${report.classesWithSubClasses}`, 'info');
+            log(`  - Issues found: ${report.issues.length}`, report.issues.length > 0 ? 'warning' : 'success');
+            
+            if (report.issues.length > 0) {
+                log("⚠️ Issues found:", 'warning');
+                report.issues.slice(0, 10).forEach(issue => {
+                    log(`  - ${issue}`, 'warning');
+                });
+                
+                if (report.issues.length > 10) {
+                    log(`  ... and ${report.issues.length - 10} more issues`, 'warning');
+                }
+            } else {
+                log("🎉 No issues found - database is valid!", 'success');
+            }
+            
+            // Display comprehensive statistics
+            logObject(report, 'Complete Validation Report');
+            
+        } catch (error) {
+            log(`❌ Database validation failed: ${error.message}`, 'error');
+            console.error('Full error:', error);
+        }
+    };
+
+    window.clearOutput = function() {
+        document.getElementById('output').innerHTML = '';
+    };
+
+    // Auto-run basic setup on page load
+    setTimeout(() => {
+        log("🎯 Inheritance Resolver Test Ready", 'success');
+        log("👆 Click 'Load Phase 1 Data' to begin testing the inheritance resolver", 'log');
+    }, 500);
+
+</script>
+
+</body>
+</html>

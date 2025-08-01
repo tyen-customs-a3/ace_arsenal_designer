@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parser Worker Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .log { background: #f5f5f5; border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .error { background: #ffe6e6; border-color: #ff9999; }
+        .success { background: #e6ffe6; border-color: #99ff99; }
+        button { padding: 10px 20px; margin: 5px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005c8a; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 4px; overflow-x: auto; max-height: 300px; }
+    </style>
+</head>
+<body>
+    <h1>Parser Worker Test</h1>
+    <p>This page tests the parser.worker.js functionality.</p>
+    
+    <button onclick="testWorker()">Test Parser Worker</button>
+    <button onclick="testInvalidPath()">Test Invalid Path</button>
+    <button onclick="clearLogs()">Clear Logs</button>
+    
+    <div id="logs"></div>
+    
+    <script type="module">
+        let worker;
+        
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const logDiv = document.createElement('div');
+            logDiv.className = `log ${type}`;
+            logDiv.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            logs.appendChild(logDiv);
+            logs.scrollTop = logs.scrollHeight;
+        }
+        
+        function initWorker() {
+            if (worker) {
+                worker.terminate();
+            }
+            
+            try {
+                worker = new Worker('./parser.worker.js', { type: 'module' });
+                
+                worker.onmessage = function(event) {
+                    const { success, ast, error, filePath } = event.data;
+                    
+                    if (success) {
+                        log(`✅ Successfully parsed: ${filePath}`, 'success');
+                        log(`<pre>${JSON.stringify(ast, null, 2)}</pre>`, 'success');
+                    } else {
+                        log(`❌ Failed to parse: ${filePath}`, 'error');
+                        log(`Error: ${error}`, 'error');
+                    }
+                };
+                
+                worker.onerror = function(error) {
+                    log(`❌ Worker error: ${error.message}`, 'error');
+                };
+                
+                log('✅ Worker initialized successfully');
+                
+            } catch (error) {
+                log(`❌ Failed to initialize worker: ${error.message}`, 'error');
+            }
+        }
+        
+        window.testWorker = function() {
+            if (!worker) {
+                initWorker();
+            }
+            
+            // Test with a real config file
+            const filePath = '../data/addons/cupweapons/cup_weapons_ak/config.cpp';
+            log(`🔄 Sending parse request for: ${filePath}`);
+            worker.postMessage({ filePath });
+        };
+        
+        window.testInvalidPath = function() {
+            if (!worker) {
+                initWorker();
+            }
+            
+            // Test with invalid path
+            const filePath = '../data/nonexistent/file.cpp';
+            log(`🔄 Testing invalid path: ${filePath}`);
+            worker.postMessage({ filePath });
+        };
+        
+        window.clearLogs = function() {
+            document.getElementById('logs').innerHTML = '';
+        };
+        
+        // Initialize worker on page load
+        initWorker();
+    </script>
+</body>
+</html>
