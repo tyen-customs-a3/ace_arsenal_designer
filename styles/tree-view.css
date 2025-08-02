@@ -309,7 +309,7 @@
 .item-hover-preview {
     position: absolute;
     width: 120px;
-    height: 120px;
+    height: 132px;
     background: var(--surface-title);
     border: 2px solid var(--border-primary);
     border-radius: 0;
@@ -327,7 +327,7 @@
 /* Category-specific popup dimensions */
 .item-hover-preview.weapons {
     width: 180px;
-    height: 84px; /* 3x1 aspect ratio: 180x60 + 24px text bar */
+    height: 96px; /* 3x1 aspect ratio: 180x60 + 36px text bar */
 }
 
 .item-hover-preview.handguns,
@@ -337,7 +337,7 @@
 .item-hover-preview.attachments,
 .item-hover-preview.magazines {
     width: 120px;
-    height: 120px; /* 1x1 aspect ratio: 120x96 + 24px text bar */
+    height: 132px; /* 1x1 aspect ratio: 120x96 + 36px text bar */
 }
 
 .item-hover-preview.visible {
@@ -347,7 +347,7 @@
 
 .item-hover-preview-icon {
     width: 100%;
-    height: 96px;  /* Default height for square categories */
+    height: 96px;  /* Default height for square categories (132px total - 36px text) */
     background: var(--border-primary);
     border-radius: 0;
     display: flex;
@@ -361,7 +361,7 @@
 
 /* Category-specific icon area heights */
 .item-hover-preview.weapons .item-hover-preview-icon {
-    height: 60px;  /* 3x1 aspect ratio: total 84px - 24px text = 60px */
+    height: 60px;  /* 3x1 aspect ratio: total 96px - 36px text = 60px */
     font-size: 24px; /* Smaller font for the wider, shorter area */
 }
 
@@ -371,23 +371,41 @@
 .item-hover-preview.vests .item-hover-preview-icon,
 .item-hover-preview.attachments .item-hover-preview-icon,
 .item-hover-preview.magazines .item-hover-preview-icon {
-    height: 96px;  /* 1x1 aspect ratio: total 120px - 24px text = 96px */
+    height: 96px;  /* 1x1 aspect ratio: total 132px - 36px text = 96px */
     font-size: 36px; /* Larger font for square area */
 }
 
 .item-hover-preview-text {
-    height: 24px;  /* Small name bar */
+    height: 36px;  /* Increased height for two lines */
     background: rgba(0, 0, 0, 0.8);  /* Dark background for name bar */
     font-size: 9px;
     color: var(--content-header);
     text-align: center;
+    padding: 2px 4px;
+    overflow: hidden;
+    border-top: 1px solid var(--border-secondary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.item-hover-name {
     font-weight: 600;
-    line-height: 24px;  /* Center text vertically */
-    padding: 0 4px;
+    line-height: 1.2;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    border-top: 1px solid var(--border-secondary);
+}
+
+.item-hover-classname {
+    font-weight: 400;
+    font-size: 8px;
+    color: var(--content-tertiary);
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 1px;
 }
 
 /* Category-specific icon backgrounds */

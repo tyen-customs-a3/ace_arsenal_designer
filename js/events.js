@@ -49,7 +49,8 @@ export const EventManager = {
                         ${categoryIcon}
                     </div>
                     <div class="item-hover-preview-text">
-                        ${itemData.displayName}
+                        <div class="item-hover-name">${itemData.displayName}</div>
+                        <div class="item-hover-classname">${itemData.className}</div>
                     </div>
                 `;
                 
@@ -106,14 +107,14 @@ export const EventManager = {
     getPreviewDimensions(category) {
         // Return width and height based on category aspect ratio
         const dimensions = {
-            'weapons': { width: 180, height: 84 },      // 3x1 aspect ratio
-            'handguns': { width: 120, height: 120 },    // 1x1 aspect ratio
-            'launchers': { width: 120, height: 120 },   // 1x1 aspect ratio
-            'backpacks': { width: 120, height: 120 },   // 1x1 aspect ratio
-            'vests': { width: 120, height: 120 },       // 1x1 aspect ratio
-            'attachments': { width: 120, height: 120 }, // 1x1 aspect ratio
-            'magazines': { width: 120, height: 120 },   // 1x1 aspect ratio
-            'unknown': { width: 120, height: 120 }      // 1x1 aspect ratio (fallback)
+            'weapons': { width: 180, height: 96 },      // 3x1 aspect ratio
+            'handguns': { width: 120, height: 132 },    // 1x1 aspect ratio
+            'launchers': { width: 120, height: 132 },   // 1x1 aspect ratio
+            'backpacks': { width: 120, height: 132 },   // 1x1 aspect ratio
+            'vests': { width: 120, height: 132 },       // 1x1 aspect ratio
+            'attachments': { width: 120, height: 132 }, // 1x1 aspect ratio
+            'magazines': { width: 120, height: 132 },   // 1x1 aspect ratio
+            'unknown': { width: 120, height: 132 }      // 1x1 aspect ratio (fallback)
         };
         return dimensions[category] || dimensions['unknown'];
     },
