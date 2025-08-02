@@ -23,17 +23,18 @@ const backpackDefinition = {
     /**
      * Determines if the given resolved class data represents a backpack
      * 
-     * Detection criteria for backpacks:
-     * - Must have maximumLoad property (primary indicator)
-     * - Should have transportMaxWeapons, transportMaxMagazines properties
-     * - Should inherit from backpack base classes like Bag_Base
-     * - Class name typically starts with B_ or CUP_B_ prefix
-     * - May have isBackpack property set to true
-     * - Should be in CfgVehicles config section (not CfgWeapons)
+     * CRITICAL: Uses ONLY hierarchy-based detection to avoid misclassifying bullets (B_762x51_*) as backpacks.
+     * 
+     * Detection hierarchy analysis from real config files shows:
+     * - Bullets: inherit from *_Ball classes (B_762x51_Ball, B_556x45_Ball) or BulletBase
+     * - Backpacks: inherit from Bag_Base or other backpack-specific base classes
+     * 
+     * This method NEVER uses string parsing or naming conventions for type detection.
+     * All detection is based on actual class inheritance hierarchy and intrinsic properties.
      * 
      * @param {Object} classData - The resolved, flattened class data from Phase 2
      * @param {string} classData.className - The class name
-     * @param {string} [classData.baseClass] - The parent class name
+     * @param {string} [classData.baseClass] - The parent class name  
      * @param {number} [classData.maximumLoad] - Maximum storage capacity
      * @param {number} [classData.transportMaxWeapons] - Maximum weapon storage
      * @param {number} [classData.transportMaxMagazines] - Maximum magazine storage
@@ -45,55 +46,51 @@ const backpackDefinition = {
             return false;
         }
 
-        // Primary indicator: maximumLoad property (most reliable)
-        if (typeof classData.maximumLoad === 'number') {
-            return true;
+        // HIERARCHY-ONLY DETECTION: Check if this inherits from genuine backpack base classes
+        return this._hasValidBackpackHierarchy(classData);
+    },
+
+    /**
+     * Checks if the class has a valid backpack inheritance hierarchy
+     * 
+     * This method ONLY examines the baseClass property to determine if the item
+     * inherits from known backpack base classes. It does NOT use string parsing
+     * of class names, which can incorrectly classify bullets as backpacks.
+     * 
+     * Based on analysis of real config files:
+     * - All genuine backpacks inherit from Bag_Base or specific backpack base classes
+     * - Bullets inherit from ammunition base classes (*_Ball, BulletBase)
+     * - No overlap between these hierarchies exists
+     * 
+     * @private
+     * @param {Object} classData - The resolved class data
+     * @returns {boolean} True if this has valid backpack hierarchy
+     */
+    _hasValidBackpackHierarchy(classData) {
+        if (!classData || !classData.baseClass) {
+            return false;
         }
 
-        // Secondary indicators: transport properties
-        if (typeof classData.transportMaxWeapons === 'number' || 
-            typeof classData.transportMaxMagazines === 'number') {
-            return true;
-        }
-
-        // Explicit backpack flag
-        if (classData.isBackpack === true || classData.isBackpack === 1) {
-            return true;
-        }
-
-        // Base class indicators - check for common backpack base classes
-        const backpackBaseClasses = [
-            'Bag_Base',
-            'B_AssaultPack_Base',
-            'B_Bergen_Base',
-            'B_Carryall_Base',
-            'B_Kitbag_Base',
-            'B_TacticalPack_Base',
-            'CUP_B_',
-            'Backpack_Base'
+        // Known genuine backpack base classes from real config analysis
+        // These are the ONLY classes that should be considered backpack roots
+        const validBackpackBaseClasses = [
+            'Bag_Base',                    // Primary Arma 3 backpack base class
+            'B_AssaultPack_Base',         // Specific assault pack base
+            'B_Bergen_Base',              // Bergen pack base
+            'B_Carryall_Base',           // Carryall base
+            'B_Kitbag_Base',             // Kitbag base  
+            'B_TacticalPack_Base',       // Tactical pack base
+            'CUP_B_AssaultPack_Base',    // CUP assault pack base
+            'CUP_B_Bergen_Base',         // CUP bergen base
+            'Backpack_Base',             // Generic backpack base
+            'CUP_B_RUS_Backpack',        // Specific CUP backpack base
+            'CUP_B_IDF_Backpack'         // Specific CUP backpack base
         ];
 
-        if (classData.baseClass && backpackBaseClasses.some(baseClass => 
-            classData.baseClass.includes(baseClass))) {
-            return true;
-        }
+        const baseClass = classData.baseClass;
 
-        // Class name patterns that indicate backpacks
-        const backpackClassPatterns = [
-            /^B_/i,                    // Standard Arma 3 backpack prefix
-            /^CUP_B_/i,               // CUP backpack prefix
-            /_pack$/i,                // Ends with "pack"
-            /backpack/i,              // Contains "backpack"
-            /rucksack/i,              // Rucksack
-            /bergen/i,                // Bergen pack
-            /carryall/i,              // Carryall
-            /kitbag/i,                // Kitbag
-            /assault.*pack/i,         // Assault pack
-            /tactical.*pack/i         // Tactical pack
-        ];
-
-        if (classData.className && backpackClassPatterns.some(pattern => 
-            pattern.test(classData.className))) {
+        // Direct exact match with known backpack base classes
+        if (validBackpackBaseClasses.includes(baseClass)) {
             return true;
         }
 

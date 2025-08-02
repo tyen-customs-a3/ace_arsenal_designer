@@ -27,6 +27,7 @@ import { SelectionManager } from './selection.js';
 import { CompatibilityEngine } from './compatibility.js';
 import { EventManager } from './events.js';
 import { PanelManager } from './panels.js';
+import { LocalizationManager } from './localization.js';
 
 // Global Arsenal state - simple object for rapid iteration
 window.Arsenal = {
@@ -106,6 +107,7 @@ async function initializeArsenal() {
         CompatibilityEngine.init();
         EventManager.init();
         PanelManager.init();
+        LocalizationManager.init();
         
         timingElement.textContent = 'Loading initial data...';
         
@@ -137,6 +139,9 @@ async function initializeArsenal() {
         document.getElementById('showModIcon').checked = Arsenal.displayOptions.showModIcon;
         document.querySelector(`input[name="spacingOption"][value="${Arsenal.displayOptions.spacing}"]`).checked = true;
 
+        // Update language selector with available languages
+        await LocalizationManager.updateLanguageSelector();
+        
         // Application ready - timing will be updated by switchCategory
         timingElement.style.color = '#00ff00'; // Green for success
         

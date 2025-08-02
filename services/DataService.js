@@ -23,6 +23,7 @@ import { resolve as resolveInheritance } from '../parser/inheritanceResolver.js'
 import { enrich as enrichDatabase } from '../extractor/dataExtractor.js';
 import { ConfigClassifier } from './ConfigClassifier.js';
 import { SemanticConflictResolver } from './SemanticConflictResolver.js';
+import { LocalizationService } from './LocalizationService.js';
 
 export class DataService {
     /**
@@ -48,6 +49,9 @@ export class DataService {
         this._classifier = null;
         this._resolver = null;
         
+        // Initialize localization service
+        this.localizationService = new LocalizationService();
+        
         // Bind methods to preserve context
         this._handleWorkerMessage = this._handleWorkerMessage.bind(this);
         this._handleWorkerError = this._handleWorkerError.bind(this);
@@ -64,6 +68,9 @@ export class DataService {
         }
         
         try {
+            // Initialize localization service first
+            console.log('DataService: Initializing localization service...');
+            await this.localizationService.initialize();
             
             // Run the parsing stage to get raw AST data
             const rawData = await this._runParsingStage();
@@ -74,10 +81,13 @@ export class DataService {
             // Run the enrichment stage to add metadata to resolved classes
             const enrichmentResult = await this._runEnrichmentStage(resolvedData);
             
+            // Run the localization stage to resolve display names
+            const localizedData = await this._runLocalizationStage(enrichmentResult.enrichedDb);
+            
             // Store all data stages
             this.rawData = rawData;
             this.resolvedData = resolvedData;
-            this.enrichedData = enrichmentResult.enrichedDb;
+            this.enrichedData = localizedData;
             this.enrichmentReport = enrichmentResult.report;
             this.isInitialized = true;
             
@@ -906,6 +916,14 @@ export class DataService {
     }
 
     /**
+     * Get the localization service instance
+     * @returns {LocalizationService} The localization service
+     */
+    getLocalizationService() {
+        return this.localizationService;
+    }
+
+    /**
      * Reset the service to uninitialized state
      * This will terminate any active workers and clear cached data
      */
@@ -1082,6 +1100,90 @@ export class DataService {
         }
         
         console.info(`DataService: No string-based heuristics or assumptions used - pure structural analysis`);
+    }
+
+    /**
+     * Phase 4: Localization Resolution Stage
+     * Resolves $STR_ localization keys to their translated strings
+     * @param {Map<string, Object>} enrichedData - The enriched class database from Phase 3
+     * @returns {Promise<Map<string, Object>>} Map with resolved display names
+     * @private
+     */
+    async _runLocalizationStage(enrichedData) {
+        console.log('DataService: Starting localization resolution stage...');
+        
+        const startTime = Date.now();
+        const localizedData = new Map();
+        let resolvedCount = 0;
+        let totalDisplayNames = 0;
+        
+        try {
+            // Process each class and resolve its display name
+            for (const [className, classObj] of enrichedData) {
+                const localizedClass = { ...classObj };
+                
+                // Resolve display name if it exists
+                if (classObj.displayName) {
+                    totalDisplayNames++;
+                    const resolvedDisplayName = this.localizationService.resolveOrPassthrough(
+                        classObj.displayName, 
+                        null, // use default language
+                        className // fallback to className if localization fails
+                    );
+                    
+                    if (resolvedDisplayName !== classObj.displayName) {
+                        resolvedCount++;
+                    }
+                    
+                    localizedClass.displayName = resolvedDisplayName;
+                }
+                
+                // Also resolve display name in properties if it exists
+                if (classObj.properties?.displayName) {
+                    const resolvedPropsDisplayName = this.localizationService.resolveOrPassthrough(
+                        classObj.properties.displayName,
+                        null, // use default language
+                        className // fallback to className if localization fails
+                    );
+                    localizedClass.properties = {
+                        ...classObj.properties,
+                        displayName: resolvedPropsDisplayName
+                    };
+                }
+                
+                // Add localized display name to _meta for easy access
+                // Always ensure we have a display name, using className as final fallback
+                const finalDisplayName = localizedClass.displayName || 
+                                       localizedClass.properties?.displayName || 
+                                       className;
+                
+                if (localizedClass._meta) {
+                    localizedClass._meta.displayName = finalDisplayName;
+                } else {
+                    localizedClass._meta = {
+                        displayName: finalDisplayName
+                    };
+                }
+                
+                localizedData.set(className, localizedClass);
+            }
+            
+            const processingTime = Date.now() - startTime;
+            const resolutionRate = totalDisplayNames > 0 ? ((resolvedCount / totalDisplayNames) * 100).toFixed(1) : '0.0';
+            
+            console.log(`DataService: Localization stage completed in ${processingTime}ms`);
+            console.log(`DataService: Resolved ${resolvedCount}/${totalDisplayNames} display names (${resolutionRate}% resolution rate)`);
+            
+            // Log localization service statistics
+            const locStats = this.localizationService.getStats();
+            console.log(`DataService: Localization service stats: ${locStats.totalKeys} keys, ${locStats.resolvedKeys} resolved, ${locStats.missedKeys} missed`);
+            
+            return localizedData;
+            
+        } catch (error) {
+            console.error('DataService: Localization stage failed:', error);
+            throw new Error(`Localization resolution failed: ${error.message}`);
+        }
     }
 }
 

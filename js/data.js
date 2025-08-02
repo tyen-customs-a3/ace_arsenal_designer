@@ -16,27 +16,26 @@ export const DataManager = {
             
             // Helper function to get the best available display name
             const getDisplayName = () => {
-                // Helper to check if a string is a localization key
-                const isLocalizationString = (str) => {
-                    return str && typeof str === 'string' && str.trim().startsWith('$STR_');
-                };
+                // With the new localization system, the DataService already resolved 
+                // all $STR_ keys to their localized strings in the _meta.displayName field.
+                // We now prefer the resolved display name from _meta first.
                 
-                // Try meta first (enriched data) - skip if it's a localization string
-                if (meta.displayName && meta.displayName.trim() && !isLocalizationString(meta.displayName)) {
+                // Try meta first (enriched data with resolved localization)
+                if (meta.displayName && meta.displayName.trim()) {
                     return meta.displayName;
                 }
                 
-                // Try classObj displayName - skip if it's a localization string
-                if (classObj.displayName && classObj.displayName.trim() && !isLocalizationString(classObj.displayName)) {
+                // Try classObj displayName (should also be resolved by DataService)
+                if (classObj.displayName && classObj.displayName.trim()) {
                     return classObj.displayName;
                 }
                 
-                // Try properties displayName (from config files) - skip if it's a localization string
-                if (classObj.properties?.displayName && classObj.properties.displayName.trim() && !isLocalizationString(classObj.properties.displayName)) {
+                // Try properties displayName (should also be resolved by DataService)
+                if (classObj.properties?.displayName && classObj.properties.displayName.trim()) {
                     return classObj.properties.displayName.trim();
                 }
                 
-                // Fallback to className (always use this instead of localization strings)
+                // Fallback to className if no display name is available
                 return classObj.className;
             };
             
