@@ -377,26 +377,13 @@ export class TreeManager {
     
     // Apply view mode transformations
     applyViewModeTransform(items, viewMode) {
-        // Debug: Check if input items are unique
-        console.log('🐛 DEBUG: applyViewModeTransform input:', items.length, 'items');
-        if (items.length > 1) {
-            console.log('🐛 First item:', items[0].displayName, items[0].className);
-            console.log('🐛 Second item:', items[1].displayName, items[1].className);
-            console.log('🐛 Items are same reference?', items[0] === items[1]);
-        }
-        
         switch(viewMode) {
             case 'list':
-                const listResult = items.map(item => ({
+                return items.map(item => ({
                     name: item.displayName,
                     item: item,
                     children: null
                 }));
-                // Debug: Check if mapped nodes are unique
-                if (listResult.length > 1) {
-                    console.log('🐛 List result - same item refs?', listResult[0].item === listResult[1].item);
-                }
-                return listResult;
             case 'hierarchy':
                 return this.buildInheritanceHierarchy(items);
             case 'variants':
@@ -515,7 +502,7 @@ export class TreeManager {
         
         return treeData.map(treeNode => {
             const nodeType = treeNode.item ? NodeType.ITEM : NodeType.GROUP;
-            const node = new TreeNode(nodeType, treeNode.item || { name: treeNode.name }, treeNode.name);
+            const node = new TreeNode(nodeType, treeNode.item || { name: treeNode.name });
             node.level = level;
             
             if (treeNode.children) {
@@ -540,11 +527,6 @@ export class TreeManager {
     renderTreeNode(node, level, viewMode = 'variants', parentIsGroup = false) {
         const hasChildren = node.children && node.children.length > 0;
         
-        // Debug: Check if all nodes have the same item reference
-        if (node.item && level === 0) {
-            console.log('🐛 DEBUG: Rendering node:', node.name, 'className:', node.item.className, 'item ref:', node.item === window.debugFirstItem ? 'SAME AS FIRST!' : 'unique');
-            if (!window.debugFirstItem) window.debugFirstItem = node.item;
-        }
         
         // Simplified indentation logic:
         // - Group headers (isPrimaryGroup) are never indented (level 0)
@@ -706,16 +688,9 @@ export function selectTreeItem(element) {
         return;
     }
     
-    console.log('🐛 DEBUG: selectTreeItem called');
-    console.log('🐛 Clicked element text:', element.textContent.trim());
-    console.log('🐛 Raw data-item length:', element.dataset.item.length);
-    
     let itemData;
     try {
         itemData = JSON.parse(element.dataset.item);
-        console.log('🐛 Parsed item:', itemData.displayName, 'className:', itemData.className);
-        console.log('🐛 Is this always the same item?', itemData.className === window.debugLastClickedClassName);
-        window.debugLastClickedClassName = itemData.className;
     } catch (e) {
         console.warn('selectTreeItem: Could not parse item data', e);
         return;
@@ -734,13 +709,6 @@ export function selectTreeItem(element) {
             
             // Find the corresponding navigation node by matching the clicked element
             const allNodes = navigationState.getNavigableNodes();
-            console.log('🔍 Looking for navigation node with className:', itemData.className);
-            console.log('🔍 Available navigation nodes:', allNodes.map(n => ({
-                name: n.name, 
-                hasData: !!n.data, 
-                className: n.data?.className,
-                type: n.type
-            })));
             
             const matchingNode = allNodes.find(node => {
                 // Try to match by item data
@@ -751,12 +719,8 @@ export function selectTreeItem(element) {
             });
             
             if (matchingNode) {
-                console.log('🎯 Syncing navigation system to clicked item:', matchingNode.name);
                 navigationState.setFocus(matchingNode);
                 navigationState.setSelection(matchingNode);
-            } else {
-                console.warn('❌ Could not find matching navigation node for clicked item:', itemData.className);
-                console.log('Available node classNames:', allNodes.map(n => n.data?.className).filter(Boolean));
             }
         }
     }

@@ -14,10 +14,36 @@ export const DataManager = {
         return enrichedClasses.map(classObj => {
             const meta = classObj._meta || {};
             
+            // Helper function to get the best available display name
+            const getDisplayName = () => {
+                // Helper to check if a string is a localization key
+                const isLocalizationString = (str) => {
+                    return str && typeof str === 'string' && str.trim().startsWith('$STR_');
+                };
+                
+                // Try meta first (enriched data) - skip if it's a localization string
+                if (meta.displayName && meta.displayName.trim() && !isLocalizationString(meta.displayName)) {
+                    return meta.displayName;
+                }
+                
+                // Try classObj displayName - skip if it's a localization string
+                if (classObj.displayName && classObj.displayName.trim() && !isLocalizationString(classObj.displayName)) {
+                    return classObj.displayName;
+                }
+                
+                // Try properties displayName (from config files) - skip if it's a localization string
+                if (classObj.properties?.displayName && classObj.properties.displayName.trim() && !isLocalizationString(classObj.properties.displayName)) {
+                    return classObj.properties.displayName.trim();
+                }
+                
+                // Fallback to className (always use this instead of localization strings)
+                return classObj.className;
+            };
+            
             // Create UI-compatible item object
             const item = {
                 className: classObj.className,
-                displayName: meta.displayName || classObj.displayName || classObj.className,
+                displayName: getDisplayName(),
                 category: meta.category || 'unknown',
                 mod: classObj._sourceMod || 'Unknown',
                 baseClass: classObj.baseClass || '',
@@ -96,6 +122,7 @@ export const DataManager = {
             'weapons': 'weapon',
             'handguns': 'handgun', 
             'launchers': 'launcher',
+            'binoculars': 'binoculars',
             'backpacks': 'backpack',
             'vests': 'vest',
             'attachments': 'attachment',
