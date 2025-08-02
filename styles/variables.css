@@ -2,63 +2,63 @@
 /* ACE Arsenal Color Scheme Implementation */
 
 :root {
-    /* === ACE ARSENAL COLOR SYSTEM === */
-    /* Primary Background Colors - Mixed opacity for contrast */
-    --surface-primary: rgba(0, 0, 0, 1.0);              /* {0,0,0,1} - Solid black */
-    --surface-secondary: rgba(0, 0, 0, 0.2);            /* 20% opacity for tree backgrounds */
-    --surface-elevated: rgba(26, 26, 26, 0.2);          /* 20% opacity for elevated elements */
-    --surface-glass: rgba(0, 0, 0, 0.2);                /* 20% opacity to match tabs */
-    --surface-panel: rgba(26, 26, 26, 0.85);            /* 85% opacity for main panels */
-    --surface-title: rgba(0, 0, 0, 0.9);                /* 90% opacity black for headers */
-    --surface-group: rgba(64, 64, 64, 0.9);             /* 90% opacity dark grey for group rows */
+    /* === ARMA 3 ARSENAL COLOR SYSTEM === */
+    /* Dark grey panels with more transparency matching real Arsenal UI */
+    --surface-primary: rgba(0, 0, 0, 0.0);              /* Transparent background to show image */
+    --surface-secondary: rgba(30, 30, 30, 0.5);         /* Dark grey with more transparency */
+    --surface-elevated: rgba(40, 40, 40, 0.6);          /* Slightly more opaque elevated surfaces */
+    --surface-glass: rgba(20, 20, 20, 0.4);             /* Very transparent dark glass overlay */
+    --surface-panel: rgba(35, 35, 35, 0.6);             /* Main panel background - dark grey, more transparent */
+    --surface-title: rgba(25, 25, 25, 0.7);             /* Header background - darker with more transparency */
+    --surface-group: rgba(40, 40, 40, 0.4);             /* Group row background - very transparent */
     
-    /* Button & Interactive Element Colors - 20% opacity for uniform styling */
-    --button-background: rgba(0, 0, 0, 0.2);            /* 20% opacity to match panels */
-    --button-background-menu: rgba(0, 0, 0, 0.2);       /* 20% opacity for menu buttons */
-    --selection-background: rgba(255, 255, 255, 0.5);   /* {1,1,1,0.5} - Semi-transparent white (50% opacity) */
-    --active-background: rgba(255, 255, 255, 0.15);     /* {1,1,1,0.15} - Very light white tint (15% opacity) */
+    /* Button & Interactive Element Colors */
+    --button-background: rgba(30, 30, 30, 0.6);         /* Dark grey transparent button background */
+    --button-background-menu: rgba(25, 25, 25, 0.7);    /* Slightly more opaque menu buttons */
+    --selection-background: rgba(0, 0, 0, 0.9);         /* BLACK selection background */
+    --active-background: rgba(60, 60, 60, 0.5);         /* Light grey transparent hover state */
     
-    /* Text Colors */
-    --content-primary: rgba(255, 255, 255, 1.0);        /* {1,1,1,1} - Pure white */
-    --content-secondary: rgba(179, 179, 179, 1.0);      /* {0.7,0.7,0.7,1} - Light gray */
-    --content-tertiary: rgba(128, 128, 128, 1.0);       /* Medium gray for less important text */
-    --content-disabled: rgba(255, 255, 255, 0.5);       /* {1,1,1,0.5} - Semi-transparent white */
-    --content-author: rgba(255, 255, 255, 0.5);         /* {1,1,1,0.5} - Semi-transparent white */
-    --content-stats: rgba(0, 0, 0, 1.0);                /* {0,0,0,1} - Black (for text over light backgrounds) */
-    --content-header: rgba(255, 255, 255, 1.0);         /* Pure white for headers with dark backgrounds */
+    /* Text Colors - Arsenal neutral styling */
+    --content-primary: rgba(255, 255, 255, 1.0);        /* Pure white text */
+    --content-secondary: rgba(200, 200, 200, 1.0);      /* Light gray secondary text */
+    --content-tertiary: rgba(160, 160, 160, 1.0);       /* Medium gray tertiary text */
+    --content-disabled: rgba(255, 255, 255, 0.5);       /* Semi-transparent white */
+    --content-author: rgba(255, 255, 255, 0.7);         /* Slightly visible white */
+    --content-stats: rgba(255, 255, 255, 1.0);          /* White text for stats */
+    --content-header: rgba(255, 255, 255, 1.0);         /* Bright white for headers */
     
-    /* Special Colors */
-    --favorites-color: rgba(230, 223, 153, 1.0);        /* [0.9, 0.875, 0.6] - Warm yellow/gold */
-    --delete-active: rgba(128, 0, 0, 1.0);              /* {0.5,0,0,1} - Red */
-    --progress-bar: rgba(255, 255, 255, 1.0);           /* {1,1,1,1} - White */
-    --progress-frame: rgba(0, 0, 0, 1.0);               /* {0,0,0,1} - Black frame */
+    /* Special Colors - Arsenal themed */
+    --favorites-color: rgba(200, 200, 200, 1.0);        /* Light gray for special items */
+    --delete-active: rgba(180, 60, 60, 1.0);            /* Red for delete actions */
+    --progress-bar: rgba(255, 255, 255, 1.0);           /* White progress */
+    --progress-frame: rgba(50, 50, 50, 1.0);            /* Dark gray frame */
     
-    /* Border Colors */
-    --border-primary: rgba(64, 64, 64, 1.0);            /* Slightly lighter for visibility */
-    --border-secondary: rgba(42, 42, 42, 1.0);          /* Darker borders */
-    --border-focus: rgba(255, 255, 255, 0.3);           /* Light focus indicator */
+    /* Border Colors - Thin black Arsenal-style borders */
+    --border-primary: rgba(0, 0, 0, 0.8);               /* Thin black border */
+    --border-secondary: rgba(0, 0, 0, 0.9);             /* Slightly more opaque black border */
+    --border-focus: rgba(0, 0, 0, 1.0);                 /* Solid black focus border */
     
-    /* State Colors - Updated for ACE Arsenal feel */
-    --state-hover: var(--active-background);            /* Using ACE's active background for hover */
-    --state-focus: rgba(255, 255, 255, 0.1);           /* Subtle white overlay for focus */
-    --state-selected: var(--selection-background);      /* Using ACE's selection background */
+    /* State Colors - Arsenal neutral styling */
+    --state-hover: var(--active-background);            /* Gray hover state */
+    --state-focus: rgba(100, 100, 100, 0.3);           /* Light gray focus overlay */
+    --state-selected: var(--selection-background);      /* Gray selection */
     
-    /* Action Colors - Keeping some branded colors for functionality */
-    --action-primary: rgba(74, 144, 226, 1.0);         /* Blue for primary actions */
-    --action-primary-hover: rgba(91, 160, 242, 1.0);   /* Lighter blue for hover */
-    --action-accent: var(--favorites-color);            /* Using ACE's favorites color as accent */
+    /* Action Colors - Arsenal themed */
+    --action-primary: rgba(80, 80, 80, 1.0);           /* Medium gray for primary actions */
+    --action-primary-hover: rgba(100, 100, 100, 1.0);  /* Lighter gray for hover */
+    --action-accent: var(--favorites-color);            /* Light gray accent */
     
-    /* Feedback Colors */
-    --feedback-success: rgba(126, 211, 33, 1.0);
-    --feedback-warning: var(--favorites-color);         /* Using favorites color for warnings */
-    --feedback-error: var(--delete-active);             /* Using delete color for errors */
+    /* Feedback Colors - Arsenal palette */
+    --feedback-success: rgba(80, 150, 80, 1.0);        /* Green success */
+    --feedback-warning: rgba(200, 150, 50, 1.0);       /* Yellow warning */
+    --feedback-error: var(--delete-active);             /* Red error */
     
-    /* Gradient and Shadows - Tan/Brown military feel */
+    /* Gradient and Shadows - Dark Arsenal feel */
     --gradient-primary: linear-gradient(135deg, 
-        rgba(139, 119, 101, 0.8),  /* Warm tan */
-        rgba(160, 130, 98, 0.7),   /* Light brown */
-        rgba(101, 85, 69, 0.8),    /* Dark brown */
-        rgba(120, 100, 80, 0.75)   /* Medium brown */
+        rgba(30, 30, 30, 0.9),     /* Dark gray */
+        rgba(40, 40, 40, 0.8),     /* Medium dark gray */
+        rgba(20, 20, 20, 0.95),    /* Very dark gray */
+        rgba(35, 35, 35, 0.85)     /* Medium gray */
     );
     --elevation-1: none;
     --elevation-2: none;
