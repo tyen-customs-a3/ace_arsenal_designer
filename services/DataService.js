@@ -210,12 +210,12 @@ export class DataService {
         // Note: Convert relative paths to absolute URLs for worker compatibility
         const basePath = this._getBasePath();
         const relativePaths = [
-            // Vanilla Arma 3 configs (web-accessible directory structure)
-            { path: 'data/addons/vanilla/weapons_f/config.cpp', mod: 'Vanilla' },
-            { path: 'data/addons/vanilla/weapons_f_mark/config.cpp', mod: 'Vanilla' },
-            { path: 'data/addons/vanilla/weapons_f_exp/config.cpp', mod: 'Vanilla' },
-            { path: 'data/addons/vanilla/characters_f/config.cpp', mod: 'Vanilla' },
-            { path: 'data/addons/vanilla/supplies_f_exp/config.cpp', mod: 'Vanilla' },
+            // Vanilla Arma 3 configs (symlinked a3 directory)
+            { path: 'data/addons/a3/weapons_f/config.cpp', mod: 'Vanilla' },
+            { path: 'data/addons/a3/weapons_f_mark/config.cpp', mod: 'Vanilla' },
+            { path: 'data/addons/a3/weapons_f_exp/config.cpp', mod: 'Vanilla' },
+            { path: 'data/addons/a3/characters_f/config.cpp', mod: 'Vanilla' },
+            { path: 'data/addons/a3/supplies_f_exp/config.cpp', mod: 'Vanilla' },
             
             // SFP mod configs
             { path: 'data/addons/sfp/ak5/config.cpp', mod: 'SFP' },

@@ -92,3 +92,6 @@ Thumbs.db
 # Logs
 logs
 *.log
+
+# Symbolic links to external content
+data/addons/a3/
