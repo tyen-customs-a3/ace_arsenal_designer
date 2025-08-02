@@ -58,7 +58,6 @@ export class DataService {
         }
         
         try {
-            console.log('DataService: Initializing parallel config parsing, inheritance resolution, and enrichment...');
             
             // Run the parsing stage to get raw AST data
             const rawData = await this._runParsingStage();
@@ -76,7 +75,6 @@ export class DataService {
             this.enrichmentReport = enrichmentResult.report;
             this.isInitialized = true;
             
-            console.log(`DataService: Initialization complete. Enriched ${enrichmentResult.enrichedDb.size} classes from ${Object.keys(rawData).length} top-level config classes.`);
             return this.enrichedData;
             
         } catch (error) {
@@ -98,28 +96,22 @@ export class DataService {
     async _runParsingStage() {
         try {
             // Phase 1: File Discovery
-            console.log('DataService: Discovering config files...');
             const configFiles = this._getConfigFilePaths();
             
             if (configFiles.length === 0) {
                 throw new Error('No config files found to parse');
             }
             
-            console.log(`DataService: Found ${configFiles.length} config files to parse`);
-            
             // Phase 2: Worker Pool Initialization
-            console.log(`DataService: Initializing worker pool (${this.maxWorkers} workers)...`);
             await this._initializeWorkerPool();
             
             // Phase 3: Dispatch and Aggregate
-            console.log('DataService: Starting parallel parsing...');
             const startTime = performance.now();
             
             const results = await this._processAllFiles(configFiles);
             
             const endTime = performance.now();
             const duration = ((endTime - startTime) / 1000).toFixed(2);
-            console.log(`DataService: Parsing completed in ${duration} seconds`);
             
             // Phase 4: Cleanup
             this._terminateWorkerPool();
@@ -141,7 +133,6 @@ export class DataService {
      */
     async _runInheritanceResolutionStage(rawAst) {
         try {
-            console.log('DataService: Starting inheritance resolution...');
             const startTime = performance.now();
             
             // Use the InheritanceResolver to resolve all class inheritance
@@ -150,8 +141,6 @@ export class DataService {
             const endTime = performance.now();
             const duration = ((endTime - startTime) / 1000).toFixed(2);
             
-            console.log(`DataService: Inheritance resolution completed in ${duration} seconds`);
-            console.log(`DataService: Resolved ${resolvedClasses.size} classes with full inheritance chains`);
             
             return resolvedClasses;
             
@@ -169,7 +158,6 @@ export class DataService {
      */
     async _runEnrichmentStage(resolvedDb) {
         try {
-            console.log('DataService: Starting data enrichment...');
             const startTime = performance.now();
             
             // Configure enrichment to continue on errors for robustness
@@ -186,9 +174,6 @@ export class DataService {
             const endTime = performance.now();
             const duration = ((endTime - startTime) / 1000).toFixed(2);
             
-            console.log(`DataService: Data enrichment completed in ${duration} seconds`);
-            console.log(`DataService: Enriched ${enrichmentResult.enrichedDb.size} classes with metadata`);
-            console.log(`DataService: Enrichment rate: ${enrichmentResult.report.summary.enrichmentRate}`);
             
             // Log any enrichment warnings or errors
             if (enrichmentResult.report.errors.length > 0) {
@@ -258,7 +243,6 @@ export class DataService {
         
         // Wait for all workers to be created
         this.workers = await Promise.all(workerPromises);
-        console.log(`DataService: Worker pool initialized with ${this.workers.length} workers`);
     }
 
     /**
@@ -388,7 +372,6 @@ export class DataService {
         const modClassCounts = {};
         const conflictLog = [];
         
-        console.log('DataService: Aggregating AST results from all config files...');
         
         // Process each file's AST results
         for (const [filePath, fileData] of Object.entries(fileResults)) {
@@ -428,20 +411,10 @@ export class DataService {
             modClassCounts[mod] = (modClassCounts[mod] || 0) + fileClassCount;
             
             if (fileClassCount > 0) {
-                console.log(`DataService: Merged ${fileClassCount} classes from ${mod} (${filePath})`);
             }
         }
         
-        // Log aggregation summary
-        console.log(`DataService: Aggregation complete - ${totalClassCount} total classes from ${Object.keys(fileResults).length} files`);
-        
-        if (conflictLog.length > 0) {
-            console.log(`DataService: ${conflictLog.length} class name conflicts resolved (first-occurrence-wins policy)`);
-        }
-        
-        for (const [mod, count] of Object.entries(modClassCounts)) {
-            console.log(`DataService: ${mod}: ${count} classes`);
-        }
+        // Aggregation complete - detailed logging removed for production
         
         return aggregated;
     }
@@ -584,7 +557,6 @@ export class DataService {
      */
     _terminateWorkerPool() {
         if (this.workers && this.workers.length > 0) {
-            console.log('DataService: Terminating worker pool...');
             
             this.workers.forEach(workerInfo => {
                 try {
@@ -759,7 +731,6 @@ export class DataService {
         this.resolvedData = null;
         this.enrichedData = null;
         this.enrichmentReport = null;
-        console.log('DataService: Service reset');
     }
 
     /**
