@@ -16,7 +16,7 @@ import {
     clearPanelFocus,
     focusFirstItem,
     restoreFocusAfterViewChange
-} from '../ui/simpleTreeV2.js';
+} from '../ui/treeView.js';
 
 // Import focused modules
 import { DataManager } from './data.js';

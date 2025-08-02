@@ -116,7 +116,7 @@ arsenal-testbed/
 ├── workers/               # Web Workers for parallel processing
 │   └── parser.worker.js   # Parsing worker
 ├── ui/                    # User interface components
-│   ├── simpleTreeV2.js    # Tree rendering with keyboard navigation
+│   ├── treeView.js    # Tree rendering with keyboard navigation
 │   ├── treeNavigation.js  # Navigation handlers
 │   └── constants.js       # UI configuration
 ├── data/addons/           # Real Arma 3 mod configuration files

@@ -4,7 +4,7 @@
 import { 
     initializeTreeManager,
     getTreeManager
-} from '../ui/simpleTreeV2.js';
+} from '../ui/treeView.js';
 
 export const Renderer = {
     init() {

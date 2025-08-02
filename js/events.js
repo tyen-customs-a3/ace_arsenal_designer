@@ -4,7 +4,7 @@
 import { 
     toggleTreeGroup,
     selectTreeItem
-} from '../ui/simpleTreeV2.js';
+} from '../ui/treeView.js';
 
 export const EventManager = {
     // Hover preview state

@@ -1,4 +1,4 @@
-// Enhanced Tree View Implementation V2
+// Enhanced Tree View Implementation
 // Uses the new unified architecture for consistent navigation and construction
 
 import { TreeNode, NodeType, TreeUtils } from './treeNode.js';
@@ -523,7 +523,6 @@ export class TreeManager {
         return treeData.map(node => this.renderTreeNode(node, 0, viewMode, false)).join('');
     }
     
-    // Tree node renderer (based on original simpleTree.js)
     renderTreeNode(node, level, viewMode = 'variants', parentIsGroup = false) {
         const hasChildren = node.children && node.children.length > 0;
         
