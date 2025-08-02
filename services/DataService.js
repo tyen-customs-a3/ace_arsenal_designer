@@ -201,28 +201,54 @@ export class DataService {
     _getConfigFilePaths() {
         // TODO: In future phases, this could be enhanced to auto-discover files
         // For now, use the hardcoded list from the existing loader.js
-        return [
+        // Note: Convert relative paths to absolute URLs for worker compatibility
+        const basePath = this._getBasePath();
+        const relativePaths = [
             // SFP mod configs
-            { path: './data/addons/sfp/ak5/config.cpp', mod: 'SFP' },
-            { path: './data/addons/sfp/attachments/config.cpp', mod: 'SFP' },
+            { path: 'data/addons/sfp/ak5/config.cpp', mod: 'SFP' },
+            { path: 'data/addons/sfp/attachments/config.cpp', mod: 'SFP' },
             
             // PTV mod configs
-            { path: './data/addons/ptv/weapons/config.cpp', mod: 'PTV' },
-            { path: './data/addons/ptv/weapons_cfg/config.cpp', mod: 'PTV' },
-            { path: './data/addons/ptv/amf/sig552/config.cpp', mod: 'PTV' },
-            { path: './data/addons/ptv/throwables/config.cpp', mod: 'PTV' },
+            { path: 'data/addons/ptv/weapons/config.cpp', mod: 'PTV' },
+            { path: 'data/addons/ptv/weapons_cfg/config.cpp', mod: 'PTV' },
+            { path: 'data/addons/ptv/amf/sig552/config.cpp', mod: 'PTV' },
+            { path: 'data/addons/ptv/throwables/config.cpp', mod: 'PTV' },
             
             // SNS mod configs
-            { path: './data/addons/sns/sns_vehicles/config.cpp', mod: 'SNS' },
-            { path: './data/addons/sns/sns_dutch/config.cpp', mod: 'SNS' },
-            { path: './data/addons/sns/sns_dutch_cfg/config.cpp', mod: 'SNS' },
-            { path: './data/addons/sns/sns_french/config.cpp', mod: 'SNS' },
-            { path: './data/addons/sns/simc_uaf_67/config.cpp', mod: 'SNS' },
-            { path: './data/addons/sns/simc_uaf_67_cfg/config.cpp', mod: 'SNS' },
-            { path: './data/addons/sns/simc_nv_67_cfg/config.cpp', mod: 'SNS' },
-            { path: './data/addons/sns/simc_uaf_68_cfg/config.cpp', mod: 'SNS' },
-            { path: './data/addons/sns/simc_mc_67_cfg/config.cpp', mod: 'SNS' }
+            { path: 'data/addons/sns/sns_vehicles/config.cpp', mod: 'SNS' },
+            { path: 'data/addons/sns/sns_dutch/config.cpp', mod: 'SNS' },
+            { path: 'data/addons/sns/sns_dutch_cfg/config.cpp', mod: 'SNS' },
+            { path: 'data/addons/sns/sns_french/config.cpp', mod: 'SNS' },
+            { path: 'data/addons/sns/simc_uaf_67/config.cpp', mod: 'SNS' },
+            { path: 'data/addons/sns/simc_uaf_67_cfg/config.cpp', mod: 'SNS' },
+            { path: 'data/addons/sns/simc_nv_67_cfg/config.cpp', mod: 'SNS' },
+            { path: 'data/addons/sns/simc_uaf_68_cfg/config.cpp', mod: 'SNS' },
+            { path: 'data/addons/sns/simc_mc_67_cfg/config.cpp', mod: 'SNS' }
         ];
+        
+        // Convert to absolute URLs for worker compatibility
+        return relativePaths.map(item => ({
+            ...item,
+            path: basePath + item.path
+        }));
+    }
+
+    /**
+     * Get the base path for resolving file URLs
+     * This ensures worker threads can access files using absolute URLs
+     * @returns {string} The base URL path
+     * @private
+     */
+    _getBasePath() {
+        if (typeof window !== 'undefined') {
+            // Browser environment - construct base path from current location
+            const location = window.location;
+            const pathWithoutFile = location.pathname.replace(/\/[^/]*$/, '/');
+            return location.origin + pathWithoutFile;
+        } else {
+            // Node.js or other environment - return relative path
+            return '';
+        }
     }
 
     /**
@@ -254,7 +280,7 @@ export class DataService {
     async _createWorker(workerId) {
         return new Promise((resolve, reject) => {
             try {
-                const worker = new Worker('./workers/parser.worker.js', { type: 'module' });
+                const worker = new Worker('workers/parser.worker.js', { type: 'module' });
                 
                 const workerInfo = {
                     id: workerId,
@@ -769,6 +795,14 @@ export class DataService {
         }
         
         return baseStats;
+    }
+
+    /**
+     * Get the list of config file paths for testing purposes
+     * @returns {Array<{path: string, mod: string}>} Array of config file specifications
+     */
+    getConfigFilePaths() {
+        return this._getConfigFilePaths();
     }
 }
 
