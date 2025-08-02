@@ -140,6 +140,9 @@ const attachmentDefinition = {
      */
     extract(classData, allResolvedData = {}) {
         const meta = {
+            // Type identifier
+            type: this.type,
+            
             // Core attachment characteristics
             attachmentType: this._extractAttachmentType(classData),
             subType: this._extractSubType(classData),
@@ -257,7 +260,7 @@ const attachmentDefinition = {
         if (/dovetail/i.test(className)) return 'dovetail';
         if (/ris/i.test(className)) return 'ris';
         if (/mlok/i.test(className)) return 'mlok';
-        if /_keymod/i.test(className)) return 'keymod';
+        if (/keymod/i.test(className)) return 'keymod';
         
         // Weapon-specific mounts
         if (/ak.*mount|ak.*rail/i.test(className)) return 'ak_mount';

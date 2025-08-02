@@ -123,6 +123,9 @@ const nvgDefinition = {
      */
     extract(classData, allResolvedData = {}) {
         const meta = {
+            // Type identifier
+            type: this.type,
+            
             // Core NVG characteristics
             nvgType: this._extractNVGType(classData),
             generation: this._extractGeneration(classData),

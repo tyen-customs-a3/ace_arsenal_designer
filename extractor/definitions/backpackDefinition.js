@@ -118,6 +118,9 @@ const backpackDefinition = {
      */
     extract(classData, allResolvedData = {}) {
         const meta = {
+            // Type identifier
+            type: this.type,
+            
             // Core capacity characteristics
             capacity: this._extractCapacity(classData),
             transportCapacity: this._extractTransportCapacity(classData),

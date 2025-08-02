@@ -27,6 +27,7 @@
  * Configuration for the enrichment process
  * @typedef {Object} EnrichmentConfig
  * @property {boolean} enableLogging - Whether to enable detailed logging
+ * @property {boolean} enableDebugLogging - Whether to enable debug-level logging
  * @property {boolean} continueOnError - Whether to continue processing after definition errors
  * @property {number} maxRetries - Maximum retries for failed definition imports
  * @property {boolean} trackPerformance - Whether to collect detailed performance metrics
@@ -38,9 +39,12 @@
  */
 const DEFAULT_CONFIG = {
     enableLogging: true,
+    enableDebugLogging: false,
     continueOnError: true,
     maxRetries: 3,
-    trackPerformance: true
+    trackPerformance: true,
+    logIndividualMatches: false,    // Disable verbose match logging by default
+    logBatchProgress: false         // Disable verbose batch progress by default
 };
 
 /**
@@ -87,11 +91,14 @@ class DataExtractor {
     /**
      * Log a message with optional level
      * @param {string} message - The message to log
-     * @param {string} level - Log level (info, warn, error)
+     * @param {string} level - Log level (info, warn, error, debug)
      * @private
      */
     log(message, level = 'info') {
         if (!this.config.enableLogging) return;
+        
+        // Skip debug messages unless debug logging is enabled
+        if (level === 'debug' && !this.config.enableDebugLogging) return;
         
         const timestamp = new Date().toISOString();
         const prefix = `[DataExtractor ${timestamp}]`;
@@ -104,6 +111,9 @@ class DataExtractor {
             case 'warn':
                 console.warn(`${prefix} WARN: ${message}`);
                 this.stats.warnings.push(message);
+                break;
+            case 'debug':
+                console.log(`${prefix} DEBUG: ${message}`);
                 break;
             default:
                 console.log(`${prefix} ${message}`);
@@ -282,7 +292,9 @@ class DataExtractor {
                     matchedDefinition = definitionName;
                     
                     // Use first match (prioritize first match as specified)
-                    this.log(`Class ${className} matched definition: ${definitionName}`);
+                    if (this.config.logIndividualMatches === true) {
+                        this.log(`Class ${className} matched definition: ${definitionName}`, 'debug');
+                    }
                     break;
                 }
                 
@@ -309,7 +321,7 @@ class DataExtractor {
         } else {
             // No definition matched this class
             this.stats.unenrichedClasses++;
-            this.log(`No definition matched class: ${className}`, 'warn');
+            this.log(`No definition matched class: ${className}`, 'debug');
             
             // Add minimal meta information for tracking
             enrichedClass._meta = {
@@ -449,8 +461,10 @@ class DataExtractor {
                 await Promise.all(batchPromises);
                 
                 // Log progress
-                const processed = Math.min(i + batchSize, classEntries.length);
-                this.log(`Processed batch: ${processed}/${classEntries.length} classes (${((processed / classEntries.length) * 100).toFixed(1)}%)`);
+                if (this.config.logBatchProgress === true) {
+                    const processed = Math.min(i + batchSize, classEntries.length);
+                    this.log(`Processed batch: ${processed}/${classEntries.length} classes (${((processed / classEntries.length) * 100).toFixed(1)}%)`);
+                }
             }
             
             // Step 3: Calculate final statistics

@@ -116,6 +116,9 @@ const magazineDefinition = {
      */
     extract(classData, allResolvedData = {}) {
         const meta = {
+            // Type identifier
+            type: this.type,
+            
             // Core ammunition characteristics
             capacity: this._extractCapacity(classData),
             caliber: this._extractCaliber(classData, allResolvedData),

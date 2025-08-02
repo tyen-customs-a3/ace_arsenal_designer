@@ -118,6 +118,9 @@ const vestDefinition = {
      */
     extract(classData, allResolvedData = {}) {
         const meta = {
+            // Type identifier
+            type: this.type,
+            
             // Core protection characteristics
             armor: this._extractArmor(classData),
             protection: this._extractProtection(classData),

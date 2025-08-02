@@ -45,18 +45,21 @@ const weaponDefinition = {
             return false;
         }
 
+        // Get properties object (may be nested)
+        const props = classData.properties || classData;
+
         // Primary indicator: weapons must have WeaponSlotsInfo
-        if (classData.WeaponSlotsInfo) {
+        if (props.WeaponSlotsInfo) {
             return true;
         }
 
         // Secondary indicators: magazines array indicates weapon
-        if (Array.isArray(classData.magazines) && classData.magazines.length > 0) {
+        if (Array.isArray(props.magazines) && props.magazines.length > 0) {
             return true;
         }
 
         // Tertiary indicator: modes array with firing modes
-        if (Array.isArray(classData.modes) && classData.modes.length > 0) {
+        if (Array.isArray(props.modes) && props.modes.length > 0) {
             return true;
         }
 
@@ -122,6 +125,9 @@ const weaponDefinition = {
      */
     extract(classData, allResolvedData = {}) {
         const meta = {
+            // Type identifier
+            type: this.type,
+            
             // Core weapon characteristics
             caliber: this._extractCaliber(classData, allResolvedData),
             damage: this._extractDamage(classData),

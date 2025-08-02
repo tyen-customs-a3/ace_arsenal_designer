@@ -1,0 +1,14 @@
+{
+  "name": "arsenal-testbed",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "ACE3 Arsenal Testbed with DataExtractor",
+  "main": "index.html",
+  "scripts": {
+    "test": "node extractor/test/runTests.js",
+    "test:quick": "node extractor/test/quickTest.js",
+    "test:transport": "node extractor/test/transportItemTest.js"
+  },
+  "author": "Arsenal Testbed",
+  "license": "MIT"
+}
