@@ -210,12 +210,12 @@ export class DataService {
         // Note: Convert relative paths to absolute URLs for worker compatibility
         const basePath = this._getBasePath();
         const relativePaths = [
-            // Vanilla Arma 3 configs (P:/ drive - base classes)
-            { path: 'P:/a3/weapons_f/config.cpp', mod: 'Vanilla' },
-            { path: 'P:/a3/weapons_f_mark/config.cpp', mod: 'Vanilla' },
-            { path: 'P:/a3/weapons_f_exp/config.cpp', mod: 'Vanilla' },
-            { path: 'P:/a3/characters_f/config.cpp', mod: 'Vanilla' },
-            { path: 'P:/a3/supplies_f_exp/config.cpp', mod: 'Vanilla' },
+            // Vanilla Arma 3 configs (web-accessible directory structure)
+            { path: 'data/addons/vanilla/weapons_f/config.cpp', mod: 'Vanilla' },
+            { path: 'data/addons/vanilla/weapons_f_mark/config.cpp', mod: 'Vanilla' },
+            { path: 'data/addons/vanilla/weapons_f_exp/config.cpp', mod: 'Vanilla' },
+            { path: 'data/addons/vanilla/characters_f/config.cpp', mod: 'Vanilla' },
+            { path: 'data/addons/vanilla/supplies_f_exp/config.cpp', mod: 'Vanilla' },
             
             // SFP mod configs
             { path: 'data/addons/sfp/ak5/config.cpp', mod: 'SFP' },
@@ -240,10 +240,9 @@ export class DataService {
         ];
         
         // Convert to absolute URLs for worker compatibility
-        // Handle P:/ drive paths differently - they're already absolute
         return relativePaths.map(item => ({
             ...item,
-            path: item.path.startsWith('P:/') ? item.path : basePath + item.path
+            path: basePath + item.path
         }));
     }
 
