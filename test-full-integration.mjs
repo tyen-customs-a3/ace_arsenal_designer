@@ -26,7 +26,10 @@ class FullIntegrationTest {
             // Test 2: Simulate parsing pipeline 
             await this.testParsingPipeline();
             
-            // Test 3: Test frontend data transformation
+            // Test 3: Test semantic conflict resolution
+            await this.testSemanticConflictResolution();
+            
+            // Test 4: Test frontend data transformation
             await this.testFrontendTransformation();
             
             console.log('\n🎉 Full integration test passed! The system is ready for production.');
@@ -34,6 +37,7 @@ class FullIntegrationTest {
             console.log('   • Path resolution fixed for worker context');
             console.log('   • DataService generates correct absolute URLs');
             console.log('   • Config parsing works correctly'); 
+            console.log('   • Semantic conflict resolution eliminates false warnings');
             console.log('   • Frontend transformation is compatible');
             console.log('   • Ready to run in browser environment');
             
@@ -132,6 +136,143 @@ class FullIntegrationTest {
         
         console.log(`✅ Data enriched (${enriched.enrichedDb.size} enriched classes)`);
         console.log(`   Enrichment rate: ${enriched.report.summary.enrichmentRate}%`);
+    }
+
+    async testSemanticConflictResolution() {
+        console.log('🧪 Testing semantic conflict resolution system...');
+        
+        // Test ConfigClassifier
+        const { ConfigClassifier } = await import('./services/ConfigClassifier.js');
+        const classifier = new ConfigClassifier();
+        
+        // Test framework class classification
+        const cfgWeaponsClassification = classifier.classifyClass('CfgWeapons', { weapons: [], units: [] }, { mod: 'TEST' });
+        if (cfgWeaponsClassification.type !== 'framework') {
+            throw new Error(`CfgWeapons should be classified as 'framework', got '${cfgWeaponsClassification.type}'`);
+        }
+        
+        // Test interface class classification
+        const muzzleSlotClassification = classifier.classifyClass('MuzzleSlot', { compatibleItems: [] }, { mod: 'TEST' });
+        if (muzzleSlotClassification.type !== 'interface') {
+            throw new Error(`MuzzleSlot should be classified as 'interface', got '${muzzleSlotClassification.type}'`);
+        }
+        
+        // Test inheritance class classification
+        const rifleBaseClassification = classifier.classifyClass('Rifle_Base_F', { baseClass: 'Weapon' }, { mod: 'TEST' });
+        if (rifleBaseClassification.type !== 'inheritance') {
+            throw new Error(`Rifle_Base_F should be classified as 'inheritance', got '${rifleBaseClassification.type}'`);
+        }
+        
+        // Test content class classification
+        const sfpWeaponClassification = classifier.classifyClass('sfp_ak5', { displayName: 'AK5', damage: 100 }, { mod: 'SFP' });
+        if (sfpWeaponClassification.type !== 'content') {
+            throw new Error(`sfp_ak5 should be classified as 'content', got '${sfpWeaponClassification.type}'`);
+        }
+        
+        console.log('✅ ConfigClassifier correctly identifies all class types');
+        
+        // Test SemanticConflictResolver
+        const { SemanticConflictResolver } = await import('./services/SemanticConflictResolver.js');
+        const resolver = new SemanticConflictResolver({ modPriority: ['SFP', 'PTV', 'SNS'] });
+        
+        // Test framework conflict resolution (should merge/prioritize, not warn)
+        const existingFramework = { _sourceMod: 'SFP', _sourceFile: 'sfp.cpp', weapons: ['sfp_ak5'] };
+        const newFramework = { _sourceMod: 'PTV', _sourceFile: 'ptv.cpp', weapons: ['amf_sig552'] };
+        
+        const frameworkResolution = resolver.resolveConflict('CfgWeapons', existingFramework, newFramework, 'framework');
+        if (frameworkResolution.severity === 'warn') {
+            throw new Error('Framework class conflicts should not generate warnings');
+        }
+        if (frameworkResolution.strategy !== 'MERGE' && frameworkResolution.strategy !== 'PRIORITIZE') {
+            throw new Error(`Framework conflicts should MERGE or PRIORITIZE, got '${frameworkResolution.strategy}'`);
+        }
+        
+        // Test content conflict resolution (should warn for true conflicts)
+        const existingContent = { _sourceMod: 'SFP', _sourceFile: 'sfp.cpp', displayName: 'AK5' };
+        const newContent = { _sourceMod: 'PTV', _sourceFile: 'ptv.cpp', displayName: 'AK5 Clone' };
+        
+        const contentResolution = resolver.resolveConflict('sfp_ak5', existingContent, newContent, 'content');
+        if (contentResolution.severity !== 'warn') {
+            throw new Error('Content class conflicts should generate warnings');
+        }
+        if (contentResolution.strategy !== 'CONFLICT') {
+            throw new Error(`Content conflicts should be marked as CONFLICT, got '${contentResolution.strategy}'`);
+        }
+        
+        console.log('✅ SemanticConflictResolver applies correct strategies and severity levels');
+        
+        // Test DataService integration with semantic analysis
+        const { DataService } = await import('./services/DataService.js');
+        
+        // Create mock file results that would trigger the original warnings
+        const mockFileResults = {
+            'sfp_test.cpp': {
+                ast: {
+                    'CfgWeapons': { _sourceMod: 'SFP', _sourceFile: 'sfp_test.cpp' },
+                    'MuzzleSlot': { _sourceMod: 'SFP', _sourceFile: 'sfp_test.cpp' },
+                    'Rifle_Base_F': { _sourceMod: 'SFP', _sourceFile: 'sfp_test.cpp' },
+                    'sfp_ak5': { _sourceMod: 'SFP', _sourceFile: 'sfp_test.cpp', displayName: 'AK5' }
+                },
+                mod: 'SFP',
+                filePath: 'sfp_test.cpp'
+            },
+            'ptv_test.cpp': {
+                ast: {
+                    'CfgWeapons': { _sourceMod: 'PTV', _sourceFile: 'ptv_test.cpp' },
+                    'MuzzleSlot': { _sourceMod: 'PTV', _sourceFile: 'ptv_test.cpp' },
+                    'Rifle_Base_F': { _sourceMod: 'PTV', _sourceFile: 'ptv_test.cpp' },
+                    'amf_sig552': { _sourceMod: 'PTV', _sourceFile: 'ptv_test.cpp', displayName: 'SIG552' }
+                },
+                mod: 'PTV',
+                filePath: 'ptv_test.cpp'
+            }
+        };
+        
+        // Capture console output to verify logging behavior
+        const originalWarn = console.warn;
+        const warnings = [];
+        console.warn = (...args) => {
+            warnings.push(args.join(' '));
+        };
+        
+        const originalInfo = console.info;
+        const infoLogs = [];
+        console.info = (...args) => {
+            infoLogs.push(args.join(' '));
+        };
+        
+        try {
+            const dataService = new DataService();
+            const aggregated = dataService._aggregateASTResults(mockFileResults);
+            
+            // Restore console
+            console.warn = originalWarn;
+            console.info = originalInfo;
+            
+            // Verify that framework classes don't generate warnings
+            const frameworkWarnings = warnings.filter(w => w.includes('CfgWeapons') || w.includes('MuzzleSlot') || w.includes('Rifle_Base_F'));
+            if (frameworkWarnings.length > 0) {
+                throw new Error(`Framework/interface classes should not generate warnings, but got: ${frameworkWarnings.join('; ')}`);
+            }
+            
+            // Verify that all classes are present in the aggregated result
+            const expectedClasses = ['CfgWeapons', 'MuzzleSlot', 'Rifle_Base_F', 'sfp_ak5', 'amf_sig552'];
+            for (const className of expectedClasses) {
+                if (!(className in aggregated)) {
+                    throw new Error(`Expected class '${className}' missing from aggregated result`);
+                }
+            }
+            
+            console.log('✅ DataService integration eliminates false positive warnings');
+            console.log(`   Framework/interface conflicts: ${infoLogs.length} info logs, ${frameworkWarnings.length} warnings`);
+            console.log(`   Total classes processed: ${Object.keys(aggregated).length}`);
+            
+        } catch (error) {
+            // Restore console on error
+            console.warn = originalWarn;
+            console.info = originalInfo;
+            throw error;
+        }
     }
 
     async testFrontendTransformation() {

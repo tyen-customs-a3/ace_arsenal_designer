@@ -21,6 +21,8 @@
 
 import { resolve as resolveInheritance } from '../parser/inheritanceResolver.js';
 import { enrich as enrichDatabase } from '../extractor/dataExtractor.js';
+import { ConfigClassifier } from './ConfigClassifier.js';
+import { SemanticConflictResolver } from './SemanticConflictResolver.js';
 
 export class DataService {
     /**
@@ -41,6 +43,10 @@ export class DataService {
         this.resolvedData = null;
         this.enrichedData = null;
         this.enrichmentReport = null;
+        
+        // Initialize semantic analysis components
+        this._classifier = null;
+        this._resolver = null;
         
         // Bind methods to preserve context
         this._handleWorkerMessage = this._handleWorkerMessage.bind(this);
@@ -388,6 +394,7 @@ export class DataService {
 
     /**
      * Aggregate individual AST results from all config files into a single unified class hierarchy
+     * Uses semantic analysis to intelligently resolve class conflicts based on their type and purpose
      * @param {Object} fileResults - Object with filePath keys and {ast, mod, filePath} values
      * @returns {Object} Single aggregated class hierarchy object
      * @private
@@ -396,8 +403,16 @@ export class DataService {
         const aggregated = {};
         let totalClassCount = 0;
         const modClassCounts = {};
-        const conflictLog = [];
+        const resolutionLog = {
+            merges: [],
+            prioritizations: [],
+            conflicts: [],
+            debugActions: []
+        };
         
+        // Initialize semantic analysis components
+        const classifier = this._getConfigClassifier();
+        const resolver = this._getSemanticConflictResolver();
         
         // Process each file's AST results
         for (const [filePath, fileData] of Object.entries(fileResults)) {
@@ -415,17 +430,29 @@ export class DataService {
                 const mergedClassData = this._mergeClassWithMetadata(classData, mod, filePath);
                 
                 if (aggregated[className]) {
-                    // Handle class name conflict - preserve first occurrence, log the conflict
-                    const existingMod = aggregated[className]._sourceMod;
-                    const existingFile = aggregated[className]._sourceFile;
+                    // Semantic conflict resolution
+                    const context = { mod, filePath };
+                    const classification = classifier.classifyClass(className, mergedClassData, context);
                     
-                    conflictLog.push({
+                    const resolution = resolver.resolveConflict(
                         className,
-                        existing: { mod: existingMod, file: existingFile },
-                        ignored: { mod, file: filePath }
-                    });
+                        aggregated[className],
+                        mergedClassData,
+                        classification.type,
+                        {
+                            ...context,
+                            classification,
+                            existingMod: aggregated[className]._sourceMod,
+                            existingFile: aggregated[className]._sourceFile
+                        }
+                    );
                     
-                    console.warn(`DataService: Class name conflict for '${className}' - keeping from ${existingMod} (${existingFile}), ignoring from ${mod} (${filePath})`);
+                    // Apply resolution result
+                    aggregated[className] = resolution.mergedClass;
+                    
+                    // Log resolution with appropriate severity
+                    this._logResolution(className, classification, resolution, resolutionLog);
+                    
                 } else {
                     // Add new class to aggregated result
                     aggregated[className] = mergedClassData;
@@ -435,12 +462,10 @@ export class DataService {
             }
             
             modClassCounts[mod] = (modClassCounts[mod] || 0) + fileClassCount;
-            
-            if (fileClassCount > 0) {
-            }
         }
         
-        // Aggregation complete - detailed logging removed for production
+        // Log aggregation summary with semantic insights
+        this._logAggregationSummary(totalClassCount, modClassCounts, resolutionLog);
         
         return aggregated;
     }
@@ -803,6 +828,115 @@ export class DataService {
      */
     getConfigFilePaths() {
         return this._getConfigFilePaths();
+    }
+
+    /**
+     * Get or create the ConfigClassifier instance
+     * @returns {ConfigClassifier} The classifier instance
+     * @private
+     */
+    _getConfigClassifier() {
+        if (!this._classifier) {
+            this._classifier = new ConfigClassifier();
+        }
+        return this._classifier;
+    }
+
+    /**
+     * Get or create the SemanticConflictResolver instance
+     * @returns {SemanticConflictResolver} The resolver instance
+     * @private
+     */
+    _getSemanticConflictResolver() {
+        if (!this._resolver) {
+            // Configure resolver with mod priority based on our config files
+            const modPriority = ['SFP', 'PTV', 'SNS']; // Can be made configurable
+            this._resolver = new SemanticConflictResolver({ modPriority });
+        }
+        return this._resolver;
+    }
+
+    /**
+     * Log conflict resolution with appropriate severity level
+     * @param {string} className - The class name that was resolved
+     * @param {Object} classification - The semantic classification result
+     * @param {Object} resolution - The conflict resolution result
+     * @param {Object} resolutionLog - The resolution log to update
+     * @private
+     */
+    _logResolution(className, classification, resolution, resolutionLog) {
+        const logEntry = {
+            className,
+            classType: classification.type,
+            strategy: resolution.strategy,
+            severity: resolution.severity,
+            message: resolution.message,
+            details: resolution.details
+        };
+
+        // Log with appropriate severity
+        switch (resolution.severity) {
+            case 'debug':
+                // Framework classes and other expected duplicates - debug level
+                console.debug(`DataService: ${resolution.message}`);
+                resolutionLog.debugActions.push(logEntry);
+                break;
+                
+            case 'info':
+                // Interface merges and prioritizations - info level
+                console.info(`DataService: ${resolution.message}`);
+                if (resolution.strategy === 'MERGE') {
+                    resolutionLog.merges.push(logEntry);
+                } else {
+                    resolutionLog.prioritizations.push(logEntry);
+                }
+                break;
+                
+            case 'warn':
+                // True content conflicts - warning level
+                console.warn(`DataService: ${resolution.message}`);
+                resolutionLog.conflicts.push(logEntry);
+                break;
+                
+            case 'error':
+                // Serious structural issues - error level
+                console.error(`DataService: ${resolution.message}`);
+                resolutionLog.conflicts.push(logEntry);
+                break;
+                
+            default:
+                console.log(`DataService: ${resolution.message}`);
+                break;
+        }
+    }
+
+    /**
+     * Log aggregation summary with semantic analysis insights
+     * @param {number} totalClassCount - Total number of unique classes processed
+     * @param {Object} modClassCounts - Class count per mod
+     * @param {Object} resolutionLog - The resolution log with categorized actions
+     * @private
+     */
+    _logAggregationSummary(totalClassCount, modClassCounts, resolutionLog) {
+        const totalResolutions = resolutionLog.merges.length + 
+                               resolutionLog.prioritizations.length + 
+                               resolutionLog.conflicts.length + 
+                               resolutionLog.debugActions.length;
+
+        if (totalResolutions > 0) {
+            console.info(`DataService: Semantic conflict resolution summary:`);
+            console.info(`  - Framework/debug actions: ${resolutionLog.debugActions.length}`);
+            console.info(`  - Successful merges: ${resolutionLog.merges.length}`);
+            console.info(`  - Prioritizations: ${resolutionLog.prioritizations.length}`);
+            console.info(`  - True conflicts: ${resolutionLog.conflicts.length}`);
+            
+            // Only warn if there are actual content conflicts
+            if (resolutionLog.conflicts.length > 0) {
+                console.warn(`DataService: ${resolutionLog.conflicts.length} true content conflicts detected and resolved`);
+            }
+        }
+
+        console.info(`DataService: Aggregated ${totalClassCount} unique classes from ${Object.keys(modClassCounts).length} mods`);
     }
 }
 
