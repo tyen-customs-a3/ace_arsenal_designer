@@ -81,6 +81,38 @@
     margin-bottom: 4px;
 }
 
+/* Language selector styling within options panel */
+.language-selector-container {
+    width: 100%;
+}
+
+.language-selector {
+    width: 100%;
+    background: var(--surface-secondary);
+    color: var(--content-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 3px;
+    padding: 4px 6px;
+    font-size: 11px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.language-selector:hover {
+    border-color: var(--border-secondary);
+}
+
+.language-selector:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 1px var(--border-focus);
+}
+
+.language-selector:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .compact-filter-checkboxes {
     display: flex;
     flex-direction: column;

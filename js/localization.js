@@ -19,60 +19,18 @@ export const LocalizationManager = {
     },
 
     /**
-     * Creates the language selection dropdown in the UI
+     * Initializes the language selection dropdown that's already in the options panel
      */
     createLanguageSelector() {
-        // Find a suitable location for the language selector
-        const headerElement = document.querySelector('.controls') || document.querySelector('header') || document.body;
+        // The language selector is now part of the options panel in index.html
+        // We just need to verify it exists and is properly set up
+        const select = document.getElementById('language-selector');
+        if (!select) {
+            console.error('LocalizationManager: Language selector element not found in options panel');
+            return;
+        }
         
-        // Create language selector container
-        const languageContainer = document.createElement('div');
-        languageContainer.className = 'language-selector-container';
-        languageContainer.style.cssText = `
-            display: inline-block;
-            margin-left: 10px;
-            vertical-align: middle;
-        `;
-        
-        // Create label
-        const label = document.createElement('label');
-        label.textContent = 'Language: ';
-        label.style.cssText = `
-            font-size: 12px;
-            margin-right: 5px;
-            color: #ccc;
-        `;
-        
-        // Create select dropdown
-        const select = document.createElement('select');
-        select.id = 'language-selector';
-        select.className = 'language-selector';
-        select.style.cssText = `
-            background: #2a2a2a;
-            color: #fff;
-            border: 1px solid #555;
-            border-radius: 3px;
-            padding: 2px 5px;
-            font-size: 12px;
-            min-width: 80px;
-        `;
-        
-        // Add loading option initially
-        const loadingOption = document.createElement('option');
-        loadingOption.value = '';
-        loadingOption.textContent = 'Loading...';
-        loadingOption.disabled = true;
-        loadingOption.selected = true;
-        select.appendChild(loadingOption);
-        
-        // Assemble the selector
-        languageContainer.appendChild(label);
-        languageContainer.appendChild(select);
-        
-        // Insert into the header
-        headerElement.appendChild(languageContainer);
-        
-        console.log('LocalizationManager: Language selector created');
+        console.log('LocalizationManager: Language selector found in options panel');
     },
 
     /**
