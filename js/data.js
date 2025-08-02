@@ -85,37 +85,89 @@ export const DataManager = {
         document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
         document.querySelector(`[data-category="${category}"]`).classList.add('active');
         
-        // Map UI categories to DataService categories if needed
-        let dataServiceCategory = category;
-        if (category === 'weapons') dataServiceCategory = 'weapon';
-        else if (category === 'handguns') dataServiceCategory = 'handgun';
-        else if (category === 'launchers') dataServiceCategory = 'launcher';
-        else if (category === 'backpacks') dataServiceCategory = 'backpack';
-        else if (category === 'vests') dataServiceCategory = 'vest';
-        else if (category === 'attachments') dataServiceCategory = 'attachment';
-        else if (category === 'magazines') dataServiceCategory = 'magazine';
+        // Check if DataService is ready
+        if (!Arsenal.dataService.isReady()) {
+            console.warn('DataService not ready, cannot switch category');
+            return;
+        }
         
-        // Get items from DataService and transform them
-        const dataServiceItems = Arsenal.dataService.getClassesByCategory(dataServiceCategory);
+        // Map UI categories to DataService categories using a more maintainable approach
+        const categoryMapping = {
+            'weapons': 'weapon',
+            'handguns': 'handgun', 
+            'launchers': 'launcher',
+            'backpacks': 'backpack',
+            'vests': 'vest',
+            'attachments': 'attachment',
+            'magazines': 'magazine'
+        };
         
-        // Transform the items and override category to match UI expectations
-        const transformedItems = this.transformDataServiceItems(dataServiceItems).map(item => ({
-            ...item,
-            category: category // Ensure UI category is used
-        }));
+        const dataServiceCategory = categoryMapping[category] || category;
         
-        // Update current items for this category
-        Arsenal.currentItems = transformedItems;
-        
-        // Populate filter options and update display
-        import('./filters.js').then(({ FilterManager }) => {
-            FilterManager.populateFilterOptions(category);
-            Arsenal.filteredItems = FilterManager.filterItemsByCategory(category);
+        try {
+            // Get items from DataService and transform them
+            const dataServiceItems = Arsenal.dataService.getClassesByCategory(dataServiceCategory);
             
-            import('./rendering.js').then(({ Renderer }) => {
-                Renderer.renderTreeView(Arsenal.filteredItems, 'leftTreeView');
+            // Debug: Log what we got from DataService
+            console.log(`DataService returned ${dataServiceItems.length} items for category '${dataServiceCategory}'`);
+            
+            // If no items found, let's see what's available
+            if (dataServiceItems.length === 0) {
+                console.warn(`No items found for category '${dataServiceCategory}'`);
+                const availableCategories = Arsenal.dataService.getAvailableCategories();
+                const allData = Arsenal.dataService.getAllClasses();
+                console.log('Available categories:', availableCategories);
+                console.log('Total classes in DataService:', allData.size);
+                
+                // Sample some classes to see their structure
+                if (allData.size > 0) {
+                    const samples = Array.from(allData.entries()).slice(0, 3);
+                    console.log('Sample classes:', samples.map(([name, data]) => ({
+                        name,
+                        category: data._meta?.category,
+                        type: data._meta?.type,
+                        displayName: data._meta?.displayName || data.displayName
+                    })));
+                }
+            }
+            
+            // Transform the items and override category to match UI expectations
+            const transformedItems = this.transformDataServiceItems(dataServiceItems).map(item => ({
+                ...item,
+                category: category // Ensure UI category is used
+            }));
+            
+            console.log(`Transformed ${transformedItems.length} items for UI`);
+            
+            // Update current items for this category
+            Arsenal.currentItems = transformedItems;
+            
+            // Update timing display with category info
+            const timingElement = document.getElementById('timing');
+            timingElement.textContent = `${transformedItems.length} ${category} loaded`;
+            timingElement.style.color = ''; // Reset to default color
+            
+            // Populate filter options and update display
+            import('./filters.js').then(({ FilterManager }) => {
+                FilterManager.populateFilterOptions(category);
+                Arsenal.filteredItems = FilterManager.filterItemsByCategory(category);
+                
+                import('./rendering.js').then(({ Renderer }) => {
+                    Renderer.renderTreeView(Arsenal.filteredItems, 'leftTreeView');
+                });
             });
-        });
+            
+        } catch (error) {
+            console.error(`Error switching to category ${category}:`, error);
+            
+            // Show error in timing display
+            document.getElementById('timing').textContent = `Error loading ${category}`;
+            document.getElementById('timing').style.color = '#ff4444';
+            
+            // Clear items on error
+            Arsenal.currentItems = [];
+            Arsenal.filteredItems = [];
+        }
     },
 
     switchRightCategory(category) {
@@ -140,5 +192,46 @@ export const DataManager = {
         import('./selection.js').then(({ SelectionManager }) => {
             SelectionManager.clearSelection();
         });
+    },
+
+    // Enhanced DataService utilities
+    getDataServiceStats() {
+        if (!Arsenal.dataService.isReady()) {
+            return null;
+        }
+        return Arsenal.dataService.getStats();
+    },
+
+    getAvailableCategories() {
+        if (!Arsenal.dataService.isReady()) {
+            return [];
+        }
+        return Arsenal.dataService.getAvailableCategories();
+    },
+
+    // Find a specific item by className using DataService 
+    findItemByClassName(className) {
+        if (!Arsenal.dataService.isReady()) {
+            return null;
+        }
+        
+        const enrichedClass = Arsenal.dataService.findClass(className);
+        if (!enrichedClass) {
+            return null;
+        }
+        
+        // Transform single item to UI format
+        return this.transformDataServiceItems([{
+            className: className,
+            ...enrichedClass
+        }])[0];
+    },
+
+    // Get enrichment report for debugging
+    getEnrichmentReport() {
+        if (!Arsenal.dataService.isReady()) {
+            return null;
+        }
+        return Arsenal.dataService.getEnrichmentReport();
     }
 };

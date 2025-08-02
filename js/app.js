@@ -75,11 +75,27 @@ window.algorithms = algorithms;
 // Initialize the application
 async function initializeArsenal() {
     // Show loading message
-    document.getElementById('timing').textContent = 'Initializing DataService...';
+    const timingElement = document.getElementById('timing');
+    timingElement.textContent = 'Initializing DataService...';
+    timingElement.style.color = '#ffa500'; // Orange for loading
     
     try {
-        // Initialize DataService
+        // Initialize DataService with progress feedback
+        timingElement.textContent = 'Loading config files...';
+        
         const enrichedData = await Arsenal.dataService.initialize();
+        
+        // Show stats from DataService
+        const stats = Arsenal.dataService.getStats();
+        console.log('DataService initialized with', stats.enrichedClassCount, 'enriched classes');
+        
+        // Log enrichment report if available
+        const enrichmentReport = Arsenal.dataService.getEnrichmentReport();
+        if (enrichmentReport) {
+            console.log('Enrichment rate:', enrichmentReport.summary.enrichmentRate + '%');
+        }
+        
+        timingElement.textContent = 'Initializing managers...';
         
         // Initialize all managers
         DataManager.init();
@@ -90,6 +106,8 @@ async function initializeArsenal() {
         CompatibilityEngine.init();
         EventManager.init();
         PanelManager.init();
+        
+        timingElement.textContent = 'Loading initial data...';
         
         // Initialize UI state
         DataManager.switchCategory('weapons');
@@ -119,11 +137,41 @@ async function initializeArsenal() {
         document.getElementById('showModIcon').checked = Arsenal.displayOptions.showModIcon;
         document.querySelector(`input[name="spacingOption"][value="${Arsenal.displayOptions.spacing}"]`).checked = true;
 
-        // Application ready
-        document.getElementById('timing').textContent = 'Ready';
+        // Application ready - timing will be updated by switchCategory
+        timingElement.style.color = '#00ff00'; // Green for success
+        
+        // Add debug helper to global scope for console debugging
+        window.debugArsenal = function() {
+            console.group('Arsenal Debug Information');
+            console.log('DataService Stats:', Arsenal.dataService.getStats());
+            console.log('Available Categories:', Arsenal.dataService.getAvailableCategories());
+            console.log('Available Types:', Arsenal.dataService.getAvailableTypes());
+            console.log('Current Items Count:', Arsenal.currentItems.length);
+            console.log('Filtered Items Count:', Arsenal.filteredItems.length);
+            console.log('Selected Category:', Arsenal.selectedCategory);
+            console.log('Active Filters:', Arsenal.activeFilters);
+            console.groupEnd();
+        };
         
     } catch (error) {
         console.error('🚨 Failed to load arsenal data:', error);
+        
+        // Check if this is a common issue
+        let userFriendlyMessage = error.message;
+        let helpText = 'Check browser console for details';
+        
+        if (error.message.includes('Failed to fetch') || error.message.includes('Network error')) {
+            userFriendlyMessage = 'Config files cannot be loaded';
+            helpText = `
+                <strong>Common solutions:</strong><br>
+                • Serve files via local web server (python -m http.server 8000)<br>
+                • Use Live Server extension in VS Code<br>
+                • Files must be served via HTTP, not opened directly
+            `;
+        } else if (error.message.includes('Worker') || error.message.includes('workers/')) {
+            userFriendlyMessage = 'Web worker loading failed';
+            helpText = 'Web workers require files to be served via HTTP protocol';
+        }
         
         // Show user-friendly error message
         const timing = document.getElementById('timing');
@@ -138,9 +186,12 @@ async function initializeArsenal() {
             leftTreeView.innerHTML = `
                 <div style="padding: 20px; color: #ff4444; text-align: center;">
                     <h3>⚠️ Data Loading Error</h3>
-                    <p style="margin: 10px 0; font-size: 12px;">${error.message}</p>
-                    <p style="font-size: 10px; color: #999;">Check browser console for details</p>
-                    <button onclick="location.reload()" style="margin-top: 10px; padding: 5px 10px; background: #333; color: #fff; border: 1px solid #666; border-radius: 3px; cursor: pointer;">
+                    <p style="margin: 10px 0; font-size: 14px; font-weight: bold;">${userFriendlyMessage}</p>
+                    <div style="margin: 15px 0; padding: 10px; background: #2a2a2a; border-radius: 5px; font-size: 11px; text-align: left;">
+                        ${helpText}
+                    </div>
+                    <p style="font-size: 10px; color: #999; margin: 10px 0;">Technical details: ${error.message}</p>
+                    <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 15px; background: #333; color: #fff; border: 1px solid #666; border-radius: 3px; cursor: pointer;">
                         Reload Page
                     </button>
                 </div>
@@ -149,7 +200,7 @@ async function initializeArsenal() {
         
         // Optional: Show error details on click
         timing.onclick = () => {
-            alert(`Arsenal Loading Error:\n\n${error.message}\n\nCheck the browser console (F12) for more details.`);
+            alert(`Arsenal Loading Error:\n\n${error.message}\n\n${helpText.replace(/<[^>]*>/g, '')}`);
         };
     }
 }

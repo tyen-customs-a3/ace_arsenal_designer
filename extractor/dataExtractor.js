@@ -314,6 +314,7 @@ class DataExtractor {
         if (metaData) {
             enrichedClass._meta = {
                 ...metaData,
+                category: metaData.type, // Set category to match type for DataService compatibility
                 extractedBy: matchedDefinition,
                 extractedAt: new Date().toISOString()
             };
@@ -326,6 +327,7 @@ class DataExtractor {
             // Add minimal meta information for tracking
             enrichedClass._meta = {
                 type: 'unknown',
+                category: 'unknown', // Set category for consistency
                 extractedBy: null,
                 extractedAt: new Date().toISOString(),
                 noMatchReason: 'No definition modules matched this class'

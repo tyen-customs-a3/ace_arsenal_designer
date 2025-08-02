@@ -8,8 +8,11 @@ export const FilterManager = {
 
     // Category filtering
     filterItemsByCategory(category) {
+        console.log(`🔍 Filtering ${Arsenal.currentItems.length} items for category '${category}'`);
         const categoryItems = Arsenal.currentItems.filter(item => item.category === category);
+        console.log(`Found ${categoryItems.length} items matching category`);
         const filtered = this.applyActiveFilters(categoryItems);
+        console.log(`After filters: ${filtered.length} items`);
         return filtered;
     },
 

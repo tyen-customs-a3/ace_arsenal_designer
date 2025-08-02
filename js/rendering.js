@@ -30,8 +30,13 @@ export const Renderer = {
 
     // Enhanced tree view rendering with new architecture
     renderTreeView(items, containerId, useGrouping = true) {
+        console.log(`🎨 Rendering ${items.length} items to ${containerId}`);
+        
         const container = document.getElementById(containerId);
-        if (!container) return;
+        if (!container) {
+            console.error(`Container ${containerId} not found!`);
+            return;
+        }
 
         // Get or create tree manager
         let treeManager = getTreeManager(containerId);
