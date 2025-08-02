@@ -45,6 +45,39 @@ const magazineDefinition = {
             return false;
         }
 
+        const className = classData.className || '';
+        const baseClass = classData.baseClass || '';
+        const props = classData.properties || classData;
+
+        // EXCLUSIONS FIRST - items that should NOT be classified as magazines
+        
+        // Exclude personnel/unit classes (MAN classes)
+        if (/^[BIOC]_.*_(base_)?FLV$|^[BIOC]_[A-Za-z_]*_FLV$/i.test(className) ||
+            /soldier|diver|ghillie|sniper|spotter|support|crew|pilot|commander/i.test(className) ||
+            /CAManBase|SoldierWB|SoldierEB|SoldierGB/i.test(baseClass)) {
+            return false;
+        }
+        
+        // Exclude weapons (they have WeaponSlotsInfo and firing modes)
+        if (props.WeaponSlotsInfo || 
+            (Array.isArray(props.modes) && props.modes.length > 0)) {
+            return false;
+        }
+        
+        // Exclude attachments
+        if (/^(optic_|muzzle_|acc_)/i.test(className) ||
+            /ItemCore|InventoryOpticsItem_Base_F/i.test(baseClass)) {
+            return false;
+        }
+        
+        // Exclude vests and backpacks
+        if (/vest|backpack|rucksack/i.test(className) ||
+            /Vest_|Bag_Base/i.test(baseClass)) {
+            return false;
+        }
+
+        // PRIMARY MAGAZINE INDICATORS
+
         // Primary indicator: count property (ammunition capacity)
         if (typeof classData.count === 'number') {
             return true;
@@ -64,8 +97,8 @@ const magazineDefinition = {
             'Default'
         ];
 
-        if (classData.baseClass && magazineBaseClasses.some(baseClass => 
-            classData.baseClass.includes(baseClass))) {
+        if (baseClass && magazineBaseClasses.some(baseClassName => 
+            baseClass.includes(baseClassName))) {
             return true;
         }
 
@@ -84,13 +117,13 @@ const magazineDefinition = {
             /clip$/i                  // Clip/stripper clip
         ];
 
-        if (classData.className && magazineClassPatterns.some(pattern => 
-            pattern.test(classData.className))) {
+        if (className && magazineClassPatterns.some(pattern => 
+            pattern.test(className))) {
             return true;
         }
 
         // Special launcher magazine patterns
-        if (/rocket|missile|grenade|rpg|javelin|at4|law/i.test(classData.className || '')) {
+        if (/rocket|missile|grenade|rpg|javelin|at4|law/i.test(className)) {
             return true;
         }
 

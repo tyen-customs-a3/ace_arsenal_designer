@@ -23,12 +23,14 @@ const weaponDefinition = {
     /**
      * Determines if the given resolved class data represents a weapon
      * 
-     * Detection criteria for weapons:
-     * - Must have WeaponSlotsInfo property (primary indicator)
+     * Detection criteria for weapons (refined to avoid false positives):
+     * - Must have WeaponSlotsInfo AND magazines/modes (not just WeaponSlotsInfo alone)
      * - Should have magazines array with ammunition types
      * - Should have modes array with firing modes
      * - May have initSpeed property for muzzle velocity
      * - Should inherit from weapon base classes like Rifle_Base_F, Pistol_Base_F, etc.
+     * - EXCLUDES launchers (they have their own category)
+     * - EXCLUDES pure accessories (no magazines/modes)
      * 
      * @param {Object} classData - The resolved, flattened class data from Phase 2
      * @param {string} classData.className - The class name
@@ -45,25 +47,61 @@ const weaponDefinition = {
             return false;
         }
 
+        const className = classData.className || '';
+        const baseClass = classData.baseClass || '';
+        
         // Get properties object (may be nested)
         const props = classData.properties || classData;
 
-        // Primary indicator: weapons must have WeaponSlotsInfo
-        if (props.WeaponSlotsInfo) {
+        // EXCLUSIONS FIRST - items that should NOT be classified as weapons
+        
+        // Exclude personnel/unit classes (MAN classes)
+        if (/^[BIOC]_.*_(base_)?FLV$|^[BIOC]_[A-Za-z_]*_FLV$/i.test(className) ||
+            /soldier|diver|ghillie|sniper|spotter|support|crew|pilot|commander/i.test(className) ||
+            /CAManBase|SoldierWB|SoldierEB|SoldierGB/i.test(baseClass)) {
+            return false;
+        }
+        
+        // Exclude launchers - they should be classified separately
+        if (/^launch_|launcher/i.test(className) || 
+            /LauncherCore|Launcher_Base_F/i.test(baseClass)) {
+            return false;
+        }
+        
+        // Exclude binoculars and laser designators
+        if (/laserdesignator|binocular|designator/i.test(className) ||
+            /LaserDesignator|Binocular/i.test(baseClass)) {
+            return false;
+        }
+        
+        // Exclude pure accessories (optics, muzzle devices, etc.)
+        if (/^(optic_|muzzle_|acc_|bipod_)/i.test(className) ||
+            /ItemCore/i.test(baseClass)) {
+            return false;
+        }
+        
+        // Exclude magazines
+        if (/^(30Rnd_|20Rnd_|10Rnd_|mag_|magazine)/i.test(className) ||
+            /CA_Magazine/i.test(baseClass)) {
+            return false;
+        }
+
+        // PRIMARY WEAPON INDICATORS (must have multiple criteria)
+        
+        // Strong indicator: WeaponSlotsInfo + magazines + modes
+        if (props.WeaponSlotsInfo && 
+            Array.isArray(props.magazines) && props.magazines.length > 0 &&
+            Array.isArray(props.modes) && props.modes.length > 0) {
             return true;
         }
 
-        // Secondary indicators: magazines array indicates weapon
-        if (Array.isArray(props.magazines) && props.magazines.length > 0) {
+        // Secondary: magazines + modes (even without WeaponSlotsInfo)
+        if (Array.isArray(props.magazines) && props.magazines.length > 0 &&
+            Array.isArray(props.modes) && props.modes.length > 0) {
             return true;
         }
 
-        // Tertiary indicator: modes array with firing modes
-        if (Array.isArray(props.modes) && props.modes.length > 0) {
-            return true;
-        }
-
-        // Base class indicators - check for common weapon base classes
+        // Base class indicators - check for specific weapon base classes (excluding launchers)
         const weaponBaseClasses = [
             'Rifle_Base_F',
             'Rifle_Long_Base_F', 
@@ -74,30 +112,31 @@ const weaponDefinition = {
             'SMG_03_Base',
             'MGun',
             'MGunCore',
-            'LauncherCore',
-            'Launcher_Base_F',
             'arifle_MX_Base_F',
             'CUP_arifle_AK_Base',
             'CUP_arifle_AKS_Base'
         ];
 
-        if (classData.baseClass && weaponBaseClasses.some(baseClass => 
-            classData.baseClass.includes(baseClass))) {
+        if (baseClass && weaponBaseClasses.some(baseClassName => 
+            baseClass.includes(baseClassName))) {
             return true;
         }
 
-        // Class name patterns that indicate weapons
+        // Class name patterns that indicate weapons (excluding launchers)
         const weaponClassPatterns = [
-            /^(arifle|srifle|hgun|lmg|smg|mmg|launch)_/i,
-            /^CUP_(arifle|srifle|hgun|lmg|smg|mmg|launch)_/i,
+            /^(arifle|srifle|hgun|lmg|smg|mmg)_/i,  // Removed launch_ from here
+            /^CUP_(arifle|srifle|hgun|lmg|smg|mmg)_/i,  // Removed launch_ from here
             /rifle$/i,
             /pistol$/i,
             /carbine$/i
         ];
 
-        if (classData.className && weaponClassPatterns.some(pattern => 
-            pattern.test(classData.className))) {
-            return true;
+        if (className && weaponClassPatterns.some(pattern => 
+            pattern.test(className))) {
+            // Additional verification: make sure it's not just an accessory with a weapon-like name
+            if (Array.isArray(props.magazines) || Array.isArray(props.modes) || props.WeaponSlotsInfo) {
+                return true;
+            }
         }
 
         return false;
@@ -468,28 +507,32 @@ const weaponDefinition = {
     },
 
     /**
-     * Determines weapon type/category
+     * Determines weapon type/category - primary weapons only (no launchers/handguns)
      * @private
      */
     _extractWeaponType(classData) {
         const className = classData.className || '';
-        
-        // Type patterns
-        if (/^arifle_|rifle/i.test(className)) return 'rifle';
-        if (/^srifle_|sniper/i.test(className)) return 'sniper_rifle';
-        if (/^hgun_|pistol/i.test(className)) return 'pistol';
-        if (/^lmg_|machinegun/i.test(className)) return 'machine_gun';
-        if (/^smg_|submachine/i.test(className)) return 'submachine_gun';
-        if (/^launch_|launcher/i.test(className)) return 'launcher';
-        if (/shotgun/i.test(className)) return 'shotgun';
-        
-        // Base class patterns
         const baseClass = classData.baseClass || '';
-        if (/rifle/i.test(baseClass)) return 'rifle';
-        if (/pistol/i.test(baseClass)) return 'pistol';
-        if (/launch/i.test(baseClass)) return 'launcher';
         
-        return 'unknown';
+        // Type patterns for PRIMARY WEAPONS only
+        if (/^arifle_|assault.*rifle/i.test(className)) return 'assault_rifle';
+        if (/^srifle_|sniper.*rifle|marksman/i.test(className)) return 'sniper_rifle';
+        if (/^lmg_|light.*machine|machine.*gun/i.test(className)) return 'machine_gun';
+        if (/^smg_|submachine/i.test(className)) return 'submachine_gun';
+        if (/shotgun|combat.*shotgun/i.test(className)) return 'shotgun';
+        if (/carbine|short.*rifle/i.test(className)) return 'carbine';
+        if (/battle.*rifle|dmr/i.test(className)) return 'battle_rifle';
+        
+        // Generic rifle patterns
+        if (/rifle$/i.test(className)) return 'rifle';
+        
+        // Base class patterns for PRIMARY WEAPONS
+        if (/Rifle_Base_F|Rifle_Long_Base_F/i.test(baseClass)) return 'rifle';
+        if (/Rifle_Short_Base_F/i.test(baseClass)) return 'carbine';
+        if (/SMG_.*_Base/i.test(baseClass)) return 'submachine_gun';
+        if (/MGun|MachineGun/i.test(baseClass)) return 'machine_gun';
+        
+        return 'rifle'; // Default for primary weapons
     },
 
     /**

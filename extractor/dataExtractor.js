@@ -131,13 +131,17 @@ class DataExtractor {
 
         // List of known definition files - in a real environment, this could be
         // discovered dynamically through file system APIs or build-time generation
+        // ORDER MATTERS: More specific definitions should come first to avoid false positives
         const definitionFiles = [
-            'weaponDefinition.js',
-            'attachmentDefinition.js',
-            'magazineDefinition.js',
-            'vestDefinition.js',
-            'backpackDefinition.js',
-            'nvgDefinition.js'
+            'binocularsDefinition.js',   // Process binoculars/laser designators first (very specific)
+            'launcherDefinition.js',     // Process launchers (most specific)
+            'handgunDefinition.js',      // Process handguns before general weapons
+            'attachmentDefinition.js',   // Process attachments before weapons (to avoid accessories being classified as weapons)
+            'magazineDefinition.js',     // Process magazines before weapons
+            'vestDefinition.js',         // Process vests
+            'backpackDefinition.js',     // Process backpacks
+            'nvgDefinition.js',          // Process NVGs
+            'weaponDefinition.js'        // Process general weapons last (most broad)
         ];
 
         const loadedDefinitions = new Map();

@@ -23,12 +23,13 @@ const attachmentDefinition = {
     /**
      * Determines if the given resolved class data represents a weapon attachment
      * 
-     * Detection criteria for attachments:
+     * Detection criteria for attachments (refined to avoid false positives):
      * - Must have ItemInfo with attachment-specific inheritance (InventoryOpticsItem_Base_F, etc.)
      * - Should have optics=1 for optical attachments
      * - Should have attachment-specific base classes (ItemCore, muzzle_snds_*, etc.)
      * - Class name patterns for optics, muzzle devices, lasers, etc.
      * - May have OpticsModes, MuzzleCoef, or other attachment-specific properties
+     * - EXCLUDES weapons, magazines, vests, backpacks (they are not attachments)
      * 
      * @param {Object} classData - The resolved, flattened class data from Phase 2
      * @param {string} classData.className - The class name
@@ -43,6 +44,50 @@ const attachmentDefinition = {
             return false;
         }
 
+        const className = classData.className || '';
+        const baseClass = classData.baseClass || '';
+        const props = classData.properties || classData;
+
+        // EXCLUSIONS FIRST - items that should NOT be classified as attachments
+        
+        // Exclude personnel/unit classes (MAN classes)
+        if (/^[BIOC]_.*_(base_)?FLV$|^[BIOC]_[A-Za-z_]*_FLV$/i.test(className) ||
+            /soldier|diver|ghillie|sniper|spotter|support|crew|pilot|commander/i.test(className) ||
+            /CAManBase|SoldierWB|SoldierEB|SoldierGB/i.test(baseClass)) {
+            return false;
+        }
+        
+        // Exclude weapons (they have magazines and firing modes)
+        if (Array.isArray(props.magazines) && props.magazines.length > 0 &&
+            Array.isArray(props.modes) && props.modes.length > 0) {
+            return false;
+        }
+        
+        // Exclude launchers
+        if (/^launch_|launcher/i.test(className) || 
+            /LauncherCore|Launcher_Base_F/i.test(baseClass)) {
+            return false;
+        }
+        
+        // Exclude handguns
+        if (/^hgun_/i.test(className) || /Pistol_Base_F/i.test(baseClass)) {
+            return false;
+        }
+        
+        // Exclude magazines
+        if (/^(30Rnd_|20Rnd_|10Rnd_|mag_|magazine)/i.test(className) ||
+            /CA_Magazine/i.test(baseClass)) {
+            return false;
+        }
+        
+        // Exclude vests and backpacks
+        if (/vest|backpack|rucksack/i.test(className) ||
+            /Vest_|Bag_Base/i.test(baseClass)) {
+            return false;
+        }
+
+        // PRIMARY ATTACHMENT INDICATORS
+        
         // Primary indicator: ItemInfo with attachment-specific inheritance
         if (classData.ItemInfo) {
             const itemInfo = classData.ItemInfo;
@@ -65,7 +110,7 @@ const attachmentDefinition = {
             }
         }
 
-        // Secondary indicator: optics flag
+        // Secondary indicator: optics flag (but only if not a weapon)
         if (classData.optics === 1) {
             return true;
         }
@@ -92,8 +137,8 @@ const attachmentDefinition = {
             'InventoryFlashLightItem_Base_F'
         ];
 
-        if (classData.baseClass && attachmentBaseClasses.some(baseClass => 
-            classData.baseClass.includes(baseClass))) {
+        if (baseClass && attachmentBaseClasses.some(baseClassName => 
+            baseClass.includes(baseClassName))) {
             return true;
         }
 
@@ -110,13 +155,13 @@ const attachmentDefinition = {
             /suppressor$/i,           // Suppressors
             /silencer$/i,             // Silencers
             /flashlight$/i,           // Flashlights
-            /laser$/i,                // Laser designators
+            /laser$/i,                // Laser designators  
             /bipod$/i,                // Bipods
             /_snds_/i                 // Sound suppressors
         ];
 
-        if (classData.className && attachmentClassPatterns.some(pattern => 
-            pattern.test(classData.className))) {
+        if (className && attachmentClassPatterns.some(pattern => 
+            pattern.test(className))) {
             return true;
         }
 
