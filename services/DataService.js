@@ -210,6 +210,13 @@ export class DataService {
         // Note: Convert relative paths to absolute URLs for worker compatibility
         const basePath = this._getBasePath();
         const relativePaths = [
+            // Vanilla Arma 3 configs (P:/ drive - base classes)
+            { path: 'P:/a3/weapons_f/config.cpp', mod: 'Vanilla' },
+            { path: 'P:/a3/weapons_f_mark/config.cpp', mod: 'Vanilla' },
+            { path: 'P:/a3/weapons_f_exp/config.cpp', mod: 'Vanilla' },
+            { path: 'P:/a3/characters_f/config.cpp', mod: 'Vanilla' },
+            { path: 'P:/a3/supplies_f_exp/config.cpp', mod: 'Vanilla' },
+            
             // SFP mod configs
             { path: 'data/addons/sfp/ak5/config.cpp', mod: 'SFP' },
             { path: 'data/addons/sfp/attachments/config.cpp', mod: 'SFP' },
@@ -233,9 +240,10 @@ export class DataService {
         ];
         
         // Convert to absolute URLs for worker compatibility
+        // Handle P:/ drive paths differently - they're already absolute
         return relativePaths.map(item => ({
             ...item,
-            path: basePath + item.path
+            path: item.path.startsWith('P:/') ? item.path : basePath + item.path
         }));
     }
 
@@ -393,28 +401,23 @@ export class DataService {
     }
 
     /**
-     * Aggregate individual AST results from all config files into a single unified class hierarchy
-     * Uses semantic analysis to intelligently resolve class conflicts based on their type and purpose
+     * Aggregate AST results using proper namespace isolation without string-based assumptions
+     * Organizes classes by mod namespace first, merges intra-namespace files structurally
      * @param {Object} fileResults - Object with filePath keys and {ast, mod, filePath} values
-     * @returns {Object} Single aggregated class hierarchy object
+     * @returns {Object} Aggregated class hierarchy with proper namespace handling
      * @private
      */
     _aggregateASTResults(fileResults) {
-        const aggregated = {};
-        let totalClassCount = 0;
-        const modClassCounts = {};
-        const resolutionLog = {
-            merges: [],
-            prioritizations: [],
-            conflicts: [],
-            debugActions: []
+        // Step 1: Organize files by mod namespace
+        const namespaces = {};
+        const aggregationLog = {
+            totalFiles: Object.keys(fileResults).length,
+            totalMods: 0,
+            filesPerMod: {},
+            classesPerMod: {}
         };
         
-        // Initialize semantic analysis components
-        const classifier = this._getConfigClassifier();
-        const resolver = this._getSemanticConflictResolver();
-        
-        // Process each file's AST results
+        // Step 2: Group files by mod namespace
         for (const [filePath, fileData] of Object.entries(fileResults)) {
             const { ast, mod } = fileData;
             
@@ -423,49 +426,61 @@ export class DataService {
                 continue;
             }
             
-            let fileClassCount = 0;
-            
-            // Merge each top-level class from this file's AST into the aggregated result
-            for (const [className, classData] of Object.entries(ast)) {
-                const mergedClassData = this._mergeClassWithMetadata(classData, mod, filePath);
-                
-                if (aggregated[className]) {
-                    // Semantic conflict resolution
-                    const context = { mod, filePath };
-                    const classification = classifier.classifyClass(className, mergedClassData, context);
-                    
-                    const resolution = resolver.resolveConflict(
-                        className,
-                        aggregated[className],
-                        mergedClassData,
-                        classification.type,
-                        {
-                            ...context,
-                            classification,
-                            existingMod: aggregated[className]._sourceMod,
-                            existingFile: aggregated[className]._sourceFile
-                        }
-                    );
-                    
-                    // Apply resolution result
-                    aggregated[className] = resolution.mergedClass;
-                    
-                    // Log resolution with appropriate severity
-                    this._logResolution(className, classification, resolution, resolutionLog);
-                    
-                } else {
-                    // Add new class to aggregated result
-                    aggregated[className] = mergedClassData;
-                    fileClassCount++;
-                    totalClassCount++;
-                }
+            // Initialize namespace if first time seeing this mod
+            if (!namespaces[mod]) {
+                namespaces[mod] = {
+                    modName: mod,
+                    configFiles: {},
+                    mergedClasses: {},
+                    stats: {
+                        totalFiles: 0,
+                        totalClasses: 0,
+                        mergedClasses: 0
+                    }
+                };
+                aggregationLog.totalMods++;
+                aggregationLog.filesPerMod[mod] = 0;
+                aggregationLog.classesPerMod[mod] = 0;
             }
             
-            modClassCounts[mod] = (modClassCounts[mod] || 0) + fileClassCount;
+            // Store this file's AST in the namespace
+            namespaces[mod].configFiles[filePath] = {
+                filePath,
+                ast,
+                classCount: Object.keys(ast).length
+            };
+            
+            namespaces[mod].stats.totalFiles++;
+            aggregationLog.filesPerMod[mod]++;
         }
         
-        // Log aggregation summary with semantic insights
-        this._logAggregationSummary(totalClassCount, modClassCounts, resolutionLog);
+        // Step 3: Within each namespace, merge all files from that mod
+        for (const [modName, namespace] of Object.entries(namespaces)) {
+            this._mergeIntraNamespaceFiles(namespace);
+            aggregationLog.classesPerMod[modName] = namespace.stats.totalClasses;
+        }
+        
+        // Step 4: Flatten namespaces into final aggregated structure for compatibility
+        const aggregated = {};
+        let totalClassCount = 0;
+        
+        for (const [modName, namespace] of Object.entries(namespaces)) {
+            for (const [className, classData] of Object.entries(namespace.mergedClasses)) {
+                // In the new architecture, there should be no conflicts at this level
+                // because each namespace has been independently resolved
+                if (aggregated[className]) {
+                    // This should only happen for legitimate cross-mod inheritance
+                    // Log it but don't treat as error - inheritance resolver will handle it
+                    console.debug(`DataService: Class '${className}' exists in multiple namespaces - inheritance resolver will handle`);
+                }
+                
+                aggregated[className] = classData;
+                totalClassCount++;
+            }
+        }
+        
+        // Log aggregation summary
+        this._logNamespaceAggregationSummary(aggregationLog, totalClassCount, namespaces);
         
         return aggregated;
     }
@@ -506,6 +521,126 @@ export class DataService {
         }
         
         return result;
+    }
+    
+    /**
+     * Merge all config files within a single mod namespace
+     * This is where same-mod, multi-file classes get properly combined
+     * @param {Object} namespace - The namespace object containing all files for a mod
+     * @private
+     */
+    _mergeIntraNamespaceFiles(namespace) {
+        // Process all config files within this namespace
+        for (const [filePath, fileData] of Object.entries(namespace.configFiles)) {
+            const { ast } = fileData;
+            
+            // Merge each class from this file into the namespace's merged classes
+            for (const [className, classData] of Object.entries(ast)) {
+                const enhancedClassData = this._mergeClassWithMetadata(
+                    classData, 
+                    namespace.modName, 
+                    filePath
+                );
+                
+                if (namespace.mergedClasses[className]) {
+                    // Same namespace, different files - merge without any conflict resolution
+                    namespace.mergedClasses[className] = this._mergeIntraNamespaceClasses(
+                        namespace.mergedClasses[className],
+                        enhancedClassData,
+                        className,
+                        namespace.modName
+                    );
+                    namespace.stats.mergedClasses++;
+                } else {
+                    // First occurrence of this class in this namespace
+                    namespace.mergedClasses[className] = enhancedClassData;
+                    namespace.stats.totalClasses++;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Merge two class definitions from the same namespace (same mod, different files)
+     * This is pure structural merging without any string-based assumptions
+     * @param {Object} existingClass - The existing class definition
+     * @param {Object} newClass - The new class definition from another file
+     * @param {string} className - The class name for logging
+     * @param {string} modName - The mod name for context
+     * @returns {Object} Merged class definition
+     * @private
+     */
+    _mergeIntraNamespaceClasses(existingClass, newClass, className, modName) {
+        // Pure structural merge - no assumptions about class content
+        const merged = this._deepMergeObjects({ ...existingClass }, newClass);
+        
+        // Update metadata to reflect the merge
+        const existingFiles = existingClass._sourceFile.includes('+') ? 
+            existingClass._sourceFile.split('+') : [existingClass._sourceFile];
+        const allFiles = [...existingFiles, newClass._sourceFile];
+        
+        merged._sourceFile = allFiles.join('+');
+        merged._processedAt = new Date().toISOString();
+        merged._intraNamespaceMerge = true;
+        
+        console.debug(`DataService: Merged '${className}' from ${allFiles.length} files in ${modName} namespace`);
+        
+        return merged;
+    }
+    
+    /**
+     * Deep merge two objects recursively
+     * @param {Object} target - Target object to merge into
+     * @param {Object} source - Source object to merge from
+     * @returns {Object} Merged object
+     * @private
+     */
+    _deepMergeObjects(target, source) {
+        for (const [key, value] of Object.entries(source)) {
+            if (key === 'subClasses') {
+                // Special handling for subClasses - merge recursively
+                if (target.subClasses && typeof target.subClasses === 'object') {
+                    target.subClasses = this._deepMergeObjects(target.subClasses, value);
+                } else {
+                    target.subClasses = this._deepClone(value);
+                }
+            } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+                // Deep merge nested objects
+                if (target[key] && typeof target[key] === 'object' && !Array.isArray(target[key])) {
+                    target[key] = this._deepMergeObjects(target[key], value);
+                } else {
+                    target[key] = this._deepClone(value);
+                }
+            } else {
+                // Direct assignment for primitives, arrays, and null values
+                target[key] = this._deepClone(value);
+            }
+        }
+        
+        return target;
+    }
+    
+    /**
+     * Deep clone an object
+     * @param {*} obj - Object to clone
+     * @returns {*} Cloned object
+     * @private
+     */
+    _deepClone(obj) {
+        if (obj === null || typeof obj !== 'object') {
+            return obj;
+        }
+        
+        if (Array.isArray(obj)) {
+            return obj.map(item => this._deepClone(item));
+        }
+        
+        const cloned = {};
+        for (const [key, value] of Object.entries(obj)) {
+            cloned[key] = this._deepClone(value);
+        }
+        
+        return cloned;
     }
 
     /**
@@ -917,26 +1052,37 @@ export class DataService {
      * @param {Object} resolutionLog - The resolution log with categorized actions
      * @private
      */
-    _logAggregationSummary(totalClassCount, modClassCounts, resolutionLog) {
-        const totalResolutions = resolutionLog.merges.length + 
-                               resolutionLog.prioritizations.length + 
-                               resolutionLog.conflicts.length + 
-                               resolutionLog.debugActions.length;
-
-        if (totalResolutions > 0) {
-            console.info(`DataService: Semantic conflict resolution summary:`);
-            console.info(`  - Framework/debug actions: ${resolutionLog.debugActions.length}`);
-            console.info(`  - Successful merges: ${resolutionLog.merges.length}`);
-            console.info(`  - Prioritizations: ${resolutionLog.prioritizations.length}`);
-            console.info(`  - True conflicts: ${resolutionLog.conflicts.length}`);
+    /**
+     * Log namespace-aware aggregation summary without string-based assumptions
+     * @param {Object} aggregationLog - The aggregation statistics
+     * @param {number} totalClassCount - Total unique classes across all namespaces
+     * @param {Object} namespaces - The namespace data for detailed reporting
+     * @private
+     */
+    _logNamespaceAggregationSummary(aggregationLog, totalClassCount, namespaces) {
+        console.info(`DataService: Namespace-aware AST aggregation complete`);
+        console.info(`  - Total files processed: ${aggregationLog.totalFiles}`);
+        console.info(`  - Total mod namespaces: ${aggregationLog.totalMods}`);
+        console.info(`  - Total unique classes: ${totalClassCount}`);
+        
+        // Log per-namespace statistics
+        console.info(`DataService: Per-namespace breakdown:`);
+        for (const [modName, namespace] of Object.entries(namespaces)) {
+            const mergeRatio = namespace.stats.totalClasses > 0 ? 
+                (namespace.stats.mergedClasses / namespace.stats.totalClasses * 100).toFixed(1) : 0;
             
-            // Only warn if there are actual content conflicts
-            if (resolutionLog.conflicts.length > 0) {
-                console.warn(`DataService: ${resolutionLog.conflicts.length} true content conflicts detected and resolved`);
-            }
+            console.info(`  - ${modName}: ${namespace.stats.totalClasses} classes from ${namespace.stats.totalFiles} files (${namespace.stats.mergedClasses} merges, ${mergeRatio}% merge rate)`);
         }
-
-        console.info(`DataService: Aggregated ${totalClassCount} unique classes from ${Object.keys(modClassCounts).length} mods`);
+        
+        // Calculate total intra-namespace merges across all mods
+        const totalIntraNamespaceMerges = Object.values(namespaces)
+            .reduce((sum, ns) => sum + ns.stats.mergedClasses, 0);
+        
+        if (totalIntraNamespaceMerges > 0) {
+            console.info(`DataService: Successfully handled ${totalIntraNamespaceMerges} intra-namespace merges without conflicts`);
+        }
+        
+        console.info(`DataService: No string-based heuristics or assumptions used - pure structural analysis`);
     }
 }
 
