@@ -47,7 +47,7 @@ export const UIState = {
             collapseToggleBtn.style.display = 'none';
             collapseToggleText.style.display = 'none';
         } else {
-            // Show collapse toggle for hierarchy and variants views
+            // Show collapse toggle for hierarchy view
             collapseToggleBtn.style.display = 'flex';
             collapseToggleText.style.display = 'inline';
         }

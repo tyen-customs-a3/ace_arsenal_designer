@@ -92,16 +92,8 @@
                         <label class="compact-filter-label">View:</label>
                         <div class="compact-filter-radios">
                             <label class="compact-filter-option">
-                                <input type="radio" name="viewMode" value="list" onchange="setViewMode('list')">
-                                <span>📄 List</span>
-                            </label>
-                            <label class="compact-filter-option">
                                 <input type="radio" name="viewMode" value="hierarchy" checked onchange="setViewMode('hierarchy')">
                                 <span>🌳 Tree</span>
-                            </label>
-                            <label class="compact-filter-option">
-                                <input type="radio" name="viewMode" value="variants" onchange="setViewMode('variants')">
-                                <span>🎨 Variants</span>
                             </label>
                         </div>
                     </div>
@@ -137,16 +129,6 @@
                                 <input type="radio" name="spacingOption" value="spacious" onchange="changeSpacing('spacious')">
                                 <span>Spacious</span>
                             </label>
-                        </div>
-                    </div>
-                    
-                    <!-- Language Selection -->
-                    <div class="compact-filter-group">
-                        <label class="compact-filter-label">Language:</label>
-                        <div class="language-selector-container" id="languageSelectorContainer">
-                            <select id="language-selector" class="language-selector" disabled>
-                                <option value="" disabled selected>Loading...</option>
-                            </select>
                         </div>
                     </div>
                 </div>
@@ -293,20 +275,6 @@
                     <label class="compact-filter-label">Weapon Type:</label>
                     <div class="compact-filter-checkboxes" id="weaponTypeFilters">
                         <!-- Populated dynamically -->
-                    </div>
-                </div>
-                
-                <div class="compact-filter-group">
-                    <label class="compact-filter-label">Variants:</label>
-                    <div class="compact-filter-checkboxes">
-                        <label class="filter-checkbox">
-                            <input type="checkbox" id="showBaseItems" onchange="toggleVariantFilter('base', this.checked)" checked>
-                            <span>Base Items</span>
-                        </label>
-                        <label class="filter-checkbox">
-                            <input type="checkbox" id="showVariants" onchange="toggleVariantFilter('variants', this.checked)" checked>
-                            <span>Variants</span>
-                        </label>
                     </div>
                 </div>
                 

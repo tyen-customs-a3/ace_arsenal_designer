@@ -1,5 +1,4 @@
 // Basic grouping algorithms
-import { VariantManager, groupWithVariantAwareness, createArsenalHierarchy } from './variantCore.js';
 
 export function groupByMod(items, sortingFunction = null) {
     const groups = {};
@@ -104,56 +103,3 @@ export function groupByWeaponType(items, sortingFunction = null) {
     
     return groups;
 }
-
-
-export function groupByVariants(items) {
-    return createArsenalHierarchy(items);
-}
-
-// Arsenal-style mixed flat/hierarchical display
-export function groupByArsenalStyle(items) {
-    return createArsenalHierarchy(items);
-}
-
-// Enhanced variant grouping with mod awareness
-export function groupByVariantsWithMod(items) {
-    return groupWithVariantAwareness(items, (item) => {
-        const mod = item.mod || 'Unknown';
-        return `${mod} Weapons`;
-    });
-}
-
-// Variant-aware caliber grouping
-export function groupByVariantsWithCaliber(items) {
-    return groupWithVariantAwareness(items, (item) => {
-        if (item.category === 'weapons' || item.category === 'magazines') {
-            const caliber = item.caliber || 'Unknown Caliber';
-            return caliber;
-        } else {
-            return 'Other';
-        }
-    });
-}
-
-// Variant-aware role-based grouping
-export function groupByVariantsWithRole(items) {
-    return groupWithVariantAwareness(items, (item) => {
-        if (item.category !== 'weapons') return 'Non-Weapons';
-        
-        const name = item.displayName.toLowerCase();
-        const subcategory = item.subcategory || '';
-        
-        // Determine tactical role
-        if (subcategory === 'machine_guns') return 'Machine Guns';
-        if (subcategory === 'sniper_rifles') return 'Designated Marksman / Sniper';
-        if (name.includes('sw') || name.includes('lmg')) return 'Support Weapons';
-        if (name.includes('c') || name.includes('cqc') || name.includes('compact')) return 'Close Quarters Combat';
-        if (name.includes('gl') || item.underbarrel) return 'Grenadier';
-        if (subcategory === 'rifles') return 'Assault Rifles';
-        
-        return 'Other Weapons';
-    });
-}
-
-
-

@@ -26,7 +26,6 @@ export const FilterManager = {
                 if (itemCaliber && !Arsenal.activeFilters.calibers.has(itemCaliber)) {
                     return false;
                 }
-                // If item has no caliber data, it passes caliber filter (relevant for vests/backpacks)
             }
 
             // Weapon type filter (only apply to weapons category)
@@ -35,19 +34,9 @@ export const FilterManager = {
                 if (weaponType && !Arsenal.activeFilters.weaponTypes.has(weaponType)) {
                     return false;
                 }
-                // If weapon has no cursorAim data, classify as "other"
                 if (!weaponType && !Arsenal.activeFilters.weaponTypes.has('other')) {
                     return false;
                 }
-            }
-
-            // Variant filter
-            const hasVariant = item.variant || (item.properties && item.properties.variant);
-            if (!hasVariant && !Arsenal.activeFilters.variants.base) {
-                return false; // Base item but base items are not selected
-            }
-            if (hasVariant && !Arsenal.activeFilters.variants.variants) {
-                return false; // Variant item but variants are not selected
             }
 
             return true;
@@ -58,10 +47,8 @@ export const FilterManager = {
     populateFilterOptions(category) {
         const categoryItems = Arsenal.currentItems.filter(item => item.category === category);
         
-        // Get unique values for mod filter (always relevant)
         const mods = [...new Set(categoryItems.map(item => item.mod || 'Unknown'))].sort();
 
-        // Populate mod filters
         const modContainer = document.getElementById('modFilters');
         modContainer.innerHTML = mods.map(mod => `
             <label class="filter-checkbox">
@@ -70,15 +57,12 @@ export const FilterManager = {
             </label>
         `).join('');
 
-        // Category-specific filter rules
         const caliberContainer = document.getElementById('caliberFilters');
         const caliberGroup = caliberContainer.parentElement;
         
-        // Categories that should have caliber filter
         const caliberRelevantCategories = ['weapons', 'handguns', 'launchers', 'magazines'];
         
         if (caliberRelevantCategories.includes(category)) {
-            // Show caliber filter and populate it
             caliberGroup.style.display = 'block';
             const calibers = [...new Set(categoryItems.map(item => item.caliber || (item.properties && item.properties.caliber)).filter(c => c))].sort();
             
@@ -89,18 +73,14 @@ export const FilterManager = {
                 </label>
             `).join('');
         } else {
-            // Hide caliber filter for categories that don't need it
             caliberGroup.style.display = 'none';
-            // Clear any active caliber filters
             Arsenal.activeFilters.calibers.clear();
         }
 
-        // Weapon type filter (only for weapons category)
         const weaponTypeContainer = document.getElementById('weaponTypeFilters');
         const weaponTypeGroup = weaponTypeContainer.parentElement;
         
         if (category === 'weapons') {
-            // Show weapon type filter and populate it
             weaponTypeGroup.style.display = 'block';
             const weaponTypes = [...new Set(categoryItems.map(item => {
                 return item.cursorAim || (item.properties && item.properties.cursorAim) || 'other';
@@ -113,14 +93,11 @@ export const FilterManager = {
                 </label>
             `).join('');
         } else {
-            // Hide weapon type filter for non-weapon categories
             weaponTypeGroup.style.display = 'none';
-            // Clear any active weapon type filters
             Arsenal.activeFilters.weaponTypes.clear();
         }
     },
 
-    // Toggle individual filter
     toggleFilter(filterType, value, isChecked) {
         if (isChecked) {
             Arsenal.activeFilters[filterType].add(value);
@@ -130,35 +107,18 @@ export const FilterManager = {
         this.updateFilteredItems();
     },
 
-    // Toggle variant filter
-    toggleVariantFilter(type, isChecked) {
-        Arsenal.activeFilters.variants[type] = isChecked;
-        this.updateFilteredItems();
-    },
-
-    // Clear all filters
     clearAllFilters() {
         Arsenal.activeFilters.mods.clear();
         Arsenal.activeFilters.calibers.clear();
         Arsenal.activeFilters.weaponTypes.clear();
-        Arsenal.activeFilters.variants = {
-            base: true,
-            variants: true
-        };
 
-        // Reset UI - uncheck mod, caliber, and weapon type filters, check variant filters
         document.querySelectorAll('#modFilters input[type="checkbox"], #caliberFilters input[type="checkbox"], #weaponTypeFilters input[type="checkbox"]').forEach(checkbox => {
             checkbox.checked = false;
         });
         
-        // Reset variant checkboxes to checked (show all)
-        document.getElementById('showBaseItems').checked = true;
-        document.getElementById('showVariants').checked = true;
-
         this.updateFilteredItems();
     },
 
-    // Update filtered items and refresh display
     updateFilteredItems() {
         Arsenal.filteredItems = this.filterItemsByCategory(Arsenal.selectedCategory);
         import('./rendering.js').then(({ Renderer }) => {
@@ -166,22 +126,18 @@ export const FilterManager = {
         });
     },
 
-    // Apply right panel filters to items
     applyRightPanelFilters(items) {
         return items.filter(item => {
-            // Magnification filter (for attachments/optics)
             if (Arsenal.rightPanelFilters.magnifications.size > 0 && item.category === 'attachments') {
                 const magnification = item.magnification || (item.properties && item.properties.magnification);
                 if (magnification && !Arsenal.rightPanelFilters.magnifications.has(magnification)) {
                     return false;
                 }
-                // If attachment has no magnification data and filter is active, exclude it
                 if (!magnification && Arsenal.rightPanelFilters.magnifications.size > 0) {
                     return false;
                 }
             }
 
-            // Capacity filter (for magazines)
             if (Arsenal.rightPanelFilters.capacities.size > 0 && item.category === 'magazines') {
                 const capacity = item.capacity || (item.properties && item.properties.capacity);
                 if (capacity) {
@@ -192,7 +148,6 @@ export const FilterManager = {
                 }
             }
 
-            // Tracer filter (for magazines)
             if (Arsenal.rightPanelFilters.tracers.size > 0 && item.category === 'magazines') {
                 const isTracer = item.tracer || (item.properties && item.properties.tracer);
                 const tracerType = isTracer ? 'Tracer' : 'Standard';
@@ -205,7 +160,6 @@ export const FilterManager = {
         });
     },
 
-    // Helper function to categorize magazine capacity
     getCapacityRange(capacity) {
         if (capacity <= 10) return '1-10';
         if (capacity <= 30) return '11-30';
@@ -214,14 +168,12 @@ export const FilterManager = {
         return '100+';
     },
 
-    // Right panel filter functions
     toggleRightPanelFilterType(filterType, value, isChecked) {
         if (isChecked) {
             Arsenal.rightPanelFilters[filterType].add(value);
         } else {
             Arsenal.rightPanelFilters[filterType].delete(value);
         }
-        // Refresh right panel with filtered items
         import('./selection.js').then(({ SelectionManager }) => {
             if (Arsenal.selectedItem && Arsenal.selectedItem.category === 'weapons') {
                 SelectionManager.updateCompatibleAccessories(Arsenal.selectedItem);
@@ -240,12 +192,10 @@ export const FilterManager = {
         Arsenal.rightPanelFilters.tracers.clear();
         Arsenal.rightPanelFilters.ballistics.clear();
 
-        // Reset UI - uncheck all right panel filters
         document.querySelectorAll('#magnificationFilters input[type="checkbox"], #capacityFilters input[type="checkbox"], #tracerFilters input[type="checkbox"], #ballisticsFilters input[type="checkbox"]').forEach(checkbox => {
             checkbox.checked = false;
         });
 
-        // Refresh right panel
         import('./selection.js').then(({ SelectionManager }) => {
             if (Arsenal.selectedItem && Arsenal.selectedItem.category === 'weapons') {
                 SelectionManager.updateCompatibleAccessories(Arsenal.selectedItem);
@@ -258,27 +208,23 @@ export const FilterManager = {
         });
     },
 
-    // Populate right panel filter options based on current right category
     populateRightPanelFilterOptions(items) {
         const magnificationContainer = document.getElementById('magnificationFilters');
         const capacityContainer = document.getElementById('capacityFilters');
         const tracerContainer = document.getElementById('tracerFilters');
         const ballisticsContainer = document.getElementById('ballisticsFilters');
 
-        // Clear all containers
         magnificationContainer.innerHTML = '';
         capacityContainer.innerHTML = '';
         tracerContainer.innerHTML = '';
         ballisticsContainer.innerHTML = '';
 
-        // Hide all filter groups initially
         magnificationContainer.parentElement.style.display = 'none';
         capacityContainer.parentElement.style.display = 'none';
         tracerContainer.parentElement.style.display = 'none';
         ballisticsContainer.parentElement.style.display = 'none';
 
         if (Arsenal.selectedRightCategory === 'attachments') {
-            // Show magnification filter for attachments
             const magnifications = [...new Set(items.map(item => {
                 return item.magnification || (item.properties && item.properties.magnification);
             }).filter(m => m))].sort();
@@ -293,7 +239,6 @@ export const FilterManager = {
                 `).join('');
             }
         } else if (Arsenal.selectedRightCategory === 'magazines') {
-            // Show capacity and tracer filters for magazines
             const capacities = [...new Set(items.map(item => {
                 const capacity = item.capacity || (item.properties && item.properties.capacity);
                 return capacity ? this.getCapacityRange(capacity) : null;
@@ -309,7 +254,6 @@ export const FilterManager = {
                 `).join('');
             }
 
-            // Tracer filter
             tracerContainer.parentElement.style.display = 'block';
             tracerContainer.innerHTML = `
                 <label class="filter-checkbox">
@@ -325,5 +269,4 @@ export const FilterManager = {
     }
 };
 
-// Make FilterManager globally available for HTML onclick handlers
 window.FilterManager = FilterManager;
