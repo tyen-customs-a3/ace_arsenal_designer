@@ -2,7 +2,7 @@
 // Handles class inheritance with property resolution and merging
 
 export class DataService {
-    constructor(ndjsonPath = '/database.ndjson') {
+    constructor(ndjsonPath = 'database.ndjson') {
         this.ndjsonPath = ndjsonPath;
         this.isInitialized = false;
         
