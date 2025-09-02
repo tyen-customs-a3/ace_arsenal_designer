@@ -11,7 +11,25 @@ export const UIState = {
             this.updateGroupByMod(e.target.checked);
         });
 
+        // Icon toggle listeners (bind in JS rather than inline HTML)
+        const previewToggle = document.getElementById('showPreviewIcon');
+        if (previewToggle) {
+            previewToggle.addEventListener('change', (e) => this.togglePreviewIcon(e.target.checked));
+        }
+        const modToggle = document.getElementById('showModIcon');
+        if (modToggle) {
+            modToggle.addEventListener('change', (e) => this.toggleModIcon(e.target.checked));
+        }
 
+        // Spacing radio listeners
+        const spacingRadios = document.querySelectorAll('input[name="spacingOption"]');
+        spacingRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target && e.target.checked) {
+                    this.changeSpacing(e.target.value);
+                }
+            });
+        });
 
         // Sort control listeners
         document.getElementById('sortingSelect').addEventListener('change', (e) => {
@@ -21,7 +39,17 @@ export const UIState = {
             });
         });
 
-        // Views consume display options directly from StateManager
+        // Apply initial display options (from localStorage if present)
+        const savedSpacing = (typeof localStorage !== 'undefined') ? localStorage.getItem('arsenal.spacing') : null;
+        const initialSpacing = savedSpacing || (getState().displayOptions?.spacing || 'general');
+        this.changeSpacing(initialSpacing);
+
+        // Reflect initial controls state
+        const initialState = getState();
+        if (previewToggle) previewToggle.checked = !!initialState.displayOptions?.showPreviewIcon;
+        if (modToggle) modToggle.checked = !!initialState.displayOptions?.showModIcon;
+        const initialRadio = document.querySelector(`input[name="spacingOption"][value="${initialSpacing}"]`);
+        if (initialRadio) initialRadio.checked = true;
     },
 
     updateGroupByMod(enabled) {
@@ -155,14 +183,23 @@ export const UIState = {
     },
 
     changeSpacing(spacing) {
+        // Persist and update state
+        try { if (typeof localStorage !== 'undefined') localStorage.setItem('arsenal.spacing', spacing); } catch (_) {}
         StateActions.setDisplayOptions({ spacing });
 
-        // Update left panel
-        const leftTreeView = document.getElementById('leftTreeView');
-        leftTreeView.className = `tree-view spacing-${spacing}`;
+        // Helper to safely update spacing class without clobbering other classes
+        const applySpacing = (el) => {
+            if (!el) return;
+            const classes = Array.from(el.classList);
+            classes.filter(c => c.startsWith('spacing-')).forEach(c => el.classList.remove(c));
+            if (!el.classList.contains('tree-view')) el.classList.add('tree-view');
+            el.classList.add(`spacing-${spacing}`);
+        };
 
-        // Update right panel
-        const rightTreeView = document.getElementById('rightTreeView');
-        rightTreeView.className = `tree-view spacing-${spacing}`;
+        applySpacing(document.getElementById('leftTreeView'));
+        applySpacing(document.getElementById('rightTreeView'));
+
+        // Re-render to ensure consistent layout after spacing change
+        this.refreshView();
     }
 };

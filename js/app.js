@@ -73,11 +73,12 @@ async function initializeArsenal() {
         initializeTreeManager('leftTreeView');
         initializeTreeManager('rightTreeView');
 
-        // Initialize UI controls
-        UIState.changeSpacing('general');
+        // Initialize UI controls (UIState.init binds listeners and applies saved spacing)
         document.getElementById('showPreviewIcon').checked = getAppState().displayOptions.showPreviewIcon;
         document.getElementById('showModIcon').checked = getAppState().displayOptions.showModIcon;
-        document.querySelector(`input[name="spacingOption"][value="${getAppState().displayOptions.spacing}"]`).checked = true;
+        const spacing = getAppState().displayOptions.spacing || 'general';
+        const radio = document.querySelector(`input[name="spacingOption"][value="${spacing}"]`);
+        if (radio) radio.checked = true;
 
         timingElement.textContent = 'Arsenal is ready.';
         timingElement.style.color = '#00ff00'; // Green for success

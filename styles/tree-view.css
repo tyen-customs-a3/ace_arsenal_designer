@@ -2,6 +2,16 @@
 /* Tree components, items, toggles, and enhanced navigation */
 
 .tree-view {
+    /* Spacing variables with sensible defaults */
+    --row-min-h: 22px;
+    --row-pad-y: 4px;
+    --row-pad-x: 8px;
+    --row-font: 11px;
+    --toggle-size: 18px;
+    --toggle-font: 14px;
+    --icon-size: 16px;
+    --icon-weapons-width: 48px;
+
     list-style: none;
     padding: 0;
     margin: 0;
@@ -30,17 +40,17 @@
 }
 
 .tree-item {
-    padding: 4px 8px;
+    padding: var(--row-pad-y) var(--row-pad-x);
     cursor: pointer;
     border-radius: 0;
     border: 1px solid transparent;
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-    font-size: 11px;
+    font-size: var(--row-font);
     color: var(--content-secondary);
     display: flex;
     align-items: center;
     width: 100%;
-    min-height: 22px;
+    min-height: var(--row-min-h);
     line-height: 1.3;
     box-sizing: border-box;
 }
@@ -113,11 +123,11 @@
     cursor: pointer;
     margin-right: 0;
     color: var(--content-tertiary);
-    font-size: 14px;
+    font-size: var(--toggle-font);
     user-select: none;
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
+    width: var(--toggle-size);
+    height: var(--toggle-size);
     text-align: center;
     display: inline-flex;
     align-items: center;
@@ -131,25 +141,10 @@
 }
 
 /* Toggle button spacing-specific sizing - increased for better visibility */
-.tree-view.spacing-compact .tree-toggle {
-    width: 16px;
-    height: 16px;
-    font-size: 12px;
-}
+.tree-view.spacing-compact { --toggle-size: 14px; --toggle-font: 12px; }
+.tree-view.spacing-general { --toggle-size: 18px; --toggle-font: 14px; }
+.tree-view.spacing-spacious { --toggle-size: 24px; --toggle-font: 18px; }
 
-.tree-view.spacing-general .tree-toggle {
-    width: 18px;
-    height: 18px;
-    font-size: 14px;
-}
-
-.tree-view.spacing-spacious .tree-toggle {
-    width: 24px;
-    height: 24px;
-    font-size: 18px;
-}
-
-/* Removed legacy bullet view styling (list view only) */
 
 .item-count-inline {
     color: var(--content-disabled);
@@ -162,43 +157,15 @@
     order: 0;
 }
 
-/* Spacing Options */
-.tree-view.spacing-compact .tree-item {
-    min-height: 18px;
-    padding: 2px 6px;
-    font-size: 10px;
-}
-
-.tree-view.spacing-general .tree-item {
-    min-height: 22px;
-    padding: 4px 8px;
-    font-size: 11px;
-}
-
-.tree-view.spacing-spacious .tree-item {
-    min-height: 36px;
-    padding: 8px 13px;
-    font-size: 16px;
-}
+/* Spacing Options (set variables per mode) */
+.tree-view.spacing-compact { --row-min-h: 16px; --row-pad-y: 1px; --row-pad-x: 6px; --row-font: 10px; --icon-size: 12px; --icon-weapons-width: 36px; }
+.tree-view.spacing-general { --row-min-h: 22px; --row-pad-y: 4px; --row-pad-x: 8px; --row-font: 11px; --icon-size: 16px; --icon-weapons-width: 48px; }
+.tree-view.spacing-spacious { --row-min-h: 36px; --row-pad-y: 8px; --row-pad-x: 13px; --row-font: 16px; --icon-size: 30px; --icon-weapons-width: 90px; }
 
 /* Group Header Spacing Options */
-.tree-view.spacing-compact .tree-group-header {
-    min-height: 20px;
-    padding: 3px 6px !important;
-    font-size: 10px !important;
-}
-
-.tree-view.spacing-general .tree-group-header {
-    min-height: 24px;
-    padding: 6px 8px !important;
-    font-size: 11px !important;
-}
-
-.tree-view.spacing-spacious .tree-group-header {
-    min-height: 40px;
-    padding: 10px 13px !important;
-    font-size: 16px !important;
-}
+.tree-view.spacing-compact .tree-group-header { min-height: 18px; padding: 2px 6px !important; font-size: 10px !important; }
+.tree-view.spacing-general .tree-group-header { min-height: 24px; padding: 6px 8px !important; font-size: 11px !important; }
+.tree-view.spacing-spacious .tree-group-header { min-height: 40px; padding: 10px 13px !important; font-size: 16px !important; }
 
 /* Group Header Item Count Scaling */
 .tree-view.spacing-compact .tree-group-header .item-count-inline {
@@ -233,6 +200,9 @@
     justify-content: center;
     color: white;
     font-weight: bold;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    font-size: calc(var(--icon-size) * 0.56);
 }
 
 .item-preview-icon {
@@ -244,6 +214,9 @@
     align-items: center;
     justify-content: center;
     color: var(--content-tertiary);
+    width: var(--icon-size);
+    height: var(--icon-size);
+    font-size: calc(var(--icon-size) * 0.56);
 }
 
 /* Hidden state - completely remove from layout */
@@ -252,49 +225,14 @@
     display: none;
 }
 
-/* Compact mode - small icons (row height ~18px) */
-.tree-view.spacing-compact .item-mod-icon,
-.tree-view.spacing-compact .item-preview-icon {
-    width: 12px;
-    height: 12px;
-    font-size: 7px;
-}
-
-/* General mode - medium icons (row height ~22px) */
-.tree-view.spacing-general .item-mod-icon,
-.tree-view.spacing-general .item-preview-icon {
-    width: 16px;
-    height: 16px;
-    font-size: 9px;
-}
-
-/* Spacious mode - large icons that nearly fill row height (~36px) */
+/* Larger icons in spacious mode add a right margin for breathing room */
 .tree-view.spacing-spacious .item-mod-icon,
-.tree-view.spacing-spacious .item-preview-icon {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
-    margin-right: 8px;
-}
+.tree-view.spacing-spacious .item-preview-icon { margin-right: 8px; }
 
 /* Category-specific preview icon styling - Weapons (3x1 aspect ratio) */
-.tree-view.spacing-compact .item-preview-icon.category-weapons {
-    width: 36px; /* 3x height of 12px */
-    height: 12px;
-    font-size: 7px;
-}
-
-.tree-view.spacing-general .item-preview-icon.category-weapons {
-    width: 48px; /* 3x height of 16px */
-    height: 16px;
-    font-size: 9px;
-}
-
-.tree-view.spacing-spacious .item-preview-icon.category-weapons {
-    width: 90px; /* 3x height of 30px */
-    height: 30px;
-    font-size: 14px;
-    margin-right: 8px;
+.tree-view .item-preview-icon.category-weapons {
+    width: var(--icon-weapons-width);
+    height: var(--icon-size);
 }
 
 /* All other categories maintain 1x1 aspect ratio (default styling above) */
