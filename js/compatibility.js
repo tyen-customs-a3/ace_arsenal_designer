@@ -1,6 +1,8 @@
 // Compatibility Engine
 // Handles weapon-accessory compatibility and storage item generation
 
+import { getState } from './StateManager.js';
+
 export const CompatibilityEngine = {
     init() {
         // No specific initialization needed
@@ -10,51 +12,36 @@ export const CompatibilityEngine = {
     getCompatibleAccessories(weapon, category = 'attachments') {
         if (!weapon) return [];
         
-        const attachments = Arsenal.currentItems.filter(item => item.category === 'attachments');
+        // Get items from the specific category being requested
+        let items;
+        const { currentItems } = getState();
+        if (category === 'optics') {
+            items = currentItems.filter(item => item.category === 'optics');
+        } else if (category === 'bipods') {
+            items = currentItems.filter(item => item.category === 'bipods');
+        } else {
+            items = currentItems.filter(item => item.category === 'attachments');
+        }
         
-        // Filter attachments by weapon slot compatibility
+        // Filter items by weapon slot compatibility
         if (weapon.weaponSlots && weapon.weaponSlots.length > 0) {
-            let compatible = attachments.filter(attachment => {
-                if (!attachment.weaponSlots || attachment.weaponSlots.length === 0) {
-                    return false; // Attachment has no slot info, assume incompatible
+            const compatible = items.filter(item => {
+                if (!item.weaponSlots || item.weaponSlots.length === 0) {
+                    return false; // Item has no slot info, assume incompatible
                 }
                 
-                // Check if any weapon slot matches any attachment slot
+                // Check if any weapon slot matches any item slot
                 return weapon.weaponSlots.some(weaponSlot => 
-                    attachment.weaponSlots.some(attachmentSlot => 
-                        weaponSlot === attachmentSlot
+                    item.weaponSlots.some(itemSlot => 
+                        weaponSlot === itemSlot
                     )
                 );
             });
             
-            // Filter by specific attachment category if specified
-            if (category === 'optics') {
-                compatible = compatible.filter(attachment => 
-                    attachment.weaponSlots && attachment.weaponSlots.some(slot => 
-                        slot.includes('OpticRail') || slot.includes('Optic')
-                    )
-                );
-            } else if (category === 'bipods') {
-                compatible = compatible.filter(attachment => 
-                    attachment.weaponSlots && attachment.weaponSlots.some(slot => 
-                        slot.includes('UnderBarrel') || slot.includes('Bipod')
-                    )
-                );
-            } else if (category === 'attachments') {
-                compatible = compatible.filter(attachment => 
-                    attachment.weaponSlots && attachment.weaponSlots.some(slot => 
-                        slot.includes('MuzzleSlot') || slot.includes('Muzzle') || 
-                        (!slot.includes('OpticRail') && !slot.includes('UnderBarrel'))
-                    )
-                );
-            }
-            
-            // Apply right panel filters - we need to import FilterManager dynamically
-            // For now, return compatible items - right panel filters will be applied elsewhere
             return compatible;
         }
         
-        // If weapon has no slot info, show no attachments (strict compatibility)
+        // If weapon has no slot info, show no accessories (strict compatibility)
         return [];
     },
 
@@ -62,7 +49,8 @@ export const CompatibilityEngine = {
     getCompatibleMagazines(weapon) {
         if (!weapon) return [];
         
-        const magazines = Arsenal.currentItems.filter(item => item.category === 'magazines');
+        const { currentItems } = getState();
+        const magazines = currentItems.filter(item => item.category === 'magazines');
         
         // Filter magazines by magazineWells compatibility
         if (weapon.magazineWells && weapon.magazineWells.length > 0) {
@@ -90,47 +78,15 @@ export const CompatibilityEngine = {
 
     // Get storage items for backpacks/vests by category
     getStorageItems(category) {
-        // For now, we'll use magazines as a base and create mock categories
-        // In a real implementation, these would be separate item categories
-        const allItems = Arsenal.currentItems.filter(item => item.category === 'magazines');
+        // Return items from the actual category if available
+        const { currentItems } = getState();
+        const categoryItems = currentItems.filter(item => item.category === category);
         
-        switch (category) {
-            case 'magazines':
-                return allItems;
-            case 'medical':
-                // Mock medical items - in reality these would be separate items
-                return allItems.slice(0, Math.ceil(allItems.length * 0.2)).map(item => ({
-                    ...item,
-                    displayName: `Medical: ${item.displayName.replace(/Magazine|Mag/g, 'Med Kit')}`,
-                    className: `medical_${item.className}`,
-                    category: 'medical'
-                }));
-            case 'food':
-                // Mock food items
-                return allItems.slice(0, Math.ceil(allItems.length * 0.15)).map(item => ({
-                    ...item,
-                    displayName: `Food: ${item.displayName.replace(/Magazine|Mag/g, 'Ration')}`,
-                    className: `food_${item.className}`,
-                    category: 'food'
-                }));
-            case 'tools':
-                // Mock tool items
-                return allItems.slice(0, Math.ceil(allItems.length * 0.1)).map(item => ({
-                    ...item,
-                    displayName: `Tool: ${item.displayName.replace(/Magazine|Mag/g, 'Kit')}`,
-                    className: `tool_${item.className}`,
-                    category: 'tools'
-                }));
-            case 'misc':
-                // Mock miscellaneous items
-                return allItems.slice(0, Math.ceil(allItems.length * 0.1)).map(item => ({
-                    ...item,
-                    displayName: `Misc: ${item.displayName.replace(/Magazine|Mag/g, 'Item')}`,
-                    className: `misc_${item.className}`,
-                    category: 'misc'
-                }));
-            default:
-                return [];
+        if (categoryItems.length > 0) {
+            return categoryItems;
         }
+        
+        // If no items exist for the category, return empty array
+        return [];
     }
 };

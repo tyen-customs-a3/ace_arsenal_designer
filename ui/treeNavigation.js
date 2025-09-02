@@ -303,12 +303,6 @@ export class NavigationHandlers {
                 return true;
             }
             
-            // Fallback: just move to immediate parent and clear selection
-            if (focused.parent.type === NodeType.GROUP) {
-                this.state.setFocus(focused.parent);
-                this.state.clearSelection();
-                return true;
-            }
         }
         
         return false;
@@ -445,6 +439,13 @@ export class TreeVisualFeedback {
             const element = this.findElementForNode(selectedNode);
             if (element) {
                 element.classList.add('selected');
+                // Ensure selected item is visible in the scroll viewport
+                try {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+                } catch (_) {
+                    // Fallback without options for older environments
+                    element.scrollIntoView(true);
+                }
             }
         }
     }
@@ -487,33 +488,6 @@ export class TreeVisualFeedback {
         // Look for element with matching node ID
         let element = this.panel.querySelector(`[data-node-id="${node.id}"]`);
         
-        if (!element && node.type === NodeType.ITEM && node.data) {
-            // Fallback: look for element with matching item data
-            const itemElements = this.panel.querySelectorAll('[data-item]');
-            for (const el of itemElements) {
-                try {
-                    const itemData = JSON.parse(el.dataset.item);
-                    if (itemData.className === node.data.className) {
-                        element = el;
-                        break;
-                    }
-                } catch (e) {
-                    // Ignore parsing errors
-                }
-            }
-        }
-        
-        // Final fallback: look for elements containing the node name
-        if (!element) {
-            const allItems = this.panel.querySelectorAll('.tree-item');
-            for (const el of allItems) {
-                const nameSpan = el.querySelector('.group-name');
-                if (nameSpan && nameSpan.textContent.trim() === node.name) {
-                    element = el;
-                    break;
-                }
-            }
-        }
         
         return element;
     }

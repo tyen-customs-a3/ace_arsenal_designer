@@ -50,7 +50,7 @@ export const EventManager = {
                     </div>
                     <div class="item-hover-preview-text">
                         <div class="item-hover-name">${itemData.displayName}</div>
-                        <div class="item-hover-classname">${itemData.className}</div>
+                        <div class="item-hover-classname">${itemData.class_name}</div>
                     </div>
                 `;
                 
@@ -92,14 +92,19 @@ export const EventManager = {
 
     getCategoryIcon(category) {
         const icons = {
-            'weapons': '⚔',
-            'handguns': '🔫',
-            'launchers': '🚀',
-            'backpacks': '🎒',
-            'vests': '🛡',
-            'attachments': '🔧',
-            'magazines': '📦',
-            'unknown': '❓'
+            'rifles': 'RF',
+            'pistols': 'PS',
+            'launchers': 'LC',
+            'backpacks': 'BP',
+            'vests': 'VS',
+            'attachments': 'AT',
+            'magazines': 'MG',
+            'optics': 'OP',
+            'tools': 'TL',
+            'medical': 'MD',
+            'uniforms': 'UN',
+            'bipods': 'BP',
+            'unknown': '??'
         };
         return icons[category] || icons['unknown'];
     },
@@ -107,14 +112,19 @@ export const EventManager = {
     getPreviewDimensions(category) {
         // Return width and height based on category aspect ratio
         const dimensions = {
-            'weapons': { width: 180, height: 96 },      // 3x1 aspect ratio
-            'handguns': { width: 120, height: 132 },    // 1x1 aspect ratio
+            'rifles': { width: 180, height: 96 },       // 3x1 aspect ratio
+            'pistols': { width: 120, height: 132 },     // 1x1 aspect ratio
             'launchers': { width: 120, height: 132 },   // 1x1 aspect ratio
             'backpacks': { width: 120, height: 132 },   // 1x1 aspect ratio
             'vests': { width: 120, height: 132 },       // 1x1 aspect ratio
             'attachments': { width: 120, height: 132 }, // 1x1 aspect ratio
             'magazines': { width: 120, height: 132 },   // 1x1 aspect ratio
-            'unknown': { width: 120, height: 132 }      // 1x1 aspect ratio (fallback)
+            'optics': { width: 120, height: 132 },      // 1x1 aspect ratio
+            'tools': { width: 120, height: 132 },       // 1x1 aspect ratio
+            'medical': { width: 120, height: 132 },     // 1x1 aspect ratio
+            'uniforms': { width: 120, height: 132 },   // 1x1 aspect ratio
+            'bipods': { width: 120, height: 132 },      // 1x1 aspect ratio
+            'unknown': { width: 120, height: 132 }      // 1x1 aspect ratio
         };
         return dimensions[category] || dimensions['unknown'];
     },
@@ -148,11 +158,7 @@ export const EventManager = {
         window.toggleTreeGroup = toggleTreeGroup;
         window.selectTreeItem = selectTreeItem;
         
-        window.setViewMode = (mode) => {
-            import('./ui-state.js').then(({ UIState }) => {
-                UIState.setViewMode(mode);
-            });
-        };
+        // setViewMode removed - always use list view
         
         window.expandAllGroups = () => {
             import('./ui-state.js').then(({ UIState }) => {
@@ -235,9 +241,15 @@ export const EventManager = {
         window.showItemPreview = (event, element) => this.showItemPreview(event, element);
         window.hideItemPreview = () => this.hideItemPreview();
         
-        window.updateGrouping = (value) => {
+        window.updateGroupByMod = (enabled) => {
             import('./ui-state.js').then(({ UIState }) => {
-                UIState.updateGrouping(value);
+                UIState.updateGroupByMod(enabled);
+            });
+        };
+        
+        window.updateGroupByType = (enabled) => {
+            import('./ui-state.js').then(({ UIState }) => {
+                UIState.updateGroupByType(enabled);
             });
         };
         

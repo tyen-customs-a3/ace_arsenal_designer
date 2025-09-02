@@ -4,6 +4,8 @@
 import { TreeNode, NodeType, TreeUtils } from './treeNode.js';
 import { TreeNavigationState, NavigationHandlers, TreeVisualFeedback, TreeEvents } from './treeNavigation.js';
 import { TOGGLE_ICONS } from './constants.js';
+import { actions as StateActions, subscribe as StateSubscribe, getState } from '../js/StateManager.js';
+import * as algorithms from '../algorithms.js';
 
 // Global navigation states for each panel
 const navigationStates = new Map();
@@ -64,6 +66,7 @@ export class TreeRenderer {
     // Render parent node (with children)
     renderParentNode(node, indent, options) {
         const nodeId = `tree_${node.id}`;
+        const domNodeId = `${this.panelId}__${nodeId}`;
         const isPrimaryGroup = node.type === NodeType.GROUP && node.level === 0;
         const groupClass = isPrimaryGroup ? 'tree-group-header' : '';
         
@@ -71,10 +74,10 @@ export class TreeRenderer {
         let clickHandler = '';
         if (hasChildren && !node.isSelectable) {
             // This is a group node - make it toggle
-            clickHandler = `onclick="window.toggleTreeGroup('${nodeId}')" style="cursor: pointer;"`;
+            clickHandler = `onclick="window.toggleTreeGroup('${domNodeId}')" style="cursor: pointer;"`;
         } else if (node.isSelectable) {
             // This is a selectable item - make it selectable
-            clickHandler = `onclick="window.selectTreeItem(this)" data-item='${JSON.stringify(node.data)}' data-node-id="${node.id}"`;
+            clickHandler = `onclick="window.selectTreeItem(this)" data-item='${JSON.stringify(node.data)}' data-node-id="${this.panelId}__${node.id}"`;
         }
         
         const itemClass = node.isSelectable ? 
@@ -88,7 +91,7 @@ export class TreeRenderer {
         html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
         
         // Toggle button - clickable with stopPropagation to prevent row selection
-        html += `<span class="tree-toggle" data-node-id="${nodeId}" onclick="event.stopPropagation(); window.toggleTreeGroup('${nodeId}');">${TOGGLE_ICONS.EXPANDED}</span>`;
+        html += `<span class="tree-toggle" data-node-id="${domNodeId}" onclick="event.stopPropagation(); window.toggleTreeGroup('${domNodeId}');">${TOGGLE_ICONS.EXPANDED}</span>`;
         
         html += `<span class="group-name">${node.name}</span>`;
         
@@ -97,7 +100,7 @@ export class TreeRenderer {
         html += '</div>';
         
         // Children container
-        html += `<ul class="tree-children" id="${nodeId}">`;
+        html += `<ul class="tree-children" id="${domNodeId}">`;
         node.children.forEach(child => {
             html += this.renderNode(child, options, node.level + 1);
         });
@@ -110,7 +113,7 @@ export class TreeRenderer {
     // Render leaf node (no children)
     renderLeafNode(node, indent, options) {
         const clickHandler = node.isSelectable ? 
-            `onclick="window.selectTreeItem(this)" data-item='${JSON.stringify(node.data)}' data-node-id="${node.id}"` : '';
+            `onclick="window.selectTreeItem(this)" data-item='${JSON.stringify(node.data)}' data-node-id="${this.panelId}__item_${(node.data && node.data.class_name) || ''}"` : '';
         
         const className = node.isSelectable ? 'tree-item' : 'tree-item tree-base-class';
         
@@ -118,10 +121,7 @@ export class TreeRenderer {
         html += `<div class="${className}" ${clickHandler} onmouseenter="window.showItemPreview && window.showItemPreview(event, this)" onmouseleave="window.hideItemPreview && window.hideItemPreview()">`;
         html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
         
-        // Bullet for hierarchy views
-        if (options.viewMode !== 'list') {
-            html += '<span class="tree-bullet">•</span>';
-        }
+        // Bullet points removed - always list view
         
         html += `<span class="group-name">${node.name}</span>`;
         
@@ -140,7 +140,7 @@ export class TreeRenderer {
         // Preview icon
         const previewText = node.data && node.data.category ? 
             node.data.category.charAt(0).toUpperCase() : '?';
-        const previewHidden = !window.displayOptions?.showPreviewIcon || !node.data;
+        const previewHidden = !getState().displayOptions?.showPreviewIcon || !node.data;
         const categoryClass = node.data && node.data.category ? ` category-${node.data.category}` : '';
         html += `<span class="item-preview-icon${previewHidden ? ' hidden' : ''}${categoryClass}">${previewText}</span>`;
         
@@ -152,7 +152,7 @@ export class TreeRenderer {
             modText = node.name.charAt(0).toUpperCase();
         }
         
-        const shouldShowModIcon = window.displayOptions?.showModIcon || isModGroup;
+        const shouldShowModIcon = getState().displayOptions?.showModIcon || isModGroup;
         const modHidden = !shouldShowModIcon || (!node.data && !isModGroup) || 
             (node.data && !node.data.mod && !isModGroup);
         
@@ -243,8 +243,24 @@ export class TreeManager {
     renderTree(items, options = {}) {
         const startTime = performance.now();
         
+        // Inject a persistent 'None' element at the top for every category
+        const stateSnapshot = getState();
+        const category = (this.panelId === 'rightTreeView') ? stateSnapshot.selectedRightCategory : stateSnapshot.selectedCategory;
+        const noneItem = {
+            class_name: `__none_${category}__`,
+            displayName: 'None',
+            category,
+            mod: 'System',
+            scope: 2,
+            properties: {}
+        };
+
+        const baseItems = Array.isArray(items) ? items.filter(it => !(typeof it?.class_name === 'string' && it.class_name.startsWith('__none_'))) : [];
+
         // Build tree properly using the corrected logic
-        const treeData = this.buildCorrectTreeData(items, options);
+        const treeData = this.buildCorrectTreeData(baseItems, options);
+        // Prepend None as a standalone leaf at top level
+        treeData.unshift({ name: noneItem.displayName, item: noneItem, children: [], level: 0 });
         
         // Convert to new node system for navigation
         const rootNodes = this.convertToNavigationNodes(treeData);
@@ -253,9 +269,9 @@ export class TreeManager {
         this.navigationState.setTree(rootNodes);
         
         // Render using corrected renderer - always apply correct spacing
-        const spacing = window.displayOptions?.spacing || 'general';
+        const spacing = getState().displayOptions?.spacing || 'general';
         const className = `tree-view spacing-${spacing}`;
-        const html = `<ul class="${className}">${this.renderTreeData(treeData, options.viewMode)}</ul>`;
+        const html = `<ul class="${className}">${this.renderTreeData(treeData)}</ul>`;
         
         const endTime = performance.now();
         if (document.getElementById('timing')) {
@@ -289,212 +305,130 @@ export class TreeManager {
     
     // Build tree data correctly using existing algorithms
     buildCorrectTreeData(items, options) {
+        console.log('🌳 TreeView buildCorrectTreeData called with options:', options);
+        
         // Apply sorting first if specified
-        const sortedItems = options.sortBy && window.algorithms && window.algorithms[options.sortBy] ? 
-            window.algorithms[options.sortBy](items, options.sortOrder) : items;
+        const sortedItems = options.sortBy && algorithms && algorithms[options.sortBy] ?
+            algorithms[options.sortBy](items, options.sortOrder) : items;
         
-        const useGrouping = !!options.groupBy;
-        const viewMode = options.viewMode || 'list';
-        const hasPrimaryGrouping = !!options.groupBy;
+        // Check if items are already hierarchically structured (from rendering.js)
+        const isAlreadyHierarchical = sortedItems.length > 0 && sortedItems.some(item =>
+            item.hasOwnProperty('children') && Array.isArray(item.children)
+        );
         
-        if (!useGrouping) {
-            // No grouping - apply view mode directly
-            return this.applyViewModeTransform(sortedItems, viewMode);
+        // If items are already hierarchical, return them directly (no further transformation needed)
+        if (isAlreadyHierarchical) {
+            console.log('🌲 Items already hierarchical, returning as-is');
+            // Ensure level property is propagated
+            function propagateLevels(nodes, parentLevel = 0) {
+                if (!Array.isArray(nodes)) return;
+                nodes.forEach(node => {
+                    node.level = typeof node.level === 'number' ? node.level : parentLevel;
+                    if (node.children && node.children.length > 0) {
+                        propagateLevels(node.children, node.level + 1);
+                    }
+                });
+            }
+            propagateLevels(sortedItems, 0);
+            return sortedItems;
         }
         
+        const useGrouping = !!options.groupBy;
+        const hasPrimaryGrouping = !!options.groupBy;
+
+        if (!useGrouping) {
+            // No grouping - return flat list
+            return sortedItems.map(item => ({
+                name: item.displayName,
+                item: item,
+                children: [],
+                level: 0
+            }));
+        }
+
         if (options.groupBy && typeof options.groupBy === 'function') {
             // Apply grouping function
             const groups = options.groupBy(sortedItems);
             const treeData = [];
-            
+
             // Sort group names
-            const sortedGroupNames = options.sortBy && window.algorithms && window.algorithms[options.sortBy] ? 
+            const sortedGroupNames = options.sortBy && algorithms && algorithms[options.sortBy] ?
                 Object.keys(groups).sort((a, b) => a.localeCompare(b)) :
                 Object.keys(groups);
-            
+
             sortedGroupNames.forEach(groupName => {
                 const groupItems = groups[groupName];
-                
+
                 // Handle multi-level grouping (e.g., "RHS → 5.56x45mm")
                 if (groupName.includes(' → ')) {
                     const parts = groupName.split(' → ');
                     const primaryGroup = parts[0];
                     const secondaryGroup = parts[1];
-                    
+
                     let primaryNode = treeData.find(node => node.name === primaryGroup);
                     if (!primaryNode) {
                         primaryNode = {
                             name: primaryGroup,
                             item: null,
                             children: [],
-                            isPrimaryGroup: hasPrimaryGrouping
+                            isPrimaryGroup: hasPrimaryGrouping,
+                            level: 0
                         };
                         treeData.push(primaryNode);
                     }
-                    
-                    // Apply view mode within secondary group
-                    const childrenData = this.applyViewModeTransform(groupItems, viewMode);
+
+                    // Apply list view within secondary group
+                    const childrenData = groupItems.map(item => ({
+                        name: item.displayName,
+                        item: item,
+                        children: [],
+                        level: 1
+                    }));
                     const secondaryNode = {
                         name: secondaryGroup,
                         item: null,
                         children: childrenData,
-                        isPrimaryGroup: hasPrimaryGrouping
+                        isPrimaryGroup: hasPrimaryGrouping,
+                        level: 1
                     };
-                    
+
                     primaryNode.children.push(secondaryNode);
                 } else {
                     // Single-level grouping
-                    const childrenData = this.applyViewModeTransform(groupItems, viewMode);
-                    
-                    // Check if we should flatten single-item groups (only for flat list view)
-                    if (groupItems.length === 1 && viewMode === 'list') {
-                        // Single item in flat view - render as flat item, not as expandable group
-                        const item = groupItems[0];
-                        treeData.push({
-                            name: item.displayName,
-                            item: item,
-                            children: null
-                        });
-                    } else {
-                        // Multiple items or non-flat view - render as expandable group
-                        const groupNode = {
-                            name: groupName,
-                            item: null,
-                            children: childrenData,
-                            isPrimaryGroup: hasPrimaryGrouping
-                        };
-                        treeData.push(groupNode);
-                    }
-                }
-            });
-            
-            return treeData;
-        } else {
-            // No grouping function - apply view mode directly
-            return this.applyViewModeTransform(sortedItems, viewMode);
-        }
-    }
-    
-    // Apply view mode transformations
-    applyViewModeTransform(items, viewMode) {
-        switch(viewMode) {
-            case 'list':
-                return items.map(item => ({
-                    name: item.displayName,
-                    item: item,
-                    children: null
-                }));
-            case 'hierarchy':
-                return this.buildInheritanceHierarchy(items);
-            case 'variants':
-                return this.buildVariantHierarchy(items);
-            default:
-                return items.map(item => ({
-                    name: item.displayName,
-                    item: item,
-                    children: null
-                }));
-        }
-    }
-    
-    // Build inheritance hierarchy
-    buildInheritanceHierarchy(items) {
-        const nodeMap = new Map();
-        const roots = [];
-        
-        // Create nodes for all items
-        items.forEach(item => {
-            const node = {
-                name: item.displayName,
-                className: item.className,
-                item: item,
-                children: []
-            };
-            nodeMap.set(item.className, node);
-        });
-        
-        // Build parent-child relationships
-        items.forEach(item => {
-            const node = nodeMap.get(item.className);
-            
-            if (item.baseClass) {
-                const parentNode = nodeMap.get(item.baseClass);
-                if (parentNode && parentNode.item) {
-                    parentNode.children.push(node);
-                } else {
-                    roots.push(node);
-                }
-            } else {
-                roots.push(node);
-            }
-        });
-        
-        // Clean up empty children arrays
-        const cleanupTree = (nodes) => {
-            nodes.forEach(node => {
-                if (node.children.length === 0) {
-                    node.children = null;
-                } else {
-                    cleanupTree(node.children);
-                }
-            });
-        };
-        
-        cleanupTree(roots);
-        return roots;
-    }
-    
-    // Build variant hierarchy
-    buildVariantHierarchy(items) {
-        const groups = new Map();
-        
-        // Group items by base class (variants share the same baseClass)
-        items.forEach(item => {
-            const groupKey = item.baseClass || item.className;
-            if (!groups.has(groupKey)) {
-                groups.set(groupKey, []);
-            }
-            groups.get(groupKey).push(item);
-        });
-        
-        const treeData = [];
-        
-        for (const [baseClassName, groupItems] of groups) {
-            if (groupItems.length === 0) continue;
-            
-            // Sort variants: base first, then by name
-            groupItems.sort((a, b) => {
-                if (!a.variant && b.variant) return -1;
-                if (a.variant && !b.variant) return 1;
-                return a.displayName.localeCompare(b.displayName);
-            });
-            
-            if (groupItems.length === 1) {
-                // Single item - no grouping needed
-                const item = groupItems[0];
-                treeData.push({
-                    name: item.displayName,
-                    item: item,
-                    children: null
-                });
-            } else {
-                // Multiple variants - create group
-                const baseItem = groupItems.find(item => !item.variant) || groupItems[0];
-                const groupNode = {
-                    name: baseItem.displayName,
-                    item: null,
-                    children: groupItems.map(item => ({
+                    const childrenData = groupItems.map(item => ({
                         name: item.displayName,
                         item: item,
-                        children: null
-                    }))
-                };
-                treeData.push(groupNode);
-            }
+                        children: [],
+                        level: 1
+                    }));
+
+                    // Always render as expandable group since we always use list view
+                    const groupNode = {
+                        name: groupName,
+                        item: null,
+                        children: childrenData,
+                        isPrimaryGroup: hasPrimaryGrouping,
+                        level: 0
+                    };
+                    treeData.push(groupNode);
+                }
+            });
+
+            return treeData;
+        } else {
+            // No grouping function - return flat list
+            return sortedItems.map(item => ({
+                name: item.displayName,
+                item: item,
+                children: [],
+                level: 0
+            }));
         }
-        
-        return treeData;
     }
+    
+
+    
+    // Advanced functionality removed
     
     // Convert tree data to navigation nodes
     convertToNavigationNodes(treeData, level = 0) {
@@ -503,10 +437,10 @@ export class TreeManager {
         return treeData.map(treeNode => {
             const nodeType = treeNode.item ? NodeType.ITEM : NodeType.GROUP;
             const node = new TreeNode(nodeType, treeNode.item || { name: treeNode.name });
-            node.level = level;
+            node.level = treeNode.level;
             
             if (treeNode.children) {
-                const childNodes = this.convertToNavigationNodes(treeNode.children, level + 1);
+                const childNodes = this.convertToNavigationNodes(treeNode.children, node.level + 1);
                 childNodes.forEach(child => node.addChild(child));
             }
             
@@ -515,144 +449,87 @@ export class TreeManager {
     }
     
     // Render tree data using simplified logic
-    renderTreeData(treeData, viewMode = 'variants') {
+    renderTreeData(treeData) {
         if (!treeData || treeData.length === 0) {
             return '<li>No items</li>';
         }
-        
-        return treeData.map(node => this.renderTreeNode(node, 0, viewMode, false)).join('');
+
+        return treeData.map(node => this.renderTreeNode(node, 0, false)).join('');
     }
-    
-    renderTreeNode(node, level, viewMode = 'variants', parentIsGroup = false) {
+
+    renderTreeNode(node, _level, parentIsGroup = false) {
         const hasChildren = node.children && node.children.length > 0;
-        
-        
-        // Simplified indentation logic:
-        // - Group headers (isPrimaryGroup) are never indented (level 0)
-        // - First level children of groups are never indented (level 0) 
-        // - All other items follow normal hierarchical indentation
-        let effectiveLevel = level;
-        
-        // If this is a primary group header, don't indent it
-        if (node.isPrimaryGroup && !node.item && hasChildren) {
-            effectiveLevel = 0;
-        }
-        // If parent is a group and this is the first level of children, don't indent
-        else if (parentIsGroup && level === 1) {
-            effectiveLevel = 0;
-        }
-        // Otherwise use normal hierarchical indentation
-        else if (level > 1) {
-            effectiveLevel = level - 1; // Adjust to account for group level
-        }
-        
-        const indent = effectiveLevel * 20; // 20px indent per level
-        
+        // Use node.level directly for indentation
+        const indent = (node.level || 0) * 20; // 20px indent per level
+
         let html = '';
-        
+
         if (hasChildren) {
-            // Parent node - clickable if it has an item, with separate toggle
             const nodeId = `tree_${node.name.replace(/\s+/g, '_').replace(/[^\w]/g, '')}`;
-            // Only primary groups (from Group by dropdown) should be highlighted
+            const domNodeId = `${this.panelId}__${nodeId}`;
             const isPrimaryGroupHeader = node.isPrimaryGroup && !node.item && hasChildren;
             const groupClass = isPrimaryGroupHeader ? 'tree-group-header' : '';
-            
-            // All groups should toggle when clicked, items should select when clicked
+
             let clickHandler = '';
             if (hasChildren && !node.item) {
-                // This is a group node (has children but no item data) - make it toggle
-                clickHandler = `onclick="window.toggleTreeGroup('${nodeId}')" style="cursor: pointer;"`;
+                clickHandler = `onclick=\"window.toggleTreeGroup('${domNodeId}')\" style=\"cursor: pointer;\"`;
             } else if (node.item) {
-                // This is an item node - make it selectable
                 clickHandler = `onclick="window.selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'`;
             }
-            
+
             const itemClass = node.item ? `tree-item tree-parent ${groupClass}` : `tree-item tree-base-class ${groupClass}`;
-            
+
             html += `<li>`;
-            
-            // The actual item (clickable if it has data) with count on the right
             html += `<div class="${itemClass}" ${clickHandler} onmouseenter="showItemPreview && showItemPreview(event, this)" onmouseleave="hideItemPreview && hideItemPreview()">`;
             html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
-            
-            // Toggle button - clickable with stopPropagation to prevent row selection
-            html += `<span class="tree-toggle" data-node-id="${nodeId}" onclick="event.stopPropagation(); window.toggleTreeGroup('${nodeId}');">${TOGGLE_ICONS.EXPANDED}</span>`;
-            
+            html += `<span class=\"tree-toggle\" data-node-id=\"${domNodeId}\" onclick=\"event.stopPropagation(); window.toggleTreeGroup('${domNodeId}');\">${TOGGLE_ICONS.EXPANDED}</span>`;
             html += `<span class="group-name">${node.name}</span>`;
-            
-            // Always add icon container to maintain consistent row layout
             html += `<span class="item-icons-container">`;
             const previewText = node.item && node.item.category ? node.item.category.charAt(0).toUpperCase() : '?';
-            const previewHidden = !window.displayOptions?.showPreviewIcon || !node.item;
+            const previewHidden = !getState().displayOptions?.showPreviewIcon || !node.item;
             const categoryClass = node.item && node.item.category ? ` category-${node.item.category}` : '';
             html += `<span class="item-preview-icon${previewHidden ? ' hidden' : ''}${categoryClass}">${previewText}</span>`;
-            
-            // For mod groups, extract mod initial from group name if no item data
             let modText = 'M';
             if (node.item && node.item.mod) {
                 modText = node.item.mod.charAt(0).toUpperCase();
             } else if (!node.item && hasChildren) {
-                // This is a group - check if it's a mod group and extract initial from group name
-                const isModGroup = window.document && 
-                    window.document.querySelector('input[name="groupByOption"]:checked')?.value === 'groupByMod';
+                const isModGroup = window.document && window.document.getElementById('groupByMod')?.checked;
                 if (isModGroup) {
                     modText = node.name.charAt(0).toUpperCase();
                 }
             }
-            
-            // Always show mod icon for mod group headers, regardless of user setting
-            const isModGroup = !node.item && hasChildren && window.document && 
-                window.document.querySelector('input[name="groupByOption"]:checked')?.value === 'groupByMod';
-            const shouldShowModIcon = window.displayOptions?.showModIcon || isModGroup;
-            const modHidden = !shouldShowModIcon || (!node.item && !isModGroup) || 
-                (node.item && !node.item.mod && !isModGroup);
-            
+            const isModGroup = !node.item && hasChildren && window.document && window.document.getElementById('groupByMod')?.checked;
+            const shouldShowModIcon = getState().displayOptions?.showModIcon || isModGroup;
+            const modHidden = !shouldShowModIcon || (!node.item && !isModGroup) || (node.item && !node.item.mod && !isModGroup);
             html += `<span class="item-mod-icon${modHidden ? ' hidden' : ''}">${modText}</span>`;
             html += `</span>`;
             html += `</div>`;
-            html += `<ul class="tree-children" id="${nodeId}">`;
-            
-            // Render children
+            html += `<ul class=\"tree-children\" id=\"${domNodeId}\">`;
             node.children.forEach(child => {
-                // Check if this node is a grouping node (has no item data)
-                const currentNodeIsGroup = !node.item && hasChildren;
-                html += this.renderTreeNode(child, level + 1, viewMode, currentNodeIsGroup);
+                html += this.renderTreeNode(child, child.level, !node.item && hasChildren);
             });
-            
             html += '</ul>';
             html += '</li>';
         } else {
-            // Leaf item - no toggle needed, no count needed, simple left-aligned text
-            const clickHandler = node.item ? `onclick="window.selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'` : '';
-            
+            const clickHandler = node.item ? `onclick=\"window.selectTreeItem(this)\" data-item='${JSON.stringify(node.item)}' data-node-id=\"${this.panelId}__item_${node.item.class_name || ''}\"` : '';
             const className = node.item ? `tree-item` : `tree-item tree-base-class`;
-                
             html += `<li>`;
             html += `<div class="${className}" ${clickHandler} onmouseenter="showItemPreview && showItemPreview(event, this)" onmouseleave="hideItemPreview && hideItemPreview()">`;
             html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
-            
-            // Only show bullet if not in flat list view mode
-            if (viewMode !== 'list') {
-                html += `<span class="tree-bullet">•</span>`;
-            }
-            
+            // Bullet points removed - always list view
             html += `<span class="group-name">${node.name}</span>`;
-            
-            // Always add icon container to maintain consistent row layout
             html += `<span class="item-icons-container">`;
             const previewText = node.item && node.item.category ? node.item.category.charAt(0).toUpperCase() : '?';
-            const previewHidden = !window.displayOptions?.showPreviewIcon || !node.item;
+            const previewHidden = !getState().displayOptions?.showPreviewIcon || !node.item;
             const categoryClass = node.item && node.item.category ? ` category-${node.item.category}` : '';
             html += `<span class="item-preview-icon${previewHidden ? ' hidden' : ''}${categoryClass}">${previewText}</span>`;
-            
             const modText = node.item && node.item.mod ? node.item.mod.charAt(0).toUpperCase() : 'M';
-            const modHidden = !window.displayOptions?.showModIcon || !node.item || !node.item.mod;
+            const modHidden = !getState().displayOptions?.showModIcon || !node.item || !node.item.mod;
             html += `<span class="item-mod-icon${modHidden ? ' hidden' : ''}">${modText}</span>`;
             html += `</span>`;
             html += `</div>`;
             html += '</li>';
         }
-        
         return html;
     }
     
@@ -695,12 +572,19 @@ export function selectTreeItem(element) {
         return;
     }
     
-    // Call selectItem directly with the item data, bypassing DOM element dependency
-    selectItemByData(itemData);
+    // Determine panel and route action accordingly
+    const panelId = findPanelId(element);
+    if (panelId === 'rightTreeView' && typeof window.equipRightPanelItem === 'function') {
+        // Equip/unequip flow for right panel; do not change main selection
+        window.equipRightPanelItem(itemData);
+        return;
+    }
+    // Left panel (or unknown) selects the item
+    StateActions.setSelectedItem(itemData);
     
     // Also update the navigation system to sync focus/selection
-    const panelId = findPanelId(element);
-    if (panelId) {
+    const panelId2 = findPanelId(element);
+    if (panelId2) {
         const manager = getTreeManager(panelId);
         if (manager) {
             const navigationState = manager.getNavigationState();
@@ -711,7 +595,7 @@ export function selectTreeItem(element) {
             
             const matchingNode = allNodes.find(node => {
                 // Try to match by item data
-                if (node.data && node.data.className === itemData.className) {
+                if (node.data && node.data.class_name === itemData.class_name) {
                     return true;
                 }
                 return false;
@@ -756,7 +640,7 @@ export function toggleTreeGroup(nodeId) {
             // NodeId format is "tree_" + sanitized name, so we need to match it
             const correspondingNode = allNodes.find(node => {
                 const expectedNodeId = `tree_${node.name.replace(/\s+/g, '_').replace(/[^\w]/g, '')}`;
-                return expectedNodeId === nodeId;
+                return nodeId.endsWith(expectedNodeId);
             });
             
             if (correspondingNode) {
@@ -829,12 +713,36 @@ function findPanelIdFromContainer(container) {
 
 // Simplified selection callback system
 window.onTreeSelectionChanged = function(itemData, panelId) {
-    if (itemData && window.selectItemByData) {
-        window.selectItemByData(itemData);
-    } else if (!itemData && window.clearSelection) {
-        window.clearSelection();
+    // Left panel drives main selection; right panel equips
+    if (panelId === 'rightTreeView') {
+        if (itemData && typeof window.equipRightPanelItem === 'function') {
+            window.equipRightPanelItem(itemData);
+        }
+        return;
     }
+    // Default: update main selection
+    StateActions.setSelectedItem(itemData || null);
 };
+
+// Reactively update visual selection when selectedItem changes
+StateSubscribe('selectedItem', (item) => {
+    // Only update selection styling in the left panel
+    const left = document.getElementById('leftTreeView');
+    if (!left) return;
+    left.querySelectorAll('.tree-item').forEach(el => el.classList.remove('selected'));
+    left.querySelectorAll('.tree-parent').forEach(el => el.classList.remove('selected'));
+    if (!item) return;
+    const el = left.querySelector(`[data-node-id="leftTreeView__item_${item.class_name}"]`);
+    if (el) {
+        el.classList.add('selected');
+        // Scroll selected item into view within the list container
+        try {
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        } catch (_) {
+            el.scrollIntoView(true);
+        }
+    }
+});
 
 
 // Make functions globally available

@@ -1,10 +1,12 @@
 // Rendering Management
 // Handles tree view rendering and search functionality
 
-import { 
+import {
     initializeTreeManager,
     getTreeManager
 } from '../ui/treeView.js';
+import { getState } from './StateManager.js';
+import * as algorithms from '../algorithms.js';
 
 export const Renderer = {
     init() {
@@ -12,7 +14,8 @@ export const Renderer = {
         document.getElementById('leftSearch').addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             import('./filters.js').then(({ FilterManager }) => {
-                const baseItems = FilterManager.filterItemsByCategory(Arsenal.selectedCategory);
+                const { selectedCategory } = getState();
+                const baseItems = FilterManager.filterItemsByCategory(selectedCategory);
                 const items = baseItems.filter(item => item.displayName.toLowerCase().includes(searchTerm));
                 this.renderTreeView(items, 'leftTreeView');
             });
@@ -21,7 +24,8 @@ export const Renderer = {
         document.getElementById('rightSearch').addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             import('./filters.js').then(({ FilterManager }) => {
-                const items = FilterManager.filterItemsByCategory(Arsenal.selectedRightCategory)
+                const { selectedRightCategory } = getState();
+                const items = FilterManager.filterItemsByCategory(selectedRightCategory)
                     .filter(item => item.displayName.toLowerCase().includes(searchTerm));
                 this.renderTreeView(items, 'rightTreeView', false);
             });
@@ -30,8 +34,6 @@ export const Renderer = {
 
     // Enhanced tree view rendering with new architecture
     renderTreeView(items, containerId, useGrouping = true) {
-        console.log(`🎨 Rendering ${items.length} items to ${containerId}`);
-        
         const container = document.getElementById(containerId);
         if (!container) {
             console.error(`Container ${containerId} not found!`);
@@ -44,32 +46,33 @@ export const Renderer = {
             treeManager = initializeTreeManager(containerId);
         }
 
-        // Get current UI state
-        const viewMode = document.querySelector('input[name="viewMode"]:checked')?.value || 'hierarchy';
-        const sortMethod = document.getElementById('sortingSelect').value;
-        const sortOrder = Arsenal.currentSortOrder;
-        const primaryGrouping = document.querySelector('input[name="groupByOption"]:checked')?.value || 'none';
+        // Get current UI state (panel-specific prefs with DOM fallback)
+        const state = getState();
+        const panelPrefs = (state.uiPanels && state.uiPanels[containerId]) || {};
+        const sortMethod = panelPrefs.sortBy || (document.getElementById('sortingSelect')?.value || null);
+        const sortOrder = panelPrefs.sortOrder || state.currentSortOrder;
+        // Global checkbox applies to both panels
+        const groupByMod = document.getElementById('groupByMod')?.checked || false;
 
-        // Determine grouping function
+        console.log(`Rendering ${items.length} items to ${containerId}`);
+        console.log(`Options - Group By Mod: ${groupByMod}`);
+
+        // Determine grouping function based on checkbox states
         let groupingFunction = null;
-        if (primaryGrouping !== 'none' && algorithms[primaryGrouping]) {
-            groupingFunction = algorithms[primaryGrouping];
-        }
-
-        // Determine if we should use grouping
-        if (primaryGrouping !== 'none') {
+        if (groupByMod) {
+            // Mod grouping enabled
+            console.log('Using Mod grouping');
+            groupingFunction = algorithms.groupByMod;
             useGrouping = true;
-        } else if (viewMode === 'variants' || viewMode === 'hierarchy') {
-            useGrouping = true;
-            groupingFunction = null; // Let view mode handle organization
         } else {
+            // No mod grouping - use list view
+            console.log('No mod grouping, using list view');
             useGrouping = false;
         }
 
         // Render tree using new system
         treeManager.renderTree(items, {
             groupBy: useGrouping ? groupingFunction : null,
-            viewMode: viewMode,
             sortBy: sortMethod,
             sortOrder: sortOrder
         });

@@ -6,12 +6,6 @@ export const TOGGLE_ICONS = {
     COLLAPSED: '+'    // Plus - indicates can expand
 };
 
-// Alternative icons (can switch by changing the values above):
-// Option 1: Simple but bigger: '−' (minus) and '＋' (fullwidth plus)
-// Option 2: Boxed symbols: '⊟' (squared minus) and '⊞' (squared plus) 
-// Option 3: Mathematical: '⊖' (circled minus) and '⊕' (circled plus)
-// Option 4: Geometric: '▬' (horizontal bar) and '┼' (cross)
-
 // Panel toggle arrows (for filter panels)
 export const PANEL_ARROWS = {
     EXPANDED: '▼',    // Down arrow - panel is open

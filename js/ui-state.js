@@ -1,93 +1,54 @@
 // UI State Management
-// Handles view modes, sorting, display options, and expand/collapse state
+// Handles sorting, display options, and expand/collapse state
 
 import { TOGGLE_ICONS, MASTER_TOGGLE } from '../ui/constants.js';
+import { getState, actions as StateActions } from './StateManager.js';
 
 export const UIState = {
     init() {
-        // Group by radio button listeners
-        document.querySelectorAll('input[name="groupByOption"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    this.updateGrouping(e.target.value);
-                }
-            });
+        // Group by checkbox listeners
+        document.getElementById('groupByMod').addEventListener('change', (e) => {
+            this.updateGroupByMod(e.target.checked);
         });
-        
-        // View mode radio button listeners
-        document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    this.setViewMode(e.target.value);
-                }
-            });
-        });
+
+
 
         // Sort control listeners
         document.getElementById('sortingSelect').addEventListener('change', (e) => {
             import('./rendering.js').then(({ Renderer }) => {
-                Renderer.renderTreeView(Arsenal.filteredItems, 'leftTreeView');
+                const { filteredItems } = getState();
+                Renderer.renderTreeView(filteredItems, 'leftTreeView');
             });
         });
 
-        // Make display options globally available
-        window.displayOptions = Arsenal.displayOptions;
+        // Views consume display options directly from StateManager
     },
 
-    setViewMode(mode) {
-        // Update radio button selection
-        document.querySelector(`input[name="viewMode"][value="${mode}"]`).checked = true;
-        
-        // Show/hide collapse toggle based on view mode
-        const collapseToggleBtn = document.getElementById('treeToggleBtn');
-        const collapseToggleText = document.getElementById('treeToggleText');
-        
-        if (mode === 'list') {
-            // Hide collapse toggle for flat list view
-            collapseToggleBtn.style.display = 'none';
-            collapseToggleText.style.display = 'none';
-        } else {
-            // Show collapse toggle for hierarchy view
-            collapseToggleBtn.style.display = 'flex';
-            collapseToggleText.style.display = 'inline';
-        }
-        
+    updateGroupByMod(enabled) {
+        // Update checkbox state
+        document.getElementById('groupByMod').checked = enabled;
+
+        // Re-render with new grouping settings
+        this.refreshView();
+    },
+
+
+
+    refreshView() {
         import('./rendering.js').then(({ Renderer }) => {
-            Renderer.renderTreeView(Arsenal.filteredItems, 'leftTreeView');
+            const { filteredItems } = getState();
+            Renderer.renderTreeView(filteredItems, 'leftTreeView');
         });
-        
+
         // Update right panel based on current selection
         import('./selection.js').then(({ SelectionManager }) => {
-            if (Arsenal.selectedItem) {
-                SelectionManager.updateRightPanel(Arsenal.selectedItem);
+            const { selectedItem, selectedRightCategory } = getState();
+            if (selectedItem) {
+                SelectionManager.updateRightPanel(selectedItem);
             } else {
                 // No item selected, refresh right panel with current category
                 import('./filters.js').then(({ FilterManager }) => {
-                    const rightItems = FilterManager.filterItemsByCategory(Arsenal.selectedRightCategory);
-                    import('./rendering.js').then(({ Renderer }) => {
-                        Renderer.renderTreeView(rightItems, 'rightTreeView', false);
-                    });
-                });
-            }
-        });
-    },
-
-    updateGrouping(value) {
-        // Update radio button selection
-        document.querySelector(`input[name="groupByOption"][value="${value}"]`).checked = true;
-        
-        import('./rendering.js').then(({ Renderer }) => {
-            Renderer.renderTreeView(Arsenal.filteredItems, 'leftTreeView');
-        });
-        
-        // Update right panel based on current selection
-        import('./selection.js').then(({ SelectionManager }) => {
-            if (Arsenal.selectedItem) {
-                SelectionManager.updateRightPanel(Arsenal.selectedItem);
-            } else {
-                // No item selected, refresh right panel with current category
-                import('./filters.js').then(({ FilterManager }) => {
-                    const rightItems = FilterManager.filterItemsByCategory(Arsenal.selectedRightCategory);
+                    const rightItems = FilterManager.filterItemsByCategory(selectedRightCategory);
                     import('./rendering.js').then(({ Renderer }) => {
                         Renderer.renderTreeView(rightItems, 'rightTreeView', false);
                     });
@@ -97,29 +58,32 @@ export const UIState = {
     },
 
     toggleSortOrder() {
-        Arsenal.currentSortOrder = Arsenal.currentSortOrder === 'asc' ? 'desc' : 'asc';
+        const { currentSortOrder } = getState();
+        const next = currentSortOrder === 'asc' ? 'desc' : 'asc';
+        StateActions.setSortOrder(next);
         const button = document.getElementById('sortOrderToggle');
-        button.textContent = Arsenal.currentSortOrder === 'asc' ? '↑' : '↓';
-        button.title = Arsenal.currentSortOrder === 'asc' ? 'Ascending order - click for descending' : 'Descending order - click for ascending';
-        
+        button.textContent = next === 'asc' ? '↑' : '↓';
+        button.title = next === 'asc' ? 'Ascending order - click for descending' : 'Descending order - click for ascending';
+
         import('./rendering.js').then(({ Renderer }) => {
-            Renderer.renderTreeView(Arsenal.filteredItems, 'leftTreeView');
+            const { filteredItems } = getState();
+            Renderer.renderTreeView(filteredItems, 'leftTreeView');
         });
     },
 
     toggleExpandCollapse() {
         const button = document.getElementById('treeToggleBtn');
         const text = document.getElementById('treeToggleText');
-        if (Arsenal.currentExpandState) {
+        if (getState().currentExpandState) {
             this.collapseAllGroups();
             button.textContent = MASTER_TOGGLE.EXPAND_ALL;
             text.textContent = 'Expand All';
-            Arsenal.currentExpandState = false;
+            StateActions.setExpandState(false);
         } else {
             this.expandAllGroups();
             button.textContent = MASTER_TOGGLE.COLLAPSE_ALL;
             text.textContent = 'Collapse All';
-            Arsenal.currentExpandState = true;
+            StateActions.setExpandState(true);
         }
     },
 
@@ -143,19 +107,21 @@ export const UIState = {
 
     // Display option methods
     togglePreviewIcon(enabled) {
-        Arsenal.displayOptions.showPreviewIcon = enabled;
-        
+        StateActions.setDisplayOptions({ showPreviewIcon: enabled });
+
         import('./rendering.js').then(({ Renderer }) => {
-            Renderer.renderTreeView(Arsenal.filteredItems, 'leftTreeView');
+            const { filteredItems } = getState();
+            Renderer.renderTreeView(filteredItems, 'leftTreeView');
             // Update right panel if it has items
             const rightTreeView = document.getElementById('rightTreeView');
             if (rightTreeView && rightTreeView.children.length > 0) {
                 import('./selection.js').then(({ SelectionManager }) => {
-                    if (Arsenal.selectedItem && Arsenal.selectedItem.category === 'weapons') {
-                        SelectionManager.updateCompatibleAccessories(Arsenal.selectedItem);
+                    const { selectedItem, selectedRightCategory } = getState();
+                    if (selectedItem && ['rifles', 'pistols', 'launchers'].includes(selectedItem.category)) {
+                        SelectionManager.updateCompatibleAccessories(selectedItem);
                     } else {
                         import('./filters.js').then(({ FilterManager }) => {
-                            const rightItems = FilterManager.filterItemsByCategory(Arsenal.selectedRightCategory);
+                            const rightItems = FilterManager.filterItemsByCategory(selectedRightCategory);
                             Renderer.renderTreeView(rightItems, 'rightTreeView', false);
                         });
                     }
@@ -165,19 +131,21 @@ export const UIState = {
     },
 
     toggleModIcon(enabled) {
-        Arsenal.displayOptions.showModIcon = enabled;
-        
+        StateActions.setDisplayOptions({ showModIcon: enabled });
+
         import('./rendering.js').then(({ Renderer }) => {
-            Renderer.renderTreeView(Arsenal.filteredItems, 'leftTreeView');
+            const { filteredItems } = getState();
+            Renderer.renderTreeView(filteredItems, 'leftTreeView');
             // Update right panel if it has items
             const rightTreeView = document.getElementById('rightTreeView');
             if (rightTreeView && rightTreeView.children.length > 0) {
                 import('./selection.js').then(({ SelectionManager }) => {
-                    if (Arsenal.selectedItem && Arsenal.selectedItem.category === 'weapons') {
-                        SelectionManager.updateCompatibleAccessories(Arsenal.selectedItem);
+                    const { selectedItem, selectedRightCategory } = getState();
+                    if (selectedItem && ['rifles', 'pistols', 'launchers'].includes(selectedItem.category)) {
+                        SelectionManager.updateCompatibleAccessories(selectedItem);
                     } else {
                         import('./filters.js').then(({ FilterManager }) => {
-                            const rightItems = FilterManager.filterItemsByCategory(Arsenal.selectedRightCategory);
+                            const rightItems = FilterManager.filterItemsByCategory(selectedRightCategory);
                             Renderer.renderTreeView(rightItems, 'rightTreeView', false);
                         });
                     }
@@ -187,12 +155,12 @@ export const UIState = {
     },
 
     changeSpacing(spacing) {
-        Arsenal.displayOptions.spacing = spacing;
-        
+        StateActions.setDisplayOptions({ spacing });
+
         // Update left panel
         const leftTreeView = document.getElementById('leftTreeView');
         leftTreeView.className = `tree-view spacing-${spacing}`;
-        
+
         // Update right panel
         const rightTreeView = document.getElementById('rightTreeView');
         rightTreeView.className = `tree-view spacing-${spacing}`;

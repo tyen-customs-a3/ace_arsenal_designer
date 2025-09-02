@@ -10,15 +10,14 @@ export const NodeType = {
 
 // Generate unique node ID for consistent identification
 function generateNodeId(data, type) {
-    if (type === NodeType.ITEM && data.className) {
-        return `item_${data.className}`;
+    if (type === NodeType.ITEM && data.class_name) {
+        return `item_${data.class_name}`;
     } else if (type === NodeType.GROUP && data.name) {
         return `group_${data.name.replace(/\s+/g, '_').replace(/[^\w]/g, '')}`;
     } else if (type === NodeType.CATEGORY && data.name) {
         return `category_${data.name}`;
     }
-    // Fallback for complex data
-    return `node_${Math.random().toString(36).substr(2, 9)}`;
+    throw new Error(`Cannot generate node ID for type ${type} with data: ${JSON.stringify(data)}`);
 }
 
 // Unified tree node class
@@ -38,7 +37,7 @@ export class TreeNode {
     // Extract display name from data based on node type
     extractName(data, type) {
         if (type === NodeType.ITEM) {
-            return data.displayName || data.name || data.className || 'Unknown Item';
+            return data.displayName || data.class_name || 'Unknown Item';
         } else if (type === NodeType.GROUP) {
             return data.name || 'Unknown Group';
         } else if (type === NodeType.CATEGORY) {

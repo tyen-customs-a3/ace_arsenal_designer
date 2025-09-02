@@ -20,7 +20,6 @@ A powerful web-based development environment for creating, testing, and optimizi
 ### Advanced Tree Views
 - **Flat List**: Simple sorted display
 - **Grouped**: Items organized by mod, caliber, weapon type, etc.
-- **Hierarchy Tree**: Class inheritance visualization with expand/collapse
 - **Variant-Aware**: Intelligent grouping of weapon variants
 
 ### Development Tools
@@ -103,7 +102,6 @@ arsenal-testbed/
 ├── algorithms/             # Sorting and grouping algorithms
 │   ├── sorting.js         # Basic and variant-aware sorting
 │   ├── grouping.js        # Grouping and categorization
-│   ├── hierarchy.js       # Tree-based organization
 │   └── variantCore.js     # Weapon variant detection system
 ├── services/              # Data orchestration services
 │   └── DataService.js     # Main data pipeline coordinator

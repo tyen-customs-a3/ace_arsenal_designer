@@ -1,9 +1,11 @@
 // Enhanced sorting algorithms with direction support
 
 export function sortByName(items, direction = 'asc') {
-    const sorted = [...items].sort((a, b) => 
-        a.displayName.localeCompare(b.displayName)
-    );
+    const sorted = [...items].sort((a, b) => {
+        const nameA = a.name || a.displayName || a.class_name || '';
+        const nameB = b.name || b.displayName || b.class_name || '';
+        return nameA.localeCompare(nameB);
+    });
     return direction === 'desc' ? sorted.reverse() : sorted;
 }
 
@@ -12,11 +14,17 @@ export function sortByMod(items, direction = 'asc') {
     const modPriority = { 'A3': 1, 'ACE3': 2, 'RHS': 3, 'CUP': 4 };
     
     const sorted = [...items].sort((a, b) => {
-        const priorityA = modPriority[a.mod] || 999;
-        const priorityB = modPriority[b.mod] || 999;
+        const modA = (a.item && a.item.mod) || a.mod || '';
+        const modB = (b.item && b.item.mod) || b.mod || '';
+        
+        const priorityA = modPriority[modA] || 999;
+        const priorityB = modPriority[modB] || 999;
         
         if (priorityA !== priorityB) return priorityA - priorityB;
-        return a.displayName.localeCompare(b.displayName);
+        
+        const nameA = a.name || a.displayName || a.class_name || '';
+        const nameB = b.name || b.displayName || b.class_name || '';
+        return nameA.localeCompare(nameB);
     });
     
     return direction === 'desc' ? sorted.reverse() : sorted;
@@ -25,11 +33,14 @@ export function sortByMod(items, direction = 'asc') {
 
 export function sortByRange(items, direction = 'desc') {
     const sorted = [...items].sort((a, b) => {
-        const rangeA = a.range || 0;
-        const rangeB = b.range || 0;
+        const rangeA = (a.item && a.item.range) || a.range || 0;
+        const rangeB = (b.item && b.item.range) || b.range || 0;
         
         if (rangeB !== rangeA) return rangeB - rangeA; // Default descending
-        return a.displayName.localeCompare(b.displayName);
+        
+        const nameA = a.name || a.displayName || a.class_name || '';
+        const nameB = b.name || b.displayName || b.class_name || '';
+        return nameA.localeCompare(nameB);
     });
     
     return direction === 'asc' ? sorted.reverse() : sorted;
@@ -38,11 +49,14 @@ export function sortByRange(items, direction = 'desc') {
 
 export function sortByMass(items, direction = 'asc') {
     const sorted = [...items].sort((a, b) => {
-        const massA = a.mass || 0;
-        const massB = b.mass || 0;
+        const massA = (a.item && a.item.mass) || a.mass || 0;
+        const massB = (b.item && b.item.mass) || b.mass || 0;
         
         if (massA !== massB) return massA - massB; // Default ascending
-        return a.displayName.localeCompare(b.displayName);
+        
+        const nameA = a.name || a.displayName || a.class_name || '';
+        const nameB = b.name || b.displayName || b.class_name || '';
+        return nameA.localeCompare(nameB);
     });
     
     return direction === 'desc' ? sorted.reverse() : sorted;
@@ -51,12 +65,17 @@ export function sortByMass(items, direction = 'asc') {
 
 export function sortByCategory(items, direction = 'asc') {
     const sorted = [...items].sort((a, b) => {
+        const categoryA = (a.item && a.item.category) || a.category || '';
+        const categoryB = (b.item && b.item.category) || b.category || '';
+        
         // First by category
-        const categoryComp = a.category.localeCompare(b.category);
+        const categoryComp = categoryA.localeCompare(categoryB);
         if (categoryComp !== 0) return categoryComp;
         
         // Then by name within category
-        return a.displayName.localeCompare(b.displayName);
+        const nameA = a.name || a.displayName || a.class_name || '';
+        const nameB = b.name || b.displayName || b.class_name || '';
+        return nameA.localeCompare(nameB);
     });
     
     return direction === 'desc' ? sorted.reverse() : sorted;

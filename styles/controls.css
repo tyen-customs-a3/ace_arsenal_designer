@@ -28,7 +28,8 @@
     flex-shrink: 0;
 }
 
-.grouping-controls select {
+.grouping-controls select,
+.compact-filter-select select {
     padding: 4px 6px;
     background: var(--button-background) !important;
     border: 1px solid var(--border-primary) !important;
@@ -37,6 +38,7 @@
     font-weight: 600;
     border-radius: 1px !important;
     flex: 1;
+    width: 100%;
     appearance: none !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
@@ -48,7 +50,9 @@
 }
 
 .grouping-controls select:hover,
-.grouping-controls select:focus {
+.grouping-controls select:focus,
+.compact-filter-select select:hover,
+.compact-filter-select select:focus {
     outline: none !important;
     border-color: var(--border-focus) !important;
     background: var(--active-background) !important;

@@ -1,164 +1,167 @@
 // Data Management
 // Handles data transformation and category switching
 
+import { actions as StateActions, getState } from './StateManager.js';
+import { dataService } from '../services/DataService.js';
+
 export const DataManager = {
-    init() {
+    async init() {
+        // Initialize DataService asynchronously (idempotent)
+        try {
+            if (!dataService.isReady()) {
+                await dataService.initialize();
+            }
+        } catch (err) {
+            console.error('Failed to initialize DataService:', err);
+        }
         // Category tab listeners
         document.querySelectorAll('.category-tab').forEach(tab => {
             tab.addEventListener('click', () => this.switchCategory(tab.dataset.category));
         });
     },
 
-    // Transform DataService enriched classes to UI-compatible format
-    transformDataServiceItems(enrichedClasses) {
-        return enrichedClasses.map(classObj => {
-            const meta = classObj._meta || {};
-            
-            // Helper function to get the best available display name
-            const getDisplayName = () => {
-                if (meta.displayName && meta.displayName.trim()) {
-                    return meta.displayName;
-                }
-                if (classObj.displayName && classObj.displayName.trim()) {
-                    return classObj.displayName;
-                }
-                if (classObj.properties?.displayName && classObj.properties.displayName.trim()) {
-                    return classObj.properties.displayName.trim();
-                }
-                return classObj.className;
-            };
-            
-            // Create UI-compatible item object
-            const item = {
-                className: classObj.className,
-                displayName: getDisplayName(),
-                category: meta.category || 'unknown',
-                mod: classObj._sourceMod || 'Unknown',
-                baseClass: classObj.baseClass || '',
-                range: meta.range || classObj.range || 0,
-                mass: meta.mass || classObj.mass || 0,
-                damage: meta.damage || classObj.damage || 0,
-                caliber: meta.caliber || classObj.caliber || '',
-                capacity: meta.capacity || classObj.capacity || 0,
-                armor: meta.armor || classObj.armor || 0,
-                maximumLoad: meta.maximumLoad || classObj.maximumLoad || 0,
-                rateOfFire: meta.rateOfFire || classObj.rateOfFire || 0,
-                zoom: meta.zoom || classObj.zoom || 0,
-                recoilModifier: meta.recoilModifier || classObj.recoilModifier || 0,
-                magazineWells: meta.magazineWells || classObj.magazineWells || [],
-                weaponSlots: meta.weaponSlots || classObj.weaponSlots || [],
-                compatibleSlots: meta.compatibleSlots || classObj.compatibleSlots || [],
-                compatibleWells: meta.compatibleWells || classObj.compatibleWells || [],
-                cursorAim: meta.cursorAim || classObj.cursorAim || '',
-                variant: meta.variant || classObj.variant || '',
-                tracer: meta.tracer || classObj.tracer || false,
-                magnification: meta.magnification || classObj.magnification || 0,
-                _originalData: classObj,
-                _meta: meta,
+    // Transform gear_database.json items to UI-compatible format
+    transformDataServiceItems(items) {
+        return items.map(item => {
+            return {
+                class_name: item.class_name, // Keep original field name for hierarchy system
+                displayName: item.displayName || item.class_name,
+                category: item.category,
+                mod: item.mod || 'Unknown',
+                baseClass: item.base_class || '',
+                range: item.range || 0,
+                mass: item.mass || 0,
+                damage: item.damage || 0,
+                caliber: item.caliber || '',
+                capacity: item.capacity || 0,
+                armor: item.armor || 0,
+                maximumLoad: item.maximumLoad || 0,
+                rateOfFire: item.rateOfFire || 0,
+                zoom: item.zoom || 0,
+                recoilModifier: item.recoilModifier || 0,
+                magazines: (Array.isArray(item.magazines) ? item.magazines : (Array.isArray(item.properties?.magazines) ? item.properties.magazines : [])),
+                magazineWells: item.magwells || [],
+                weaponSlots: item.weaponSlots || [],
+                compatibleSlots: item.compatibleSlots || [],
+                compatibleWells: item.compatibleWells || [],
+                cursorAim: item.cursorAim || '',
+                variant: item.variant || '',
+                tracer: item.tracer || false,
+                magnification: item.magnification || 0,
+                // Additional fields from enhanced database
+                picture: item.picture || '',
+                model: item.model || '',
+                descriptionShort: item.descriptionShort || '',
+                author: item.author || '',
+                scope: item.scope || 0,
+                _originalData: item,
                 properties: {
-                    displayName: meta.displayName || classObj.displayName || classObj.className,
-                    range: meta.range || classObj.range || 0,
-                    mass: meta.mass || classObj.mass || 0,
-                    damage: meta.damage || classObj.damage || 0,
-                    caliber: meta.caliber || classObj.caliber || '',
-                    capacity: meta.capacity || classObj.capacity || 0,
-                    armor: meta.armor || classObj.armor || 0,
-                    maximumLoad: meta.maximumLoad || classObj.maximumLoad || 0,
-                    rateOfFire: meta.rateOfFire || classObj.rateOfFire || 0,
-                    zoom: meta.zoom || classObj.zoom || 0,
-                    recoilModifier: meta.recoilModifier || classObj.recoilModifier || 0,
-                    cursorAim: meta.cursorAim || classObj.cursorAim || '',
-                    variant: meta.variant || classObj.variant || '',
-                    tracer: meta.tracer || classObj.tracer || false,
-                    magnification: meta.magnification || classObj.magnification || 0,
-                    magazineWells: meta.magazineWells || classObj.magazineWells || [],
-                    weaponSlots: meta.weaponSlots || classObj.weaponSlots || [],
-                    compatibleSlots: meta.compatibleSlots || classObj.compatibleSlots || [],
-                    compatibleWells: meta.compatibleWells || classObj.compatibleWells || []
+                    displayName: item.displayName || item.class_name,
+                    range: item.range || 0,
+                    mass: item.mass || 0,
+                    damage: item.damage || 0,
+                    caliber: item.caliber || '',
+                    capacity: item.capacity || 0,
+                    armor: item.armor || 0,
+                    maximumLoad: item.maximumLoad || 0,
+                    rateOfFire: item.rateOfFire || 0,
+                    zoom: item.zoom || 0,
+                    recoilModifier: item.recoilModifier || 0,
+                    magazines: (Array.isArray(item.magazines) ? item.magazines : (Array.isArray(item.properties?.magazines) ? item.properties.magazines : [])),
+                    cursorAim: item.cursorAim || '',
+                    variant: item.variant || '',
+                    tracer: item.tracer || false,
+                    magnification: item.magnification || 0,
+                    magazineWells: item.magwells || [],
+                    weaponSlots: item.weaponSlots || [],
+                    compatibleSlots: item.compatibleSlots || [],
+                    compatibleWells: item.compatibleWells || [],
+                    picture: item.picture || '',
+                    model: item.model || '',
+                    descriptionShort: item.descriptionShort || '',
+                    author: item.author || '',
+                    scope: item.scope || 0
                 }
             };
-            
-            return item;
         });
     },
 
-    switchCategory(category) {
-        Arsenal.selectedCategory = category;
-        
+    async switchCategory(category) {
+        StateActions.setSelectedCategory(category);
+
         // Update tab appearance
         document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
         const activeTab = document.querySelector(`[data-category="${category}"]`);
         if (activeTab) {
             activeTab.classList.add('active');
         }
-        
-        if (!Arsenal.dataService.isReady()) {
+
+        if (!dataService.isReady()) {
             console.warn('DataService not ready, cannot switch category');
             return;
         }
-        
-        const categoryMapping = {
-            'weapons': 'weapon',
-            'handguns': 'handgun', 
-            'launchers': 'launcher',
-            'binoculars': 'binoculars',
-            'backpacks': 'backpack',
-            'vests': 'vest',
-            'attachments': 'attachment',
-            'magazines': 'magazine'
-        };
-        
-        const dataServiceCategory = categoryMapping[category] || category;
-        
+
+        const timingElement = document.getElementById('timing');
+        timingElement.textContent = `Loading ${category}...`;
+        timingElement.style.color = '';
+
         try {
-            const dataServiceItems = Arsenal.dataService.getClassesByCategory(dataServiceCategory);
-            console.log(`DataService returned ${dataServiceItems.length} items for category '${dataServiceCategory}'`);
-            
+            const dataServiceItems = await dataService.getClassesByCategory(category);
+            console.log(`DataService returned ${dataServiceItems.length} items for category '${category}'`);
+
             if (dataServiceItems.length === 0) {
-                console.warn(`No items found for category '${dataServiceCategory}'`);
-                const availableCategories = Arsenal.dataService.getAvailableCategories();
-                const allData = Arsenal.dataService.getAllClasses();
-                console.log('Available categories:', availableCategories);
+                console.warn(`No items found for category '${category}'`);
             }
-            
-            const transformedItems = this.transformDataServiceItems(dataServiceItems).map(item => ({
-                ...item,
-                category: category
-            }));
-            
+
+            const transformedItems = this.transformDataServiceItems(dataServiceItems);
+
             console.log(`Transformed ${transformedItems.length} items for UI`);
-            Arsenal.currentItems = transformedItems;
-            
-            const timingElement = document.getElementById('timing');
+            StateActions.setCurrentItems(transformedItems);
+
             timingElement.textContent = `${transformedItems.length} ${category} loaded`;
             timingElement.style.color = '';
-            
+
             import('./filters.js').then(({ FilterManager }) => {
                 FilterManager.populateFilterOptions(category);
-                Arsenal.filteredItems = FilterManager.filterItemsByCategory(category);
-                
+                const items = FilterManager.filterItemsByCategory(category);
+                StateActions.setFilteredItems(items);
                 import('./rendering.js').then(({ Renderer }) => {
-                    Renderer.renderTreeView(Arsenal.filteredItems, 'leftTreeView');
+                    // Prepend a global 'None' item at the top for every category
+                    const noneItem = {
+                        class_name: `__none_${category}__`,
+                        displayName: 'None',
+                        category,
+                        mod: 'System',
+                        scope: 2,
+                        properties: {}
+                    };
+                    Renderer.renderTreeView([noneItem, ...items], 'leftTreeView');
                 });
             });
-            
+
+            // Emit category changed event for hierarchy loader
+            document.dispatchEvent(new CustomEvent('categoryChanged', { 
+                detail: { category, itemCount: transformedItems.length } 
+            }));
+
         } catch (error) {
             console.error(`Error switching to category ${category}:`, error);
-            document.getElementById('timing').textContent = `Error loading ${category}`;
-            document.getElementById('timing').style.color = '#ff4444';
-            Arsenal.currentItems = [];
-            Arsenal.filteredItems = [];
+            timingElement.textContent = `Error loading ${category}`;
+            timingElement.style.color = '#ff4444';
+            StateActions.setCurrentItems([]);
+            StateActions.setFilteredItems([]);
         }
     },
 
     switchRightCategory(category) {
-        Arsenal.selectedRightCategory = category;
+        StateActions.setSelectedRightCategory(category);
         
         import('./selection.js').then(({ SelectionManager }) => {
             SelectionManager.updateRightCategoryTabs();
             
-            if (Arsenal.selectedItem) {
-                SelectionManager.updateRightPanel(Arsenal.selectedItem);
+            const { selectedItem } = getState();
+            if (selectedItem) {
+                SelectionManager.updateRightPanel(selectedItem);
             } else {
                 SelectionManager.clearRightPanelWithMessage('Select an item to view compatible accessories');
             }
@@ -166,47 +169,48 @@ export const DataManager = {
     },
 
     regenerateData() {
-        this.switchCategory(Arsenal.selectedCategory);
-        this.switchRightCategory(Arsenal.selectedRightCategory);
+        const { selectedCategory, selectedRightCategory } = getState();
+        this.switchCategory(selectedCategory);
+        this.switchRightCategory(selectedRightCategory);
         import('./selection.js').then(({ SelectionManager }) => {
             SelectionManager.clearSelection();
         });
     },
 
     getDataServiceStats() {
-        if (!Arsenal.dataService.isReady()) {
+        if (!dataService.isReady()) {
             return null;
         }
-        return Arsenal.dataService.getStats();
+        return dataService.getStats();
     },
 
     getAvailableCategories() {
-        if (!Arsenal.dataService.isReady()) {
+        if (!dataService.isReady()) {
             return [];
         }
-        return Arsenal.dataService.getAvailableCategories();
+        return dataService.getAvailableCategories();
     },
 
     findItemByClassName(className) {
-        if (!Arsenal.dataService.isReady()) {
+        if (!dataService.isReady()) {
             return null;
         }
         
-        const enrichedClass = Arsenal.dataService.findClass(className);
+        const enrichedClass = dataService.findClass(className);
         if (!enrichedClass) {
             return null;
         }
         
         return this.transformDataServiceItems([{
-            className: className,
+            class_name: className,
             ...enrichedClass
         }])[0];
     },
 
     getEnrichmentReport() {
-        if (!Arsenal.dataService.isReady()) {
+        if (!dataService.isReady()) {
             return null;
         }
-        return Arsenal.dataService.getEnrichmentReport();
+        return dataService.getEnrichmentReport();
     }
 };

@@ -1,6 +1,8 @@
 // Filter Management
 // Handles all filtering logic for both left and right panels
 
+import { getState, actions as StateActions } from './StateManager.js';
+
 export const FilterManager = {
     init() {
         // No specific initialization needed - filters are populated dynamically
@@ -8,33 +10,35 @@ export const FilterManager = {
 
     // Category filtering
     filterItemsByCategory(category) {
-        const categoryItems = Arsenal.currentItems.filter(item => item.category === category);
+        const { currentItems } = getState();
+        const categoryItems = currentItems.filter(item => item.category === category);
         return this.applyActiveFilters(categoryItems);
     },
 
     // Apply all active filters to items
     applyActiveFilters(items) {
+        const { activeFilters } = getState();
         return items.filter(item => {
             // Mod filter
-            if (Arsenal.activeFilters.mods.size > 0 && !Arsenal.activeFilters.mods.has(item.mod || 'Unknown')) {
+            if (activeFilters.mods.size > 0 && !activeFilters.mods.has(item.mod || 'Unknown')) {
                 return false;
             }
 
             // Caliber filter (only apply if item has caliber data)
-            if (Arsenal.activeFilters.calibers.size > 0) {
+            if (activeFilters.calibers.size > 0) {
                 const itemCaliber = item.caliber || (item.properties && item.properties.caliber);
-                if (itemCaliber && !Arsenal.activeFilters.calibers.has(itemCaliber)) {
+                if (itemCaliber && !activeFilters.calibers.has(itemCaliber)) {
                     return false;
                 }
             }
 
-            // Weapon type filter (only apply to weapons category)
-            if (Arsenal.activeFilters.weaponTypes.size > 0 && item.category === 'weapons') {
+            // Weapon type filter (apply to rifles, pistols, and launchers)
+            if (activeFilters.weaponTypes.size > 0 && ['rifles', 'pistols', 'launchers'].includes(item.category)) {
                 const weaponType = item.cursorAim || (item.properties && item.properties.cursorAim);
-                if (weaponType && !Arsenal.activeFilters.weaponTypes.has(weaponType)) {
+                if (weaponType && !activeFilters.weaponTypes.has(weaponType)) {
                     return false;
                 }
-                if (!weaponType && !Arsenal.activeFilters.weaponTypes.has('other')) {
+                if (!weaponType && !activeFilters.weaponTypes.has('other')) {
                     return false;
                 }
             }
@@ -45,7 +49,8 @@ export const FilterManager = {
 
     // Generate filter options dynamically based on current category
     populateFilterOptions(category) {
-        const categoryItems = Arsenal.currentItems.filter(item => item.category === category);
+        const { currentItems } = getState();
+        const categoryItems = currentItems.filter(item => item.category === category);
         
         const mods = [...new Set(categoryItems.map(item => item.mod || 'Unknown'))].sort();
 
@@ -60,7 +65,7 @@ export const FilterManager = {
         const caliberContainer = document.getElementById('caliberFilters');
         const caliberGroup = caliberContainer.parentElement;
         
-        const caliberRelevantCategories = ['weapons', 'handguns', 'launchers', 'magazines'];
+        const caliberRelevantCategories = ['rifles', 'pistols', 'launchers', 'magazines'];
         
         if (caliberRelevantCategories.includes(category)) {
             caliberGroup.style.display = 'block';
@@ -74,13 +79,13 @@ export const FilterManager = {
             `).join('');
         } else {
             caliberGroup.style.display = 'none';
-            Arsenal.activeFilters.calibers.clear();
+            StateActions.clearAllFilters();
         }
 
         const weaponTypeContainer = document.getElementById('weaponTypeFilters');
         const weaponTypeGroup = weaponTypeContainer.parentElement;
         
-        if (category === 'weapons') {
+        if (['rifles', 'pistols', 'launchers'].includes(category)) {
             weaponTypeGroup.style.display = 'block';
             const weaponTypes = [...new Set(categoryItems.map(item => {
                 return item.cursorAim || (item.properties && item.properties.cursorAim) || 'other';
@@ -94,23 +99,17 @@ export const FilterManager = {
             `).join('');
         } else {
             weaponTypeGroup.style.display = 'none';
-            Arsenal.activeFilters.weaponTypes.clear();
+            StateActions.clearAllFilters();
         }
     },
 
     toggleFilter(filterType, value, isChecked) {
-        if (isChecked) {
-            Arsenal.activeFilters[filterType].add(value);
-        } else {
-            Arsenal.activeFilters[filterType].delete(value);
-        }
+        StateActions.toggleFilter(filterType, value, isChecked);
         this.updateFilteredItems();
     },
 
     clearAllFilters() {
-        Arsenal.activeFilters.mods.clear();
-        Arsenal.activeFilters.calibers.clear();
-        Arsenal.activeFilters.weaponTypes.clear();
+        StateActions.clearAllFilters();
 
         document.querySelectorAll('#modFilters input[type="checkbox"], #caliberFilters input[type="checkbox"], #weaponTypeFilters input[type="checkbox"]').forEach(checkbox => {
             checkbox.checked = false;
@@ -120,41 +119,44 @@ export const FilterManager = {
     },
 
     updateFilteredItems() {
-        Arsenal.filteredItems = this.filterItemsByCategory(Arsenal.selectedCategory);
+        const { selectedCategory } = getState();
+        const items = this.filterItemsByCategory(selectedCategory);
+        StateActions.setFilteredItems(items);
         import('./rendering.js').then(({ Renderer }) => {
-            Renderer.renderTreeView(Arsenal.filteredItems, 'leftTreeView');
+            Renderer.renderTreeView(items, 'leftTreeView');
         });
     },
 
     applyRightPanelFilters(items) {
         return items.filter(item => {
-            if (Arsenal.rightPanelFilters.magnifications.size > 0 && item.category === 'attachments') {
-                const magnification = item.magnification || (item.properties && item.properties.magnification);
-                if (magnification && !Arsenal.rightPanelFilters.magnifications.has(magnification)) {
-                    return false;
-                }
-                if (!magnification && Arsenal.rightPanelFilters.magnifications.size > 0) {
-                    return false;
-                }
+        const { rightPanelFilters } = getState();
+        if (rightPanelFilters.magnifications.size > 0 && item.category === 'attachments') {
+            const magnification = item.magnification || (item.properties && item.properties.magnification);
+            if (magnification && !rightPanelFilters.magnifications.has(magnification)) {
+                return false;
             }
+            if (!magnification && rightPanelFilters.magnifications.size > 0) {
+                return false;
+            }
+        }
 
-            if (Arsenal.rightPanelFilters.capacities.size > 0 && item.category === 'magazines') {
-                const capacity = item.capacity || (item.properties && item.properties.capacity);
-                if (capacity) {
-                    const capacityRange = this.getCapacityRange(capacity);
-                    if (!Arsenal.rightPanelFilters.capacities.has(capacityRange)) {
-                        return false;
-                    }
-                }
-            }
-
-            if (Arsenal.rightPanelFilters.tracers.size > 0 && item.category === 'magazines') {
-                const isTracer = item.tracer || (item.properties && item.properties.tracer);
-                const tracerType = isTracer ? 'Tracer' : 'Standard';
-                if (!Arsenal.rightPanelFilters.tracers.has(tracerType)) {
+        if (rightPanelFilters.capacities.size > 0 && item.category === 'magazines') {
+            const capacity = item.capacity || (item.properties && item.properties.capacity);
+            if (capacity) {
+                const capacityRange = this.getCapacityRange(capacity);
+                if (!rightPanelFilters.capacities.has(capacityRange)) {
                     return false;
                 }
             }
+        }
+
+        if (rightPanelFilters.tracers.size > 0 && item.category === 'magazines') {
+            const isTracer = item.tracer || (item.properties && item.properties.tracer);
+            const tracerType = isTracer ? 'Tracer' : 'Standard';
+            if (!rightPanelFilters.tracers.has(tracerType)) {
+                return false;
+            }
+        }
 
             return true;
         });
@@ -169,16 +171,13 @@ export const FilterManager = {
     },
 
     toggleRightPanelFilterType(filterType, value, isChecked) {
-        if (isChecked) {
-            Arsenal.rightPanelFilters[filterType].add(value);
-        } else {
-            Arsenal.rightPanelFilters[filterType].delete(value);
-        }
+        StateActions.toggleRightPanelFilterType(filterType, value, isChecked);
         import('./selection.js').then(({ SelectionManager }) => {
-            if (Arsenal.selectedItem && Arsenal.selectedItem.category === 'weapons') {
-                SelectionManager.updateCompatibleAccessories(Arsenal.selectedItem);
+            const { selectedItem, selectedRightCategory } = getState();
+            if (selectedItem && ['rifles', 'pistols', 'launchers'].includes(selectedItem.category)) {
+                SelectionManager.updateCompatibleAccessories(selectedItem);
             } else {
-                const rightItems = this.filterItemsByCategory(Arsenal.selectedRightCategory);
+                const rightItems = this.filterItemsByCategory(selectedRightCategory);
                 import('./rendering.js').then(({ Renderer }) => {
                     Renderer.renderTreeView(rightItems, 'rightTreeView', false);
                 });
@@ -187,20 +186,18 @@ export const FilterManager = {
     },
 
     clearRightPanelFilters() {
-        Arsenal.rightPanelFilters.magnifications.clear();
-        Arsenal.rightPanelFilters.capacities.clear();
-        Arsenal.rightPanelFilters.tracers.clear();
-        Arsenal.rightPanelFilters.ballistics.clear();
+        StateActions.clearRightPanelFilters();
 
         document.querySelectorAll('#magnificationFilters input[type="checkbox"], #capacityFilters input[type="checkbox"], #tracerFilters input[type="checkbox"], #ballisticsFilters input[type="checkbox"]').forEach(checkbox => {
             checkbox.checked = false;
         });
 
         import('./selection.js').then(({ SelectionManager }) => {
-            if (Arsenal.selectedItem && Arsenal.selectedItem.category === 'weapons') {
-                SelectionManager.updateCompatibleAccessories(Arsenal.selectedItem);
+            const { selectedItem, selectedRightCategory } = getState();
+            if (selectedItem && ['rifles', 'pistols', 'launchers'].includes(selectedItem.category)) {
+                SelectionManager.updateCompatibleAccessories(selectedItem);
             } else {
-                const rightItems = this.filterItemsByCategory(Arsenal.selectedRightCategory);
+                const rightItems = this.filterItemsByCategory(selectedRightCategory);
                 import('./rendering.js').then(({ Renderer }) => {
                     Renderer.renderTreeView(rightItems, 'rightTreeView', false);
                 });
@@ -224,7 +221,8 @@ export const FilterManager = {
         tracerContainer.parentElement.style.display = 'none';
         ballisticsContainer.parentElement.style.display = 'none';
 
-        if (Arsenal.selectedRightCategory === 'attachments') {
+        const { selectedRightCategory } = getState();
+        if (selectedRightCategory === 'attachments') {
             const magnifications = [...new Set(items.map(item => {
                 return item.magnification || (item.properties && item.properties.magnification);
             }).filter(m => m))].sort();
@@ -238,7 +236,7 @@ export const FilterManager = {
                     </label>
                 `).join('');
             }
-        } else if (Arsenal.selectedRightCategory === 'magazines') {
+        } else if (selectedRightCategory === 'magazines') {
             const capacities = [...new Set(items.map(item => {
                 const capacity = item.capacity || (item.properties && item.properties.capacity);
                 return capacity ? this.getCapacityRange(capacity) : null;

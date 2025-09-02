@@ -95,3 +95,5 @@ logs
 
 # Symbolic links to external content
 data/addons/a3/
+GEMINI.md
+config/
