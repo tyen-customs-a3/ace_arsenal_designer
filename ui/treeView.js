@@ -474,7 +474,7 @@ export class TreeManager {
 
             let clickHandler = '';
             if (hasChildren && !node.item) {
-                clickHandler = `onclick=\"window.toggleTreeGroup('${domNodeId}')\" style=\"cursor: pointer;\"`;
+                clickHandler = `onclick="window.toggleTreeGroup('${domNodeId}')" style="cursor: pointer;"`;
             } else if (node.item) {
                 const __data = encodeURIComponent(JSON.stringify(node.item));
                 const itemNodeId = `${this.panelId}__item_${node.item.class_name || ''}`;
@@ -484,9 +484,9 @@ export class TreeManager {
             const itemClass = node.item ? `tree-item tree-parent ${groupClass}` : `tree-item tree-base-class ${groupClass}`;
 
             html += `<li>`;
-            html += `<div class="${itemClass}" ${clickHandler} onmouseenter="showItemPreview && showItemPreview(event, this)" onmouseleave="hideItemPreview && hideItemPreview()">`;
+            html += `<div class="${itemClass}" ${clickHandler} onmouseenter="window.showItemPreview && window.showItemPreview(event, this)" onmouseleave="window.hideItemPreview && window.hideItemPreview()">`;
             html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
-            html += `<span class=\"tree-toggle\" data-node-id=\"${domNodeId}\" onclick=\"event.stopPropagation(); window.toggleTreeGroup('${domNodeId}');\">${TOGGLE_ICONS.EXPANDED}</span>`;
+            html += `<span class="tree-toggle" data-node-id="${domNodeId}" onclick="event.stopPropagation(); window.toggleTreeGroup('${domNodeId}');">${TOGGLE_ICONS.EXPANDED}</span>`;
             html += `<span class="group-name">${node.name}</span>`;
             html += `<span class="item-icons-container">`;
             const previewText = node.item && node.item.category ? node.item.category.charAt(0).toUpperCase() : '?';
@@ -508,17 +508,17 @@ export class TreeManager {
             html += `<span class="item-mod-icon${modHidden ? ' hidden' : ''}">${modText}</span>`;
             html += `</span>`;
             html += `</div>`;
-            html += `<ul class=\"tree-children\" id=\"${domNodeId}\">`;
+            html += `<ul class="tree-children" id="${domNodeId}">`;
             node.children.forEach(child => {
                 html += this.renderTreeNode(child, child.level, !node.item && hasChildren);
             });
             html += '</ul>';
             html += '</li>';
         } else {
-            const clickHandler = node.item ? (() => { const __data = encodeURIComponent(JSON.stringify(node.item)); return `onclick=\\"window.selectTreeItem(this)\\" data-item='${__data}' data-node-id=\\"${this.panelId}__item_${node.item.class_name || ''}\\"`; })() : '';
+            const clickHandler = node.item ? (() => { const __data = encodeURIComponent(JSON.stringify(node.item)); return `onclick="window.selectTreeItem(this)" data-item='${__data}' data-node-id="${this.panelId}__item_${node.item.class_name || ''}"`; })() : '';
             const className = node.item ? `tree-item` : `tree-item tree-base-class`;
             html += `<li>`;
-            html += `<div class="${className}" ${clickHandler} onmouseenter="showItemPreview && showItemPreview(event, this)" onmouseleave="hideItemPreview && hideItemPreview()">`;
+            html += `<div class="${className}" ${clickHandler} onmouseenter="window.showItemPreview && window.showItemPreview(event, this)" onmouseleave="window.hideItemPreview && window.hideItemPreview()">`;
             html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
             
             html += `<span class="group-name">${node.name}</span>`;

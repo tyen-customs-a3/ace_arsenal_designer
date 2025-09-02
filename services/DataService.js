@@ -25,8 +25,11 @@ export class DataService {
             const response = await fetch(this.ndjsonPath);
             if (!response.ok) throw new Error(`Failed to load ${this.ndjsonPath}: ${response.status} ${response.statusText}`);
             const text = await response.text();
-            const lines = text.split('\n').filter(line => line.trim());
-            this.items = lines.map(line => JSON.parse(line));
+            const lines = text.split(/\r?\n/).filter(line => line.trim());
+            this.items = lines.map(line => {
+                const cleaned = line.replace(/^\uFEFF/, '').trim();
+                return JSON.parse(cleaned);
+            });
             
             // Build class maps and inheritance tree
             this._buildClassMaps();
@@ -370,6 +373,29 @@ export class DataService {
 
     getClassesByCategory(category) {
         if (!this.isReady()) return [];
+        // New pseudo-categories: NVG goggles and glasses/facewear mapped from data
+        if (category === 'nvg' || category === 'glasses') {
+            const ancestorSet = new Set(['NVGoggles']);
+            const isNVGFamily = (className) => this._inheritsFromAny(className, ancestorSet) || className === 'NVGoggles';
+            const hasNVGVision = (item) => {
+                const vm = item.visionMode || (item.properties && item.properties.visionMode);
+                return Array.isArray(vm) && vm.includes('NVG');
+            };
+
+            const matches = Object.entries(this.resolvedClasses)
+                .filter(([className, item]) => {
+                    if (!(item && item.scope === 2)) return false;
+                    if (!isNVGFamily(className)) return false;
+                    const nvgCapable = hasNVGVision(item);
+                    return category === 'nvg' ? nvgCapable : !nvgCapable;
+                })
+                .map(([, item]) => {
+                    const cloned = this._cloneDeep(item);
+                    cloned.category = category; // normalize to pseudo-category for UI filtering
+                    return cloned;
+                });
+            return matches;
+        }
         // Special handling for right-panel pseudo-categories
         if (category === 'bipods') {
             return Object.values(this.resolvedClasses).filter(item =>

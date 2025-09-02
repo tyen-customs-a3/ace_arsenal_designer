@@ -134,9 +134,7 @@ export const EventManager = {
         
         window.toggleTreeGroup = toggleTreeGroup;
         window.selectTreeItem = selectTreeItem;
-        
-        // setViewMode removed - always use list view
-        
+                       
         // Note: expand/collapse and filter controls are handled via UI listeners
         
         window.clearAllFilters = () => {
@@ -157,8 +155,6 @@ export const EventManager = {
             });
         };
         
-        // Panel toggles are bound directly to headers in panels.js
-        
         // Display option toggles are wired via UI controls
         
         window.showItemPreview = (event, element) => this.showItemPreview(event, element);
@@ -169,8 +165,7 @@ export const EventManager = {
                 UIState.updateGroupByMod(enabled);
             });
         };
-        
-        // Removed legacy grouping-by-type hook (no UI/control and no implementation)
+       
         
         // Right-panel filter toggles are handled by panels.js and filters.js UI
         window.clearRightPanelFilters = () => {
