@@ -12,13 +12,14 @@
     <div class="arsenal-container">
         <!-- Compact Category Sidebar -->
         <div class="category-sidebar">
-            <button class="category-tab active" data-category="rifles" data-tooltip="Rifles & Primary Weapons">◈</button>
-            <button class="category-tab" data-category="pistols" data-tooltip="Pistols & Handguns">◐</button>
+            <button class="category-tab" data-category="uniforms" data-tooltip="Uniforms">👕</button>
+            <button class="category-tab active" data-category="rifles" data-tooltip="Primary Weapons">◈</button>
+            <button class="category-tab" data-category="pistols" data-tooltip="Secondary">◐</button>
             <button class="category-tab" data-category="launchers" data-tooltip="Launchers">◎</button>
-            <button class="category-tab" data-category="tools" data-tooltip="Tools & Equipment">🔧</button>
+            <button class="category-tab" data-category="glasses" data-tooltip="Glasses">👓</button>
+            <button class="category-tab" data-category="nvg" data-tooltip="NVG">🟢</button>
             <button class="category-tab" data-category="backpacks" data-tooltip="Backpacks">◢</button>
             <button class="category-tab" data-category="vests" data-tooltip="Vests">◧</button>
-            <button class="category-tab" data-category="uniforms" data-tooltip="Uniforms">👕</button>
         </div>
 
         <!-- Left Panel - Equipment List -->
@@ -83,11 +84,11 @@
                         <label class="compact-filter-label">Icons:</label>
                         <div class="compact-filter-checkboxes">
                             <label class="filter-checkbox">
-                                <input type="checkbox" id="showPreviewIcon" onchange="togglePreviewIcon(this.checked)" checked>
+                                <input type="checkbox" id="showPreviewIcon" checked>
                                 <span>Preview Icon</span>
                             </label>
                             <label class="filter-checkbox">
-                                <input type="checkbox" id="showModIcon" onchange="toggleModIcon(this.checked)" checked>
+                                <input type="checkbox" id="showModIcon" checked>
                                 <span>Mod Icon</span>
                             </label>
                         </div>
@@ -98,15 +99,15 @@
                         <label class="compact-filter-label">Spacing:</label>
                         <div class="compact-filter-radios">
                             <label class="compact-filter-option">
-                                <input type="radio" name="spacingOption" value="compact" onchange="changeSpacing('compact')">
+                                <input type="radio" name="spacingOption" value="compact">
                                 <span>Compact</span>
                             </label>
                             <label class="compact-filter-option">
-                                <input type="radio" name="spacingOption" value="general" checked onchange="changeSpacing('general')">
+                                <input type="radio" name="spacingOption" value="general" checked>
                                 <span>General</span>
                             </label>
                             <label class="compact-filter-option">
-                                <input type="radio" name="spacingOption" value="spacious" onchange="changeSpacing('spacious')">
+                                <input type="radio" name="spacingOption" value="spacious">
                                 <span>Spacious</span>
                             </label>
                         </div>
@@ -244,12 +245,7 @@
                     </div>
                 </div>
                 
-                <div class="compact-filter-group">
-                    <label class="compact-filter-label">Caliber:</label>
-                    <div class="compact-filter-checkboxes" id="caliberFilters">
-                        <!-- Populated dynamically -->
-                    </div>
-                </div>
+                
                 
                 <div class="compact-filter-group">
                     <label class="compact-filter-label">Weapon Type:</label>

@@ -62,25 +62,7 @@ export const FilterManager = {
             </label>
         `).join('');
 
-        const caliberContainer = document.getElementById('caliberFilters');
-        const caliberGroup = caliberContainer.parentElement;
-        
-        const caliberRelevantCategories = ['rifles', 'pistols', 'launchers', 'magazines'];
-        
-        if (caliberRelevantCategories.includes(category)) {
-            caliberGroup.style.display = 'block';
-            const calibers = [...new Set(categoryItems.map(item => item.caliber || (item.properties && item.properties.caliber)).filter(c => c))].sort();
-            
-            caliberContainer.innerHTML = calibers.map(caliber => `
-                <label class="filter-checkbox">
-                    <input type="checkbox" value="${caliber}" onchange="FilterManager.toggleFilter('calibers', '${caliber}', this.checked)">
-                    <span>${caliber}</span>
-                </label>
-            `).join('');
-        } else {
-            caliberGroup.style.display = 'none';
-            StateActions.clearAllFilters();
-        }
+        // Caliber filter UI removed
 
         const weaponTypeContainer = document.getElementById('weaponTypeFilters');
         const weaponTypeGroup = weaponTypeContainer.parentElement;
@@ -111,7 +93,7 @@ export const FilterManager = {
     clearAllFilters() {
         StateActions.clearAllFilters();
 
-        document.querySelectorAll('#modFilters input[type="checkbox"], #caliberFilters input[type="checkbox"], #weaponTypeFilters input[type="checkbox"]').forEach(checkbox => {
+        document.querySelectorAll('#modFilters input[type="checkbox"], #weaponTypeFilters input[type="checkbox"]').forEach(checkbox => {
             checkbox.checked = false;
         });
         
