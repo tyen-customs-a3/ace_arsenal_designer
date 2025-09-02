@@ -130,59 +130,14 @@ export const EventManager = {
     },
 
     exposeGlobalFunctions() {
-        // Global functions for buttons and tree interaction
-        window.regenerateData = () => {
-            import('./data.js').then(({ DataManager }) => {
-                DataManager.regenerateData();
-            });
-        };
-        
-        window.clearSelection = () => {
-            import('./selection.js').then(({ SelectionManager }) => {
-                SelectionManager.clearSelection();
-            });
-        };
-        
-        window.selectItem = (element) => {
-            import('./selection.js').then(({ SelectionManager }) => {
-                SelectionManager.selectItem(element);
-            });
-        };
-        
-        window.selectItemByData = (itemData) => {
-            import('./selection.js').then(({ SelectionManager }) => {
-                SelectionManager.selectItemByData(itemData);
-            });
-        };
+        // Global functions for buttons and tree interaction (pruned to only required handlers)
         
         window.toggleTreeGroup = toggleTreeGroup;
         window.selectTreeItem = selectTreeItem;
         
         // setViewMode removed - always use list view
         
-        window.expandAllGroups = () => {
-            import('./ui-state.js').then(({ UIState }) => {
-                UIState.expandAllGroups();
-            });
-        };
-        
-        window.collapseAllGroups = () => {
-            import('./ui-state.js').then(({ UIState }) => {
-                UIState.collapseAllGroups();
-            });
-        };
-        
-        window.toggleFilter = (filterType, value, isChecked) => {
-            import('./filters.js').then(({ FilterManager }) => {
-                FilterManager.toggleFilter(filterType, value, isChecked);
-            });
-        };
-        
-        window.toggleVariantFilter = (type, isChecked) => {
-            import('./filters.js').then(({ FilterManager }) => {
-                FilterManager.toggleVariantFilter(type, isChecked);
-            });
-        };
+        // Note: expand/collapse and filter controls are handled via UI listeners
         
         window.clearAllFilters = () => {
             import('./filters.js').then(({ FilterManager }) => {
@@ -202,41 +157,9 @@ export const EventManager = {
             });
         };
         
-        window.toggleFilterPanel = () => {
-            import('./panels.js').then(({ PanelManager }) => {
-                PanelManager.toggleFilterPanel();
-            });
-        };
+        // Panel toggles are bound directly to headers in panels.js
         
-        window.toggleStatsPanel = () => {
-            import('./panels.js').then(({ PanelManager }) => {
-                PanelManager.toggleStatsPanel();
-            });
-        };
-        
-        window.toggleOptionsPanel = () => {
-            import('./panels.js').then(({ PanelManager }) => {
-                PanelManager.toggleOptionsPanel();
-            });
-        };
-        
-        window.togglePreviewIcon = (enabled) => {
-            import('./ui-state.js').then(({ UIState }) => {
-                UIState.togglePreviewIcon(enabled);
-            });
-        };
-        
-        window.toggleModIcon = (enabled) => {
-            import('./ui-state.js').then(({ UIState }) => {
-                UIState.toggleModIcon(enabled);
-            });
-        };
-        
-        window.changeSpacing = (spacing) => {
-            import('./ui-state.js').then(({ UIState }) => {
-                UIState.changeSpacing(spacing);
-            });
-        };
+        // Display option toggles are wired via UI controls
         
         window.showItemPreview = (event, element) => this.showItemPreview(event, element);
         window.hideItemPreview = () => this.hideItemPreview();
@@ -247,24 +170,9 @@ export const EventManager = {
             });
         };
         
-        window.updateGroupByType = (enabled) => {
-            import('./ui-state.js').then(({ UIState }) => {
-                UIState.updateGroupByType(enabled);
-            });
-        };
+        // Removed legacy grouping-by-type hook (no UI/control and no implementation)
         
-        window.toggleRightPanelFilter = () => {
-            import('./panels.js').then(({ PanelManager }) => {
-                PanelManager.toggleRightPanelFilter();
-            });
-        };
-        
-        window.toggleRightPanelFilterType = (filterType, value, isChecked) => {
-            import('./filters.js').then(({ FilterManager }) => {
-                FilterManager.toggleRightPanelFilterType(filterType, value, isChecked);
-            });
-        };
-        
+        // Right-panel filter toggles are handled by panels.js and filters.js UI
         window.clearRightPanelFilters = () => {
             import('./filters.js').then(({ FilterManager }) => {
                 FilterManager.clearRightPanelFilters();

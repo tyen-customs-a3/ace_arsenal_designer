@@ -61,22 +61,3 @@ export function sortByMass(items, direction = 'asc') {
     
     return direction === 'desc' ? sorted.reverse() : sorted;
 }
-
-
-export function sortByCategory(items, direction = 'asc') {
-    const sorted = [...items].sort((a, b) => {
-        const categoryA = (a.item && a.item.category) || a.category || '';
-        const categoryB = (b.item && b.item.category) || b.category || '';
-        
-        // First by category
-        const categoryComp = categoryA.localeCompare(categoryB);
-        if (categoryComp !== 0) return categoryComp;
-        
-        // Then by name within category
-        const nameA = a.name || a.displayName || a.class_name || '';
-        const nameB = b.name || b.displayName || b.class_name || '';
-        return nameA.localeCompare(nameB);
-    });
-    
-    return direction === 'desc' ? sorted.reverse() : sorted;
-}

@@ -119,34 +119,7 @@ export const SelectionManager = {
         }
     },
 
-    // New function to select item by data without DOM dependency
-    selectItemByData(itemData) {
-        StateActions.setSelectedItem(itemData);
-        
-        // Update visual selection after a short delay to ensure DOM is ready
-        setTimeout(() => {
-            // Remove previous selection
-            document.querySelectorAll('.tree-item').forEach(item => item.classList.remove('selected'));
-            document.querySelectorAll('.tree-parent').forEach(item => item.classList.remove('selected'));
-            
-            // Find and select the correct element
-            const elements = document.querySelectorAll('[data-item]');
-            for (const el of elements) {
-                try {
-                    const data = JSON.parse(el.dataset.item);
-                    if (data.class_name === itemData.class_name) {
-                        el.classList.add('selected');
-                        break;
-                    }
-                } catch (e) {
-                    continue;
-                }
-            }
-        }, 0);
-        
-        this.updateStats(itemData);
-        this.updateRightPanel(itemData);
-    },
+    // selectItemByData removed (unused)
 
     updateStats(item) {
         // Clear all stat fields first
@@ -315,19 +288,7 @@ export const SelectionManager = {
         }
     },
 
-    clearSelection() {
-        // Clear visual selection
-        document.querySelectorAll('.tree-item').forEach(item => item.classList.remove('selected'));
-        document.querySelectorAll('.tree-parent').forEach(item => item.classList.remove('selected'));
-        
-        // Clear selected item
-        StateActions.setSelectedItem(null);
-        
-        // Clear stats
-        ['statName', 'statClassName', 'statMod', 'statDamage', 'statRange', 'statMass', 'statCapacity'].forEach(id => {
-            document.getElementById(id).textContent = '-';
-        });
-    },
+    // clearSelection removed (unused)
 
     // Right panel management
     updateRightPanel(selectedItem) {

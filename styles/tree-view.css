@@ -149,13 +149,7 @@
     font-size: 18px;
 }
 
-.tree-bullet {
-    color: var(--content-tertiary);
-    margin-right: 0;
-    flex-shrink: 0;
-    width: 14px;
-    text-align: center;
-}
+/* Removed legacy bullet view styling (list view only) */
 
 .item-count-inline {
     color: var(--content-disabled);

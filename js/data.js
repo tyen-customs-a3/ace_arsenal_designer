@@ -113,7 +113,10 @@ export const DataManager = {
                 console.warn(`No items found for category '${category}'`);
             }
 
-            const transformedItems = this.transformDataServiceItems(dataServiceItems);
+            const transformedItems = this.transformDataServiceItems(dataServiceItems).map(it => ({
+                ...it,
+                category // force current category for pseudo-categories like 'nvg'/'glasses'
+            }));
 
             console.log(`Transformed ${transformedItems.length} items for UI`);
             StateActions.setCurrentItems(transformedItems);
@@ -168,14 +171,7 @@ export const DataManager = {
         });
     },
 
-    regenerateData() {
-        const { selectedCategory, selectedRightCategory } = getState();
-        this.switchCategory(selectedCategory);
-        this.switchRightCategory(selectedRightCategory);
-        import('./selection.js').then(({ SelectionManager }) => {
-            SelectionManager.clearSelection();
-        });
-    },
+    // regenerateData removed (unused)
 
     getDataServiceStats() {
         if (!dataService.isReady()) {

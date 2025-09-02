@@ -662,35 +662,7 @@ export function toggleTreeGroup(nodeId) {
     }
 }
 
-// Panel focus management
-export function clearPanelFocus(panelId) {
-    const manager = getTreeManager(panelId);
-    if (manager) {
-        const navigationState = manager.getNavigationState();
-        navigationState.setActive(false);
-    }
-}
-
-export function focusFirstItem(panelId) {
-    const manager = getTreeManager(panelId);
-    if (manager) {
-        const navigationState = manager.getNavigationState();
-        navigationState.focusFirst();
-    }
-}
-
-export function restoreFocusAfterViewChange(panelId) {
-    const manager = getTreeManager(panelId);
-    if (manager) {
-        const navigationState = manager.getNavigationState();
-        // Try to restore focus to previously selected item
-        setTimeout(() => {
-            if (!navigationState.focusedNode) {
-                navigationState.focusFirst();
-            }
-        }, 0);
-    }
-}
+// Removed legacy panel focus helpers (managed internally by navigation state)
 
 
 // Utility function to find panel ID from element
