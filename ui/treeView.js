@@ -77,7 +77,8 @@ export class TreeRenderer {
             clickHandler = `onclick="window.toggleTreeGroup('${domNodeId}')" style="cursor: pointer;"`;
         } else if (node.isSelectable) {
             // This is a selectable item - make it selectable
-            clickHandler = `onclick="window.selectTreeItem(this)" data-item='${JSON.stringify(node.data)}' data-node-id="${this.panelId}__${node.id}"`;
+            const __data = encodeURIComponent(JSON.stringify(node.data));
+            clickHandler = `onclick="window.selectTreeItem(this)" data-item='${__data}' data-node-id="${this.panelId}__${node.id}"`;
         }
         
         const itemClass = node.isSelectable ? 
@@ -113,7 +114,7 @@ export class TreeRenderer {
     // Render leaf node (no children)
     renderLeafNode(node, indent, options) {
         const clickHandler = node.isSelectable ? 
-            `onclick="window.selectTreeItem(this)" data-item='${JSON.stringify(node.data)}' data-node-id="${this.panelId}__item_${(node.data && node.data.class_name) || ''}"` : '';
+            (() => { const __data = encodeURIComponent(JSON.stringify(node.data)); return `onclick="window.selectTreeItem(this)" data-item='${__data}' data-node-id="${this.panelId}__item_${(node.data && node.data.class_name) || ''}"`; })() : '';
         
         const className = node.isSelectable ? 'tree-item' : 'tree-item tree-base-class';
         
@@ -121,7 +122,7 @@ export class TreeRenderer {
         html += `<div class="${className}" ${clickHandler} onmouseenter="window.showItemPreview && window.showItemPreview(event, this)" onmouseleave="window.hideItemPreview && window.hideItemPreview()">`;
         html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
         
-        // Bullet points removed - always list view
+        
         
         html += `<span class="group-name">${node.name}</span>`;
         
@@ -474,7 +475,9 @@ export class TreeManager {
             if (hasChildren && !node.item) {
                 clickHandler = `onclick=\"window.toggleTreeGroup('${domNodeId}')\" style=\"cursor: pointer;\"`;
             } else if (node.item) {
-                clickHandler = `onclick="window.selectTreeItem(this)" data-item='${JSON.stringify(node.item)}'`;
+                const __data = encodeURIComponent(JSON.stringify(node.item));
+                const itemNodeId = `${this.panelId}__item_${node.item.class_name || ''}`;
+                clickHandler = `onclick="window.selectTreeItem(this)" data-item='${__data}' data-node-id="${itemNodeId}"`;
             }
 
             const itemClass = node.item ? `tree-item tree-parent ${groupClass}` : `tree-item tree-base-class ${groupClass}`;
@@ -511,12 +514,12 @@ export class TreeManager {
             html += '</ul>';
             html += '</li>';
         } else {
-            const clickHandler = node.item ? `onclick=\"window.selectTreeItem(this)\" data-item='${JSON.stringify(node.item)}' data-node-id=\"${this.panelId}__item_${node.item.class_name || ''}\"` : '';
+            const clickHandler = node.item ? (() => { const __data = encodeURIComponent(JSON.stringify(node.item)); return `onclick=\\"window.selectTreeItem(this)\\" data-item='${__data}' data-node-id=\\"${this.panelId}__item_${node.item.class_name || ''}\\"`; })() : '';
             const className = node.item ? `tree-item` : `tree-item tree-base-class`;
             html += `<li>`;
             html += `<div class="${className}" ${clickHandler} onmouseenter="showItemPreview && showItemPreview(event, this)" onmouseleave="hideItemPreview && hideItemPreview()">`;
             html += `<span class="tree-indent" style="width: ${indent}px;"></span>`;
-            // Bullet points removed - always list view
+            
             html += `<span class="group-name">${node.name}</span>`;
             html += `<span class="item-icons-container">`;
             const previewText = node.item && node.item.category ? node.item.category.charAt(0).toUpperCase() : '?';
@@ -566,7 +569,7 @@ export function selectTreeItem(element) {
     
     let itemData;
     try {
-        itemData = JSON.parse(element.dataset.item);
+        itemData = JSON.parse(decodeURIComponent(element.dataset.item));
     } catch (e) {
         console.warn('selectTreeItem: Could not parse item data', e);
         return;
@@ -662,7 +665,7 @@ export function toggleTreeGroup(nodeId) {
     }
 }
 
-// Removed legacy panel focus helpers (managed internally by navigation state)
+ 
 
 
 // Utility function to find panel ID from element
@@ -720,3 +723,8 @@ StateSubscribe('selectedItem', (item) => {
 // Make functions globally available
 window.selectTreeItem = selectTreeItem;
 window.toggleTreeGroup = toggleTreeGroup;
+
+
+
+
+

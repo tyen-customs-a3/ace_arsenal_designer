@@ -76,5 +76,14 @@ export const Renderer = {
             sortBy: sortMethod,
             sortOrder: sortOrder
         });
+
+        // Re-apply selection highlight after re-render, if any selection exists
+        const current = state.selectedItem;
+        if (containerId === 'leftTreeView' && current && current.class_name) {
+            const el = document.querySelector(`#leftTreeView [data-node-id="leftTreeView__item_${current.class_name}"]`);
+            if (el) {
+                el.classList.add('selected');
+            }
+        }
     }
 };
