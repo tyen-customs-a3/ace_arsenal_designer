@@ -76,9 +76,10 @@ export class TreeRenderer {
             // This is a group node - make it toggle
             clickHandler = `onclick="window.toggleTreeGroup('${domNodeId}')" style="cursor: pointer;"`;
         } else if (node.isSelectable) {
-            // This is a selectable item - make it selectable
+            // This is a selectable item - make it selectable and consistently addressable
             const __data = encodeURIComponent(JSON.stringify(node.data));
-            clickHandler = `onclick="window.selectTreeItem(this)" data-item='${__data}' data-node-id="${this.panelId}__${node.id}"`;
+            const className = (node.data && node.data.class_name) ? node.data.class_name : '';
+            clickHandler = `onclick="window.selectTreeItem(this)" data-item='${__data}' data-node-id="${this.panelId}__item_${className}"`;
         }
         
         const itemClass = node.isSelectable ? 
